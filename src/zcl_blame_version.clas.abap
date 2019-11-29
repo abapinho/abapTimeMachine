@@ -45,7 +45,7 @@ CLASS zcl_blame_version IMPLEMENTATION.
 
     SELECT SINGLE korrnum author datum zeit INTO (e_request, e_author, e_date, e_time)
       FROM vrsd
-      WHERE objtype = me->go_part->object_type
+      WHERE objtype = 'REPS'
         AND objname = me->go_part->object_name
         AND versno  = me->version_number.
     IF sy-subrc <> 0.
@@ -58,8 +58,8 @@ CLASS zcl_blame_version IMPLEMENTATION.
     DATA: t_trdir TYPE trdir_it.
     CALL FUNCTION 'SVRS_GET_REPS_FROM_OBJECT'
       EXPORTING
-        object_name = me->go_part->object_name
-        object_type = me->go_part->object_type
+        object_name = CONV versobjnam( me->go_part->object_name )
+        object_type = 'REPS'
         versno      = me->version_number
       TABLES
         repos_tab   = rt_source
@@ -83,6 +83,7 @@ CLASS zcl_blame_version IMPLEMENTATION.
                               e_time    = s_source-time ).
 
     LOOP AT get_source_int( ) INTO DATA(source_int).
+      s_source-line_num = sy-tabix.
       s_source-source = source_int.
       INSERT s_source INTO TABLE rt_blame.
     ENDLOOP.

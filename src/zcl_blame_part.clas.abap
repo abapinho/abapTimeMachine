@@ -4,13 +4,11 @@ CLASS zcl_blame_part DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    DATA object_type TYPE versobjtyp READ-ONLY.
-    DATA object_name TYPE versobjnam READ-ONLY.
+    DATA object_name TYPE sobj_name READ-ONLY.
 
     METHODS constructor
       IMPORTING
-        !i_object_type TYPE versobjtyp
-        !i_object_name TYPE versobjnam.
+        !i_object_name TYPE sobj_name.
 
     METHODS compute_blame
       RETURNING VALUE(rt_blame) TYPE zblame_line_t.
@@ -27,12 +25,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_blame_part IMPLEMENTATION.
-  METHOD  constructor.
-    me->object_type = i_object_type.
-    me->object_name = i_object_name.
-    go_versions = NEW #( me ).
-  ENDMETHOD.
+CLASS ZCL_BLAME_PART IMPLEMENTATION.
 
 
   METHOD compute_blame.
@@ -48,5 +41,11 @@ CLASS zcl_blame_part IMPLEMENTATION.
       rt_blame = NEW zcl_blame_diff( )->compute( it_old   = compute_blame_aux( o_previous_version )
                                                  it_new   =  io_version->get_source_with_blame( ) ).
     ENDIF.
+  ENDMETHOD.
+
+
+  METHOD  constructor.
+    me->object_name = i_object_name.
+    go_versions = NEW #( me ).
   ENDMETHOD.
 ENDCLASS.

@@ -13,7 +13,7 @@ CLASS zcl_blame_versions DEFINITION
                 !i_version_number TYPE versno
       RETURNING VALUE(ro_version) TYPE REF TO zcl_blame_version.
 
-    methods get_previous_version
+    METHODS get_previous_version
       IMPORTING
                 !i_version_number TYPE versno
       RETURNING VALUE(ro_version) TYPE REF TO zcl_blame_version.
@@ -36,18 +36,17 @@ ENDCLASS.
 
 
 
-CLASS zcl_blame_versions IMPLEMENTATION.
+CLASS ZCL_BLAME_VERSIONS IMPLEMENTATION.
+
+
   METHOD constructor.
     go_part = io_part.
     load_numbers( ).
   ENDMETHOD.
 
 
-  METHOD load_numbers.
-    SELECT versno INTO TABLE gt_versno
-      FROM vrsd
-      WHERE objtype = go_part->object_type
-        AND objname = go_part->object_name.
+  METHOD get_previous_version.
+    ro_version = get_version( get_previous_version_number( i_version_number ) ).
   ENDMETHOD.
 
 
@@ -63,7 +62,11 @@ CLASS zcl_blame_versions IMPLEMENTATION.
 
     DATA(t_versno) = gt_versno.
     DELETE t_versno WHERE table_line >= i_current.
-    r_previous = t_versno[ lines( t_versno ) ].
+    IF t_versno[] IS INITIAL.
+      r_previous = -1.
+    ELSE.
+      r_previous = t_versno[ lines( t_versno ) ].
+    ENDIF.
   ENDMETHOD.
 
 
@@ -73,7 +76,10 @@ CLASS zcl_blame_versions IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method get_previous_version.
-    ro_version = get_version( get_previous_version_number( i_version_number ) ).
+  METHOD load_numbers.
+    SELECT versno INTO TABLE gt_versno
+      FROM vrsd
+      WHERE objtype = 'REPS'
+        AND objname = go_part->object_name.
   ENDMETHOD.
 ENDCLASS.

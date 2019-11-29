@@ -1,0 +1,41 @@
+<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  version="1.0">
+  <xsl:output method="text"/>
+  <xsl:template match="/">
+<html>
+  <head>
+    <title>abapBlame</title>
+    <link href="abapblame.css" rel="stylesheet" type="text/css"/>
+  </head>
+
+  <body>
+    <div id="header">HEADER</div>
+
+    <table class="blame">
+      <THEAD class="header">
+        <TR>
+          <TH class="num">Line</TH>
+          <TH>Source</TH>
+          <TH class="num">Version</TH>
+          <TH>Author</TH>
+          <TH>Date</TH>
+          <TH>Request</TH>
+        </TR>
+      </THEAD>
+
+         <xsl:for-each select="//LINES/ZBLAME_LINE">
+        <TR>
+          <TD class="num"><xsl:value-of select="number(LINE_NUM)"/></TD>
+          <TD class="code"><xsl:value-of select="SOURCE"/></TD>
+          <TD class="num"><xsl:value-of select="number(VERSION_NUMBER)"/></TD>
+          <TD><xsl:value-of select="AUTHOR"/></TD>
+          <TD><xsl:value-of select="DATE"/> <xsl:value-of select="TIME"/></TD>
+          <TD><xsl:value-of select="REQUEST"/></TD>
+        </TR>
+        </xsl:for-each>
+
+        </table>
+    <div id="footer">FOOTER</div>
+  </body>
+</html>
+  </xsl:template>
+</xsl:transform>
