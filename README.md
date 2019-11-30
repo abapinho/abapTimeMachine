@@ -10,7 +10,7 @@ ABAP's versioning system is unbelievably bad. Blame is just one of the dozens of
 
 ## What
 
-A simple programa called `ZBLAME`. Give it the name of a program and it will list its source code blaming someone for every single line.
+A simple programa called `ZBLAME`. Give it the name of a program and it will list its source code, blaming someone for every single line.
 
 ## Requirements
 
