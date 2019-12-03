@@ -1,0 +1,64 @@
+<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  version="1.0">
+  <xsl:output method="text"/>
+  <xsl:template match="/">
+<html>
+  <head>
+    <title>abapBlame</title>
+    <link href="abapblame.css" rel="stylesheet" type="text/css"/>
+  </head>
+
+  <body>
+    <div id="header">
+      <h1>
+        <xsl:choose>
+          <xsl:when test="//PARTS/TYPE = 'CLAS'">Class</xsl:when>
+          <xsl:when test="//PARTS/TYPE = 'PROG'">Program</xsl:when>
+          <xsl:when test="//PARTS/TYPE = 'FUGR'">Function group</xsl:when>
+        </xsl:choose>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="//PARTS/NAME"/>
+      </h1>
+    </div>
+
+    <xsl:for-each select="//PARTS/T_PART/ZBLAME_PART">
+
+    <h2><xsl:value-of select="NAME"/></h2>
+
+    <table class="blame">
+      <THEAD class="header">
+        <TR>
+          <TH class="num">Version</TH>
+          <TH>Author</TH>
+          <TH>Date</TH>
+          <TH>Request</TH>
+          <TH class="num">Line</TH>
+          <TH>Source</TH>
+        </TR>
+      </THEAD>
+
+      <xsl:for-each select="T_BLAME/ZBLAME_LINE">
+        <TR>
+          <TD class="num">
+            <xsl:choose>
+              <xsl:when test="VERSION_NUMBER = 99999">LATEST</xsl:when>
+              <xsl:when test="VERSION_NUMBER &gt; 0"><xsl:value-of select="number(VERSION_NUMBER)"/></xsl:when>
+            </xsl:choose>
+          </TD>
+          <TD><xsl:value-of select="AUTHOR"/></TD>
+          <TD>
+            <xsl:if test="TIME != '00:00:00'"><xsl:value-of select="DATE"/><xsl:text> </xsl:text><xsl:value-of select="TIME"/></xsl:if></TD>
+          <TD><xsl:value-of select="REQUEST"/></TD>
+          <TD class="num"><xsl:value-of select="number(LINE_NUM)"/></TD>
+          <TD class="code"><PRE><xsl:value-of select="SOURCE"/></PRE></TD>
+        </TR>
+        </xsl:for-each>
+
+        </table>
+
+    </xsl:for-each>
+
+    <div id="footer">FOOTER</div>
+  </body>
+</html>
+  </xsl:template>
+</xsl:transform>
