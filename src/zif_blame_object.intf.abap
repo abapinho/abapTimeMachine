@@ -1,11 +1,17 @@
-interface ZIF_BLAME_OBJECT
-  public .
+INTERFACE zif_blame_object
+  PUBLIC .
 
 
-  methods GET_INCLUDES
-    returning
-      value(RT_INCLUDE) type SEOINCL_T .
-  methods GET_NAME
-    returning
-      value(R_NAME) type STRING .
-endinterface.
+  METHODS get_part_list
+    RETURNING
+      VALUE(rt_part) TYPE zblame_part_ref_t
+    RAISING
+      zcx_blame .
+
+  METHODS get_name
+    RETURNING
+      VALUE(r_name) TYPE string .
+
+  METHODS check_exists
+    RETURNING VALUE(r_result) TYPE boolean.
+ENDINTERFACE.

@@ -9,11 +9,11 @@ CLASS zcl_blame_asset_html DEFINITION
 
     METHODS constructor
       IMPORTING
-        it_blame TYPE zblame_line_t.
+        is_parts TYPE zblame_parts.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA gt_blame TYPE zblame_line_t.
+    DATA gs_parts TYPE zblame_parts.
 
     METHODS pre_render_lines
       IMPORTING
@@ -23,16 +23,19 @@ ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_ASSET_HTML IMPLEMENTATION.
+CLASS zcl_blame_asset_html IMPLEMENTATION.
 
 
   METHOD constructor.
-    gt_blame = pre_render_lines( it_blame ).
+    gs_parts = is_parts.
+    LOOP AT gs_parts-t_part REFERENCE INTO DATA(s_part).
+      s_part->t_blame = pre_render_lines( s_part->t_blame ).
+    ENDLOOP.
   ENDMETHOD.
 
 
   METHOD pre_render_lines.
-    data(o_highlighter) = NEW zcl_blame_syntax_abap( ).
+    DATA(o_highlighter) = NEW zcl_blame_syntax_abap( ).
     DATA s_previous LIKE LINE OF it_blame.
 
     LOOP AT it_blame INTO DATA(s_blame).
@@ -57,9 +60,9 @@ CLASS ZCL_BLAME_ASSET_HTML IMPLEMENTATION.
 
   METHOD zif_blame_asset~get_content.
     CALL TRANSFORMATION zblame_html
-    SOURCE lines = gt_blame
+    SOURCE parts = gs_parts
     RESULT XML r_content
-    OPTIONS xml_header = 'NO' .
+    OPTIONS xml_header = 'NO'.
   ENDMETHOD.
 
 

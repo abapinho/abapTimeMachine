@@ -4,88 +4,102 @@ CLASS zcl_blame_version DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    DATA: version_number TYPE versno READ-ONLY.
+    CONSTANTS c_latest_version TYPE versno VALUE 99999.
+
+    DATA version_number TYPE versno READ-ONLY.
+    DATA request TYPE verskorrno READ-ONLY.
+    DATA author  TYPE versuser READ-ONLY.
+    DATA date    TYPE versdate READ-ONLY.
+    DATA time    TYPE verstime READ-ONLY.
 
     METHODS constructor
       IMPORTING
-        !io_part          TYPE REF TO zcl_blame_part
-        !i_version_number TYPE versno.
+                !io_part          TYPE REF TO zcl_blame_part
+                !i_version_number TYPE versno
+      RAISING   zcx_blame.
 
     METHODS get_source_with_blame
-      RETURNING VALUE(rt_blame) TYPE zblame_line_t.
+      RETURNING VALUE(rt_blame) TYPE zblame_line_t
+      RAISING   zcx_blame.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA go_part TYPE REF TO zcl_blame_part.
+    DATA gt_source TYPE abaptxt255_tab.
 
-    METHODS get_attributes
-      EXPORTING
-        e_request TYPE verskorrno
-        e_author  TYPE versuser
-        e_date    TYPE versdate
-        e_time    TYPE verstime.
+    METHODS load_attributes
+      RAISING zcx_blame.
 
-    METHODS get_source_int
-      RETURNING VALUE(rt_source) TYPE abaptxt255_tab.
+    METHODS load_source
+      RAISING zcx_blame.
+
+    METHODS get_real_version
+      RETURNING VALUE(r_version) TYPE versno.
 ENDCLASS.
 
 
 
 CLASS zcl_blame_version IMPLEMENTATION.
-
-
   METHOD constructor.
     me->go_part = io_part.
     me->version_number = i_version_number.
+    load_source( ).
+    load_attributes( ).
   ENDMETHOD.
 
 
-  METHOD get_attributes.
-    CLEAR: e_request, e_author, e_date, e_time.
-
-    SELECT SINGLE korrnum author datum zeit INTO (e_request, e_author, e_date, e_time)
+  METHOD load_attributes.
+    DATA(versno) = get_real_version( ).
+    SELECT SINGLE korrnum author datum zeit INTO (me->request, me->author, me->date, me->time)
       FROM vrsd
-      WHERE objtype = 'REPS'
-        AND objname = me->go_part->object_name
-        AND versno  = me->version_number.
+      WHERE objtype = me->go_part->vrsd_type
+        AND objname = me->go_part->vrsd_name
+        AND versno  = versno.
     IF sy-subrc <> 0.
-      ASSERT 1 = 0. " TODO
-    ENDIF.
-  ENDMETHOD.
-
-
-  METHOD get_source_int.
-    DATA: t_trdir TYPE trdir_it.
-    CALL FUNCTION 'SVRS_GET_REPS_FROM_OBJECT'
-      EXPORTING
-        object_name = CONV versobjnam( me->go_part->object_name )
-        object_type = 'REPS'
-        versno      = me->version_number
-      TABLES
-        repos_tab   = rt_source
-        trdir_tab   = t_trdir
-      EXCEPTIONS
-        no_version  = 1
-        OTHERS      = 2.
-    IF sy-subrc <> 0.
-      ASSERT 1 = 0. " TODO
+      RAISE EXCEPTION TYPE zcx_blame. " TODO
     ENDIF.
   ENDMETHOD.
 
 
   METHOD get_source_with_blame.
-    DATA: s_source LIKE LINE OF rt_blame.
+    DATA: s_source_with_blame LIKE LINE OF rt_blame.
 
-    s_source-version_number = me->version_number.
-    get_attributes( IMPORTING e_request = s_source-request
-                              e_author  = s_source-author
-                              e_date    = s_source-date
-                              e_time    = s_source-time ).
+    s_source_with_blame-version_number = me->version_number.
+    s_source_with_blame-request = me->request.
+    s_source_with_blame-author = me->author.
+    s_source_with_blame-date = me->date.
+    s_source_with_blame-time = me->time.
 
-    LOOP AT get_source_int( ) INTO DATA(source_int).
-      s_source-line_num = sy-tabix.
-      s_source-source = source_int.
-      INSERT s_source INTO TABLE rt_blame.
+    LOOP AT gt_source INTO DATA(source_int).
+      s_source_with_blame-line_num = sy-tabix.
+      s_source_with_blame-source = source_int.
+      INSERT s_source_with_blame INTO TABLE rt_blame.
     ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_source.
+    DATA t_trdir TYPE trdir_it.
+
+    CALL FUNCTION 'SVRS_GET_REPS_FROM_OBJECT'
+      EXPORTING
+        object_name = me->go_part->vrsd_name
+        object_type = me->go_part->vrsd_type
+        versno      = get_real_version( )
+      TABLES
+        repos_tab   = gt_source
+        trdir_tab   = t_trdir
+      EXCEPTIONS
+        no_version  = 1
+        OTHERS      = 2.
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION TYPE zcx_blame. " TODO
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD get_real_version.
+    r_version = COND #( WHEN me->version_number = c_latest_version THEN 0
+                        ELSE me->version_number ).
   ENDMETHOD.
 ENDCLASS.

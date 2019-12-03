@@ -15,7 +15,8 @@ CLASS zcl_blame_object_factory DEFINITION
       IMPORTING
                 i_object_type    TYPE zblame_object_type
                 i_object_name    TYPE sobj_name
-      RETURNING VALUE(ro_object) TYPE REF TO zif_blame_object.
+      RETURNING VALUE(ro_object) TYPE REF TO zif_blame_object
+      RAISING   zcx_blame.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -23,10 +24,15 @@ ENDCLASS.
 
 
 
-CLASS zcl_blame_object_factory IMPLEMENTATION.
+CLASS ZCL_BLAME_OBJECT_FACTORY IMPLEMENTATION.
+
+
   METHOD get_instance.
     ro_object = SWITCH #( i_object_type
                         WHEN gc_object_type-program THEN NEW zcl_blame_object_prog( i_object_name )
                         WHEN gc_object_type-class THEN NEW zcl_blame_object_clas( CONV #( i_object_name ) ) ).
+    IF ro_object IS NOT BOUND OR NOT ro_object->check_exists( ).
+      RAISE EXCEPTION TYPE zcx_blame. " TODO
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.

@@ -98,12 +98,6 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_HTML</KEY>
-     <ENTRY>HTML</ENTRY>
-     <LENGTH>12</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
      <KEY>P_NAME</KEY>
      <ENTRY>.</ENTRY>
      <LENGTH>19</LENGTH>
@@ -111,16 +105,10 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_OBJECT</KEY>
+     <KEY>P_OTYPE</KEY>
      <ENTRY>.</ENTRY>
-     <LENGTH>19</LENGTH>
+     <LENGTH>9</LENGTH>
      <SPLIT>D</SPLIT>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_SALV</KEY>
-     <ENTRY>ALV</ENTRY>
-     <LENGTH>11</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

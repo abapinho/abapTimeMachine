@@ -8,7 +8,7 @@ CLASS zcl_blame_output DEFINITION
 
     METHODS render
       IMPORTING
-        !it_blame TYPE zblame_line_t.
+        !is_parts TYPE zblame_parts.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -23,7 +23,7 @@ CLASS zcl_blame_output DEFINITION
 
     METHODS add_html
       IMPORTING
-                it_blame     TYPE zblame_line_t
+                is_parts     TYPE zblame_parts
       RETURNING VALUE(r_url) TYPE w3url.
 
     METHODS string_2_xstring
@@ -82,7 +82,7 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
 
 
   METHOD add_html.
-    r_url = add_asset( NEW zcl_blame_asset_html( it_blame ) ).
+    r_url = add_asset( NEW zcl_blame_asset_html( is_parts ) ).
   ENDMETHOD.
 
 
@@ -94,7 +94,7 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
   METHOD render.
     SKIP. " Creates the screen0 container
     add_css( ).
-    DATA(url) = add_html( it_blame ).
+    DATA(url) = add_html( is_parts ).
     "DATA(url) = cache_html( i_html         = i_html ).
     go_html_viewer->show_url(
       EXPORTING
