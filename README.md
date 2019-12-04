@@ -17,6 +17,11 @@ A simple programa called `ZBLAME`. Give it the name of a program and it will lis
 * ABAP Version: 740 or higher
 * [abapGit](https://abapgit.org)
 
-# FAQ
+## FAQ
 
 For questions/comments/bugs/feature requests/wishes please create an [issue](https://github.com/abapinho/abapblame/issues).
+
+## Credits
+
+* Most code by [Nuno Godinho](https://github.com/orgs/abapinho/people/nununo)
+* Diff algorithm and syntax highlighter parcially copied from [abapGit](http://abapgit.org/)
