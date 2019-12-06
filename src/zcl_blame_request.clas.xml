@@ -3,14 +3,13 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_BLAME_DIFF</CLSNAME>
+    <CLSNAME>ZCL_BLAME_REQUEST</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>AbapBlame DIFF</DESCRIPT>
+    <DESCRIPT>abapBlame request</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
-    <WITH_UNIT_TESTS>X</WITH_UNIT_TESTS>
    </VSEOCLASS>
   </asx:values>
  </asx:abap>

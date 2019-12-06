@@ -3,27 +3,31 @@
   <xsl:output method="text"/>
   <xsl:template match="/">
     <css>
-body {overflow-x: hidden; background-color:#E8E8E8;}
+body {
+  overflow-x: hidden;
+  background-color:#E8E8E8;
+}
+h1, h2, h3 {font-family: Consolas, Courier, monospace;}
 table { border-collapse: collapse; }
 pre { display: inline; }
-table.blame th { text-align: left; }
-table.blame .num { text-align: right; }
-table.blame {
+table th { text-align: left; }
+table .num { text-align: right; }
+table {
   font-family: Consolas, Courier, monospace;
   font-size: 10pt;
 }
-table.blame td,th {
+table td,th {
   padding-left: 0.5em;
   padding-right: 0.5em;
   padding-top: 3px;
   padding-bottom: 3px;
 }
-table.blame th { color: #707070; }
-table.blame td { color: #707070; }
-table.blame td.code { color: black; }
-table.blame td.code span.keyword { color: #0a69ce; }
-table.blame td.code span.text { color: #48ce4f; }
-table.blame td.code span.comment { color: #808080; font-style: italic; }
+table th { color: #707070; }
+table td { color: #707070; }
+table td.code { color: black; }
+table td.code span.keyword { color: #0a69ce; }
+table td.code span.text { color: #48ce4f; }
+table td.code span.comment { color: #808080; font-style: italic; }
     </css>
   </xsl:template>
 </xsl:transform>

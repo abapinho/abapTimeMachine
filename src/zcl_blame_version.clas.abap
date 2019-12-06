@@ -9,6 +9,7 @@ CLASS zcl_blame_version DEFINITION
     DATA version_number TYPE versno READ-ONLY.
     DATA request TYPE verskorrno READ-ONLY.
     DATA author  TYPE versuser READ-ONLY.
+    DATA author_name TYPE ad_namtext READ-ONLY.
     DATA date    TYPE versdate READ-ONLY.
     DATA time    TYPE verstime READ-ONLY.
 
@@ -50,8 +51,9 @@ CLASS zcl_blame_version IMPLEMENTATION.
 
   METHOD load_attributes.
     DATA(versno) = get_real_version( ).
-    SELECT SINGLE korrnum author datum zeit INTO (me->request, me->author, me->date, me->time)
+    SELECT SINGLE korrnum author datum zeit name_textc INTO (me->request, me->author, me->date, me->time, me->author_name)
       FROM vrsd
+      LEFT JOIN user_addr ON user_addr~bname = vrsd~author
       WHERE objtype = me->go_part->vrsd_type
         AND objname = me->go_part->vrsd_name
         AND versno  = versno.
@@ -67,6 +69,7 @@ CLASS zcl_blame_version IMPLEMENTATION.
     s_source_with_blame-version_number = me->version_number.
     s_source_with_blame-request = me->request.
     s_source_with_blame-author = me->author.
+    s_source_with_blame-author_name = me->author_name.
     s_source_with_blame-date = me->date.
     s_source_with_blame-time = me->time.
 
