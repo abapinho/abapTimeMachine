@@ -41,6 +41,7 @@ CLASS zcl_blame_asset_html IMPLEMENTATION.
     LOOP AT it_blame INTO DATA(s_blame).
       IF s_blame-version_number = s_previous-version_number.
         CLEAR s_blame-author.
+        CLEAR s_blame-author_name.
         CLEAR s_blame-version_number.
         CLEAR s_blame-request.
         CLEAR s_blame-date.

@@ -1,15 +1,19 @@
-CLASS zcl_blame_diff DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+class ZCL_BLAME_DIFF definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
-    METHODS compute
-      IMPORTING
-                !it_old         TYPE zblame_line_t
-                !it_new         TYPE zblame_line_t
-      RETURNING VALUE(rt_blame) TYPE zblame_line_t.
+public section.
 
+  methods CONSTRUCTOR
+    importing
+      !IO_OPTIONS type ref to ZCL_BLAME_OPTIONS .
+  methods COMPUTE
+    importing
+      !IT_OLD type ZBLAME_LINE_T
+      !IT_NEW type ZBLAME_LINE_T
+    returning
+      value(RT_BLAME) type ZBLAME_LINE_T .
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:
@@ -18,6 +22,8 @@ CLASS zcl_blame_diff DEFINITION
         delete TYPE c LENGTH 1 VALUE 'D',
         update TYPE c LENGTH 1 VALUE 'U',
       END OF c_diff .
+
+    DATA go_options TYPE REF TO zcl_blame_options.
 
     METHODS compute_delta
       IMPORTING
@@ -30,15 +36,27 @@ CLASS zcl_blame_diff DEFINITION
       IMPORTING
                 !it_blame        TYPE zblame_line_t
       RETURNING VALUE(rt_source) TYPE abaptxt255_tab.
+
+    METHODS process_line
+      IMPORTING
+                !i_line       TYPE text255
+      RETURNING VALUE(r_line) TYPE text255.
 ENDCLASS.
 
 
 
-CLASS zcl_blame_diff IMPLEMENTATION.
+CLASS ZCL_BLAME_DIFF IMPLEMENTATION.
+
+
   METHOD compute.
     DATA: old_index TYPE i VALUE 1,
           new_index TYPE i VALUE 1,
           s_blame   LIKE LINE OF rt_blame.
+
+    IF it_old IS INITIAL.
+      rt_blame = it_new.
+      RETURN.
+    ENDIF.
 
     DATA(t_delta) = compute_delta( it_old = it_old it_new = it_new ).
 
@@ -104,7 +122,24 @@ CLASS zcl_blame_diff IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD constructor.
+    ASSERT io_options IS BOUND.
+    go_options = io_options.
+  ENDMETHOD.
+
+
   METHOD get_source.
-    rt_source = VALUE abaptxt255_tab( FOR s_blame IN it_blame ( line = s_blame-source ) ).
+    rt_source = VALUE abaptxt255_tab( FOR s_blame IN it_blame ( line = process_line( s_blame-source ) ) ).
+  ENDMETHOD.
+
+
+  METHOD process_line.
+    r_line = i_line.
+    IF go_options->ignore_case = abap_true.
+      r_line = to_upper( r_line ).
+    ENDIF.
+    IF go_options->ignore_indentation = abap_true.
+      SHIFT r_line LEFT DELETING LEADING space.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.

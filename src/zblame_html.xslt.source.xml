@@ -8,7 +8,7 @@
   </head>
 
   <body>
-    <div id="header">
+    <div class="header">
       <h1>
         <xsl:choose>
           <xsl:when test="//PARTS/TYPE = 'CLAS'">Class</xsl:when>
@@ -20,9 +20,36 @@
       </h1>
     </div>
 
+    <h2 class="toc">Table of contents</h2>
+    <div class="toc">
+      <ul class="toc">
+    <xsl:for-each select="//PARTS/T_PART/ZBLAME_PART">
+        <li>
+          <a><xsl:attribute name="href">#<xsl:value-of select="NAME"/></xsl:attribute>
+            <xsl:value-of select="NAME"/>
+          </a>
+        </li>
+    </xsl:for-each>
+        <li>
+          <a><xsl:attribute name="href">#contributors</xsl:attribute>
+            Contributors
+          </a>
+        </li>
+        <li>
+          <a><xsl:attribute name="href">#requests</xsl:attribute>
+            Requests
+          </a>
+        </li>
+      </ul>
+    </div>
+
     <xsl:for-each select="//PARTS/T_PART/ZBLAME_PART">
 
-    <h2><xsl:value-of select="NAME"/></h2>
+    <h2 class="blame">
+      <a><xsl:attribute name="name"><xsl:value-of select="NAME"/></xsl:attribute>
+        <xsl:value-of select="NAME"/>
+      </a>
+    </h2>
 
     <table class="blame">
       <THEAD class="header">
@@ -44,7 +71,11 @@
               <xsl:when test="VERSION_NUMBER &gt; 0"><xsl:value-of select="number(VERSION_NUMBER)"/></xsl:when>
             </xsl:choose>
           </TD>
-          <TD><xsl:value-of select="AUTHOR"/></TD>
+          <TD>
+            <a><xsl:attribute name="title"><xsl:value-of select="AUTHOR_NAME"/></xsl:attribute>
+              <xsl:value-of select="AUTHOR"/>
+            </a>
+          </TD>
           <TD>
             <xsl:if test="TIME != '00:00:00'"><xsl:value-of select="DATE"/><xsl:text> </xsl:text><xsl:value-of select="TIME"/></xsl:if></TD>
           <TD><xsl:value-of select="REQUEST"/></TD>
@@ -54,10 +85,67 @@
         </xsl:for-each>
 
         </table>
-
     </xsl:for-each>
 
-    <div id="footer">FOOTER</div>
+    <h2 class="contributors">
+      <a><xsl:attribute name="name">contributors</xsl:attribute>
+         Contributors
+      </a>
+    </h2>
+
+    <table class="contributors">
+      <THEAD class="header">
+      <tr>
+        <th>Username</th>
+        <th>Name</th>
+        <th class="num">Lines</th>
+        <th class="num">Percentage</th>
+        <th class="num">Requests</th>
+      </tr>
+      </THEAD>
+      <xsl:for-each select="//PARTS/T_AUTHOR/ZBLAME_AUTHOR_INFO">
+      <tr>
+        <td><xsl:value-of select="AUTHOR"/></td>
+        <td><xsl:value-of select="NAME"/></td>
+        <td class="num"><xsl:value-of select="number(LINE_COUNT)"/></td>
+        <td class="num"><xsl:value-of select="format-number(BLAME_PERCENTAGE, '#%')"/></td>
+        <td class="num"><xsl:value-of select="number(REQUEST_COUNT)"/></td>
+      </tr>
+      </xsl:for-each>
+    </table>
+
+    <h2 class="requests">
+      <a><xsl:attribute name="name">requests</xsl:attribute>
+         Requests
+      </a>
+    </h2>
+
+    <table class="request">
+      <THEAD class="header">
+      <tr>
+        <th>Date</th>
+        <th>Request</th>
+        <th>Description</th>
+        <th>Author</th>
+        <th>Name</th>
+        <th class="num">Lines</th>
+        <th class="num">Percentage</th>
+      </tr>
+      </THEAD>
+      <xsl:for-each select="//PARTS/T_REQUEST/ZBLAME_REQUEST_INFO">
+      <tr>
+        <td><xsl:value-of select="DATE"/><xsl:text> </xsl:text><xsl:value-of select="TIME"/></td>
+        <td><xsl:value-of select="REQUEST"/></td>
+        <td><xsl:value-of select="DESCRIPTION"/></td>
+        <td><xsl:value-of select="AUTHOR"/></td>
+        <td><xsl:value-of select="NAME"/></td>
+        <td class="num"><xsl:value-of select="number(LINE_COUNT)"/></td>
+        <td class="num"><xsl:value-of select="format-number(BLAME_PERCENTAGE, '#%')"/></td>
+      </tr>
+      </xsl:for-each>
+    </table>
+
+    <div id="footer"></div>
   </body>
 </html>
   </xsl:template>
