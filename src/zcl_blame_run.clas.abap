@@ -22,6 +22,6 @@ CLASS zcl_blame_run IMPLEMENTATION.
     DATA(o_parts) = NEW zcl_blame_parts( i_object_type = i_object_type
                                           i_object_name = i_object_name ).
     DATA(s_parts) = o_parts->get_data( io_options ).
-    NEW zcl_blame_output( )->render( s_parts ).
+    NEW zcl_blame_output( io_options->theme )->render( s_parts ).
   ENDMETHOD.
 ENDCLASS.

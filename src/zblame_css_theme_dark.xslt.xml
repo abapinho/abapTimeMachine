@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <ATTRIBUTES>
-    <XSLTDESC>ZBLAME_CSS</XSLTDESC>
+    <XSLTDESC>ZBLAME_CSS_THEME_DARK</XSLTDESC>
     <LANGU>E</LANGU>
     <DESCRIPT>abapBlame CSS</DESCRIPT>
    </ATTRIBUTES>

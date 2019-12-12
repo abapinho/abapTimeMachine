@@ -35,36 +35,22 @@ CLASS zcl_blame_parts DEFINITION
       IMPORTING
                 !it_part          TYPE zblame_part_t
       RETURNING VALUE(rt_request) TYPE zblame_request_info_t.
+
+    methods get_stats
+      IMPORTING
+        !it_part type zblame_part_t
+        RETURNING VALUE(rs_stats) type zblame_stats.
 ENDCLASS.
 
 
 
 CLASS zcl_blame_parts IMPLEMENTATION.
+
+
   METHOD constructor.
     me->g_type = i_object_type.
     me->g_name = i_object_name.
     load_parts( ).
-  ENDMETHOD.
-
-
-  METHOD get_data.
-    DATA(t_part) = VALUE zblame_part_t( FOR o_part IN gt_part
-                                        ( name = o_part->name
-                                          type = o_part->vrsd_type
-                                          object_name = o_part->vrsd_name
-                                          t_blame = o_part->compute_blame( io_options ) ) ).
-    rs_data = VALUE #( name = g_name
-                       type = g_type
-                       t_author = get_authors( t_part )
-                       t_request = get_requests( t_part )
-                       t_part = t_part ).
-  ENDMETHOD.
-
-
-  METHOD load_parts.
-    DATA(o_object) = NEW zcl_blame_object_factory( )->get_instance( i_object_type = me->g_type
-                                                                    i_object_name = me->g_name ).
-    me->gt_part = o_object->get_part_list( ).
   ENDMETHOD.
 
 
@@ -76,7 +62,6 @@ CLASS zcl_blame_parts IMPLEMENTATION.
 
     LOOP AT t_blame_all REFERENCE INTO DATA(os_blame)
      GROUP BY ( author = os_blame->author name = os_blame->author_name )
-              ASCENDING
               REFERENCE INTO DATA(os_group).
 
       REFRESH t_blame_author.
@@ -96,6 +81,23 @@ CLASS zcl_blame_parts IMPLEMENTATION.
                              blame_percentage = lines( t_blame_author ) / lines( t_blame_all )
                              request_count = request_count ) ).
     ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD get_data.
+    DATA(t_part) = VALUE zblame_part_t( FOR o_part IN gt_part
+                                        ( name = o_part->name
+                                          type = o_part->vrsd_type
+                                          object_name = o_part->vrsd_name
+                                          t_blame = o_part->compute_blame( io_options ) ) ).
+
+    rs_data = VALUE #( name = g_name
+                       type = g_type
+                       abapblame_version = zif_blame_consts=>version
+                       t_author = get_authors( t_part )
+                       t_request = get_requests( t_part )
+                       t_part = t_part
+                       s_stats = get_stats( t_part ) ).
   ENDMETHOD.
 
 
@@ -130,5 +132,20 @@ CLASS zcl_blame_parts IMPLEMENTATION.
                              line_count = lines( t_blame_request )
                              blame_percentage = lines( t_blame_request ) / lines( t_blame_all ) ) ).
     ENDLOOP.
+  ENDMETHOD.
+
+
+  method get_stats.
+    DATA(t_blame_all) = VALUE zblame_line_t( FOR s_part IN it_part
+                                 FOR s_blame IN s_part-t_blame
+                                 ( s_blame ) ).
+    rs_stats = new zcl_blame_stats( t_blame_all )->stats.
+  ENDMETHOD.
+
+
+  METHOD load_parts.
+    DATA(o_object) = NEW zcl_blame_object_factory( )->get_instance( i_object_type = me->g_type
+                                                                    i_object_name = me->g_name ).
+    me->gt_part = o_object->get_part_list( ).
   ENDMETHOD.
 ENDCLASS.
