@@ -14,6 +14,10 @@ According to the [git-blame documentation(https://www.git-scm.com/docs/git-blame
 
 ABAP's versioning system is unbelievably bad. Blame is just one of the dozens of things you should be able to do but, for some mysterious reason, are not. Enabling blame in ABAP code is the sole purpose of this simple but hopefully useful project.
 
+## How
+
+Please read the [Wiki](https://github.com/abapinho/abapBlame/wiki) to learn how to install and use `ZBLAME`.
+
 ## Requirements
 
 * ABAP Version: 7.40 or higher
