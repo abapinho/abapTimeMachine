@@ -40,8 +40,6 @@ CLASS zcl_blame_object_prog IMPLEMENTATION.
     SELECT SINGLE name INTO @data(name)
       FROM trdir
       WHERE name   = @g_name.
-    IF sy-subrc = 0.
-      r_result = abap_true.
-    ENDIF.
+    r_result = boolc( sy-subrc = 0 ).
   ENDMETHOD.
 ENDCLASS.

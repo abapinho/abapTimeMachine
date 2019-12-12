@@ -1,0 +1,15 @@
+<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:sap="http://www.sap.com/sapxsl" version="1.0">
+  <xsl:strip-space elements="*"/>
+  <xsl:output method="text"/>
+  <xsl:template match="/">
+    <css>
+table.blame tr.versionfirstrow td { border-top: 1pt dotted #707070; }
+table th, table td { color: #707070; }
+table td.code { color: white; width: 80%; }
+table td.code span.keyword { color: #0a69ce; }
+table td.code span.text { color: #48ce4f; }
+table td.code span.comment { color: #808080; font-style: italic; }
+table.contributors th,table.requests th { border-bottom: 1pt dotted #707070; }
+    </css>
+  </xsl:template>
+</xsl:transform>

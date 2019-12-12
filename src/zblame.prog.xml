@@ -82,8 +82,14 @@
     <item>
      <ID>I</ID>
      <KEY>OPT</KEY>
-     <ENTRY>Options</ENTRY>
+     <ENTRY>Diff options</ENTRY>
      <LENGTH>17</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>OUT</KEY>
+     <ENTRY>Output options</ENTRY>
+     <LENGTH>24</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -120,6 +126,13 @@
      <KEY>P_OTYPE</KEY>
      <ENTRY>.</ENTRY>
      <LENGTH>19</LENGTH>
+     <SPLIT>D</SPLIT>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_THEME</KEY>
+     <ENTRY>.</ENTRY>
+     <LENGTH>13</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
    </TPOOL>

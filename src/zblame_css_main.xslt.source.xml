@@ -4,30 +4,23 @@
   <xsl:template match="/">
     <css>
 body {
-  overflow-x: hidden;
-  background-color:#E8E8E8;
+  background-color: yellow;
 }
-h1, h2, h3 {font-family: Consolas, Courier, monospace;}
+div, table, h1, h2, h3 {font-family: Consolas, Courier, monospace;}
 table { border-collapse: collapse; }
+div, table { font-size: 10pt; }
 pre { display: inline; }
 table th { text-align: left; }
 table .num { text-align: right; }
-table {
-  font-family: Consolas, Courier, monospace;
-  font-size: 10pt;
-}
+table.blame { width: 100%; }
 table td,th {
   padding-left: 0.5em;
   padding-right: 0.5em;
   padding-top: 3px;
   padding-bottom: 3px;
+  white-space:nowrap;
+  vertical-align: top;
 }
-table th { color: #707070; }
-table td { color: #707070; }
-table td.code { color: black; }
-table td.code span.keyword { color: #0a69ce; }
-table td.code span.text { color: #48ce4f; }
-table td.code span.comment { color: #808080; font-style: italic; }
     </css>
   </xsl:template>
 </xsl:transform>

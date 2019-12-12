@@ -33,6 +33,13 @@
      <DOMVALUE_L>FUGR</DOMVALUE_L>
      <DDTEXT>Function group</DDTEXT>
     </DD07V>
+    <DD07V>
+     <DOMNAME>ZBLAME_OBJECT_TYPE</DOMNAME>
+     <VALPOS>0004</VALPOS>
+     <DDLANGUAGE>E</DDLANGUAGE>
+     <DOMVALUE_L>FUNC</DOMVALUE_L>
+     <DDTEXT>Function module</DDTEXT>
+    </DD07V>
    </DD07V_TAB>
   </asx:values>
  </asx:abap>

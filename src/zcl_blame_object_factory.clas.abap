@@ -9,6 +9,7 @@ CLASS zcl_blame_object_factory DEFINITION
         program        TYPE zblame_object_type VALUE 'PROG',
         class          TYPE zblame_object_type VALUE 'CLAS',
         function_group TYPE zblame_object_type VALUE 'FUGR',
+        function       TYPE zblame_object_type VALUE 'FUNC',
       END OF gc_object_type.
 
     METHODS get_instance
@@ -30,7 +31,9 @@ CLASS ZCL_BLAME_OBJECT_FACTORY IMPLEMENTATION.
   METHOD get_instance.
     ro_object = SWITCH #( i_object_type
                         WHEN gc_object_type-program THEN NEW zcl_blame_object_prog( i_object_name )
-                        WHEN gc_object_type-class THEN NEW zcl_blame_object_clas( CONV #( i_object_name ) ) ).
+                        WHEN gc_object_type-class THEN NEW zcl_blame_object_clas( CONV #( i_object_name ) )
+                        WHEN gc_object_type-function_group THEN NEW zcl_blame_object_fugr( CONV #( i_object_name ) )
+                        WHEN gc_object_type-function THEN NEW zcl_blame_object_func( CONV #( i_object_name ) ) ).
     IF ro_object IS NOT BOUND OR NOT ro_object->check_exists( ).
       RAISE EXCEPTION TYPE zcx_blame. " TODO
     ENDIF.

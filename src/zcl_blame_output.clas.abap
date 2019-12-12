@@ -4,7 +4,15 @@ CLASS zcl_blame_output DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    METHODS constructor.
+    CONSTANTS:
+      BEGIN OF c_theme,
+        light TYPE zblame_theme VALUE 'LIGHT',
+        dark  TYPE zblame_theme VALUE 'DARK',
+      END OF c_theme.
+
+    METHODS constructor
+      IMPORTING
+        !i_theme type zblame_theme.
 
     METHODS render
       IMPORTING
@@ -12,31 +20,43 @@ CLASS zcl_blame_output DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA go_html_viewer TYPE REF TO cl_gui_html_viewer.
+    data g_theme type zblame_theme.
+    DATA go_html_viewer TYPE REF TO cl_gui_html_viewer .
 
     METHODS add_asset
       IMPORTING
-                io_asset     TYPE REF TO zif_blame_asset
-      RETURNING VALUE(r_url) TYPE w3url.
+        !io_asset    TYPE REF TO zif_blame_asset
+      RETURNING
+        VALUE(r_url) TYPE w3url .
 
-    METHODS add_css.
+    METHODS add_main_css .
 
     METHODS add_html
       IMPORTING
-                is_parts     TYPE zblame_parts
-      RETURNING VALUE(r_url) TYPE w3url.
+        !is_parts    TYPE zblame_parts
+      RETURNING
+        VALUE(r_url) TYPE w3url .
 
     METHODS string_2_xstring
       IMPORTING
-                !i_input        TYPE string
-      RETURNING VALUE(r_output) TYPE xstring.
+        !i_input        TYPE string
+      RETURNING
+        VALUE(r_output) TYPE xstring .
+
+    METHODS on_html_events
+          FOR EVENT sapevent OF cl_gui_html_viewer
+      IMPORTING
+          !action
+          !getdata .
+
+    METHODS register_events .
 
     CLASS-METHODS xstring_2_bintab
       IMPORTING
-        i_xstr    TYPE xstring
+        !i_xstr    TYPE xstring
       EXPORTING
-        e_size    TYPE i
-        et_bintab TYPE lvc_t_mime.
+        !e_size    TYPE i
+        !et_bintab TYPE lvc_t_mime .
 ENDCLASS.
 
 
@@ -76,8 +96,8 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD add_css.
-    add_asset( NEW zcl_blame_asset_css( ) ).
+  METHOD add_main_css.
+    add_asset( NEW zcl_blame_asset_css( g_theme ) ).
   ENDMETHOD.
 
 
@@ -87,15 +107,30 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
 
 
   METHOD constructor.
+    g_theme = i_theme.
     go_html_viewer = NEW cl_gui_html_viewer( parent = cl_gui_container=>screen0 ).
+  ENDMETHOD.
+
+
+  METHOD on_html_events.
+    BREAK-POINT.
+  ENDMETHOD.
+
+
+  METHOD register_events.
+    DATA t_event TYPE cntl_simple_events.
+    t_event = VALUE #( ( appl_event = abap_true
+                         eventid    = go_html_viewer->m_id_sapevent ) ).
+    go_html_viewer->set_registered_events( t_event ).
+    SET HANDLER me->on_html_events FOR go_html_viewer.
   ENDMETHOD.
 
 
   METHOD render.
     SKIP. " Creates the screen0 container
-    add_css( ).
+    add_main_css( ).
     DATA(url) = add_html( is_parts ).
-    "DATA(url) = cache_html( i_html         = i_html ).
+    register_events( ).
     go_html_viewer->show_url(
       EXPORTING
         url = url
