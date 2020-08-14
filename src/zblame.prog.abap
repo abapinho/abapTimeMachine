@@ -5,8 +5,6 @@
 *&---------------------------------------------------------------------*
 REPORT zblame.
 
-DATA: s_tadir TYPE tadir.
-
 SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-sel.
 PARAMETERS p_otype TYPE zblame_object_type AS LISTBOX VISIBLE LENGTH 25 OBLIGATORY DEFAULT 'PROG'.
 PARAMETERS p_name TYPE sobj_name OBLIGATORY.
