@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>ZBLAME</NAME>
+    <NAME>ZPRAISE</NAME>
     <SUBC>1</SUBC>
     <APPL>*</APPL>
     <RSTAT>K</RSTAT>
@@ -14,7 +14,7 @@
    <DYNPROS>
     <item>
      <HEADER>
-      <PROGRAM>ZBLAME</PROGRAM>
+      <PROGRAM>ZPRAISE</PROGRAM>
       <SCREEN>9000</SCREEN>
       <LANGUAGE>E</LANGUAGE>
       <DESCRIPT>HTML output</DESCRIPT>
@@ -99,7 +99,7 @@
     </item>
     <item>
      <ID>R</ID>
-     <ENTRY>abapPraise/abapBlame</ENTRY>
+     <ENTRY>abapPraise</ENTRY>
      <LENGTH>20</LENGTH>
     </item>
     <item>

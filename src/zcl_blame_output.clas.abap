@@ -1,23 +1,23 @@
-CLASS zcl_blame_output DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC.
+class ZCL_BLAME_OUTPUT definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
-    CONSTANTS:
-      BEGIN OF c_theme,
+public section.
+
+  constants:
+    BEGIN OF c_theme,
         light TYPE zblame_theme VALUE 'LIGHT',
         dark  TYPE zblame_theme VALUE 'DARK',
-      END OF c_theme.
+      END OF c_theme .
+  data MT_DATA type LVC_T_MIME .
 
-    METHODS constructor
-      IMPORTING
-        !i_theme type zblame_theme.
-
-    METHODS render
-      IMPORTING
-        !is_parts TYPE zblame_parts.
-
+  methods CONSTRUCTOR
+    importing
+      !I_THEME type ZBLAME_THEME .
+  methods RENDER
+    importing
+      !IS_PARTS type ZBLAME_PARTS .
   PROTECTED SECTION.
   PRIVATE SECTION.
     data g_theme type zblame_theme.
@@ -73,7 +73,7 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
         i_xstr    = xstr
       IMPORTING
         e_size    = DATA(size)
-        et_bintab = DATA(t_bintab) ).
+        et_bintab = mt_data ). "DATA(t_bintab) ).
 
     go_html_viewer->load_data(
       EXPORTING
@@ -81,7 +81,7 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
         type                   = 'text'
         subtype                = io_asset->get_subtype( )
       CHANGING
-        data_table             = t_bintab
+        data_table             = mt_data
       EXCEPTIONS
         dp_invalid_parameter   = 1
         dp_error_general       = 2
@@ -96,13 +96,13 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD add_main_css.
-    add_asset( NEW zcl_blame_asset_css( g_theme ) ).
+  METHOD add_html.
+    r_url = add_asset( NEW zcl_blame_asset_html( is_parts ) ).
   ENDMETHOD.
 
 
-  METHOD add_html.
-    r_url = add_asset( NEW zcl_blame_asset_html( is_parts ) ).
+  METHOD add_main_css.
+    add_asset( NEW zcl_blame_asset_css( g_theme ) ).
   ENDMETHOD.
 
 
@@ -113,7 +113,34 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
 
 
   METHOD on_html_events.
-    BREAK-POINT.
+    "BREAK-POINT.
+*    write: / action, getdata.
+    CASE action.
+      WHEN 'request'.
+        DATA: lv_trkorr    TYPE e070-trkorr.
+        DATA: lv_highlight TYPE c VALUE 'X'.
+        DATA: ls_popup     TYPE strhi_popup.
+        DATA: lv_showonly  TYPE c . "VALUE 'X'.
+
+        lv_trkorr = condense( getdata ).
+        ls_popup = VALUE #(
+          end_column = 255
+          end_row    = 200
+        ).
+
+        CALL FUNCTION 'TR_PRESENT_REQUEST'
+          EXPORTING
+            iv_trkorr    = lv_trkorr
+            iv_highlight = lv_highlight
+            is_popup     = ls_popup
+            iv_showonly  = lv_showonly.
+
+      WHEN 'save'.
+        "save( mt_data ).
+      WHEN OTHERS.
+    ENDCASE.
+
+
   ENDMETHOD.
 
 

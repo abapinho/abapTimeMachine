@@ -17,7 +17,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_blame_run IMPLEMENTATION.
+CLASS ZCL_BLAME_RUN IMPLEMENTATION.
   METHOD go.
     DATA(o_parts) = NEW zcl_blame_parts( i_object_type = i_object_type
                                           i_object_name = i_object_name ).

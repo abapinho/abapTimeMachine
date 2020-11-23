@@ -110,7 +110,12 @@
                       </xsl:if>
                     </TD>
                     <TD>
+                       <a>
+                          <xsl:attribute name="href">SAPEVENT:request?
                       <xsl:value-of select="REQUEST"/>
+                          </xsl:attribute>
+                          <xsl:value-of select="REQUEST"/>
+                       </a>
                     </TD>
                     <TD class="num">
                       <xsl:value-of select="number(LINE_NUM)"/>
