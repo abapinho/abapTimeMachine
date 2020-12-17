@@ -12,7 +12,7 @@ CLASS zcl_blame_output DEFINITION
 
     METHODS constructor
       IMPORTING
-        !i_theme type zblame_theme.
+        !i_theme TYPE zblame_theme.
 
     METHODS render
       IMPORTING
@@ -20,7 +20,7 @@ CLASS zcl_blame_output DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    data g_theme type zblame_theme.
+    DATA g_theme TYPE zblame_theme.
     DATA go_html_viewer TYPE REF TO cl_gui_html_viewer .
 
     METHODS add_asset
@@ -61,7 +61,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
+CLASS zcl_blame_output IMPLEMENTATION.
 
 
   METHOD add_asset.
@@ -113,7 +113,15 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
 
 
   METHOD on_html_events.
-    BREAK-POINT.
+    action = condense( action ).
+    CASE action.
+      WHEN 'author'.
+        " TODO
+      WHEN 'request'.
+        " TODO
+      WHEN OTHERS.
+        RETURN.
+    ENDCASE.
   ENDMETHOD.
 
 

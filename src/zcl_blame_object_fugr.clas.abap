@@ -41,8 +41,10 @@ CLASS zcl_blame_object_fugr IMPLEMENTATION.
       EXCEPTIONS
         function_pool_not_found = 1
         OTHERS                  = 2.
-    SORT rt_function BY funcname ASCENDING.
-    DELETE ADJACENT DUPLICATES FROM rt_function COMPARING funcname.
+    IF sy-subrc = 0.
+      SORT rt_function BY funcname ASCENDING.
+      DELETE ADJACENT DUPLICATES FROM rt_function COMPARING funcname.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -83,10 +85,6 @@ CLASS zcl_blame_object_fugr IMPLEMENTATION.
     DATA t_include TYPE STANDARD TABLE OF progname.
 
     DATA(main_program) = get_main_name( ).
-    rt_part = VALUE #( ( NEW #( i_name = |Program { main_program }|
-                              i_vrsd_name = CONV #( main_program )
-                              i_vrsd_type = 'REPS' ) ) ).
-
     CALL FUNCTION 'RS_GET_ALL_INCLUDES'
       EXPORTING
         program      = main_program
@@ -100,6 +98,13 @@ CLASS zcl_blame_object_fugr IMPLEMENTATION.
       RAISE EXCEPTION TYPE zcx_blame.
     ENDIF.
 
+    DATA(o_counter) = NEW zcl_blame_counter( 1 + lines( t_include ) ).
+
+    rt_part = VALUE #( ( NEW #( i_name = |Program { main_program }|
+                              i_vrsd_name = CONV #( main_program )
+                              i_vrsd_type = 'REPS' ) ) ).
+    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Program { main_program }|.
+
     DATA(t_function) = get_functions( ).
     LOOP AT t_include INTO DATA(include).
       IF NOT line_exists( t_function[ include = include ] ).
@@ -107,13 +112,16 @@ CLASS zcl_blame_object_fugr IMPLEMENTATION.
                          ( NEW #( i_name = |Include { include }|
                                   i_vrsd_name = CONV #( include )
                                   i_vrsd_type = 'REPS' ) ) ).
+        RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Include { include }|.
       ENDIF.
     ENDLOOP.
 
-    rt_part = VALUE #( BASE rt_part
-                       FOR s_functab IN t_function
-                       ( NEW #( i_name      = |Function module { s_functab-funcname }|
-                                i_vrsd_name = CONV #( s_functab-funcname )
+    LOOP AT t_function REFERENCE INTO DATA(os_function).
+      rt_part = VALUE #( BASE rt_part
+                         ( NEW #( i_name      = |Function module { os_function->funcname }|
+                                i_vrsd_name = CONV #( os_function->funcname )
                                 i_vrsd_type = 'FUNC' ) ) ).
+      RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Function module { os_function->funcname }|.
+    ENDLOOP.
   ENDMETHOD.
 ENDCLASS.

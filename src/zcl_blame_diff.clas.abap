@@ -1,19 +1,19 @@
-class ZCL_BLAME_DIFF definition
-  public
-  final
-  create public .
+CLASS zcl_blame_diff DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods CONSTRUCTOR
-    importing
-      !IO_OPTIONS type ref to ZCL_BLAME_OPTIONS .
-  methods COMPUTE
-    importing
-      !IT_OLD type ZBLAME_LINE_T
-      !IT_NEW type ZBLAME_LINE_T
-    returning
-      value(RT_BLAME) type ZBLAME_LINE_T .
+    METHODS constructor
+      IMPORTING
+        !io_options TYPE REF TO zcl_blame_options .
+    METHODS compute
+      IMPORTING
+        !it_old         TYPE zblame_line_t
+        !it_new         TYPE zblame_line_t
+      RETURNING
+        VALUE(rt_blame) TYPE zblame_line_t .
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:

@@ -4,42 +4,58 @@ CLASS zcl_blame_parts DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+
+    EVENTS percentage_complete
+      EXPORTING
+        VALUE(percentage) TYPE i
+        VALUE(text) TYPE string.
+
     METHODS constructor
       IMPORTING
         !i_object_type TYPE zblame_object_type
-        !i_object_name TYPE sobj_name
+        !i_object_name TYPE sobj_name.
+
+    METHODS load_parts
       RAISING
         zcx_blame .
 
     METHODS get_data
       IMPORTING
-                !io_options    TYPE REF TO zcl_blame_options
-      RETURNING VALUE(rs_data) TYPE zblame_parts
-      RAISING   zcx_blame.
+        !io_options    TYPE REF TO zcl_blame_options
+      RETURNING
+        VALUE(rs_data) TYPE zblame_parts
+      RAISING
+        zcx_blame .
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA g_type TYPE zblame_object_type.
-    DATA g_name TYPE sobj_name.
-    DATA gt_part TYPE zblame_part_ref_t.
-
-    METHODS load_parts
-      RAISING zcx_blame.
+    DATA g_type TYPE zblame_object_type .
+    DATA g_name TYPE sobj_name .
+    DATA gt_part TYPE zblame_part_ref_t .
 
     METHODS get_authors
       IMPORTING
-                !it_part         TYPE zblame_part_t
-      RETURNING VALUE(rt_author) TYPE zblame_author_info_t.
+        !it_part         TYPE zblame_part_t
+      RETURNING
+        VALUE(rt_author) TYPE zblame_author_info_t .
 
     METHODS get_requests
       IMPORTING
-                !it_part          TYPE zblame_part_t
-      RETURNING VALUE(rt_request) TYPE zblame_request_info_t.
+        !it_part          TYPE zblame_part_t
+      RETURNING
+        VALUE(rt_request) TYPE zblame_request_info_t .
 
-    methods get_stats
+    METHODS get_stats
       IMPORTING
-        !it_part type zblame_part_t
-        RETURNING VALUE(rs_stats) type zblame_stats.
+        !it_part        TYPE zblame_part_t
+      RETURNING
+        VALUE(rs_stats) TYPE zblame_stats .
+
+    METHODS on_object_percentage_complete
+          FOR EVENT percentage_complete OF zif_blame_object
+      IMPORTING
+          !percentage
+          !text.
 ENDCLASS.
 
 
@@ -50,7 +66,6 @@ CLASS zcl_blame_parts IMPLEMENTATION.
   METHOD constructor.
     me->g_type = i_object_type.
     me->g_name = i_object_name.
-    load_parts( ).
   ENDMETHOD.
 
 
@@ -135,17 +150,23 @@ CLASS zcl_blame_parts IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method get_stats.
+  METHOD get_stats.
     DATA(t_blame_all) = VALUE zblame_line_t( FOR s_part IN it_part
                                  FOR s_blame IN s_part-t_blame
                                  ( s_blame ) ).
-    rs_stats = new zcl_blame_stats( t_blame_all )->stats.
+    rs_stats = NEW zcl_blame_stats( t_blame_all )->stats.
   ENDMETHOD.
 
 
   METHOD load_parts.
     DATA(o_object) = NEW zcl_blame_object_factory( )->get_instance( i_object_type = me->g_type
                                                                     i_object_name = me->g_name ).
+    SET HANDLER me->on_object_percentage_complete FOR o_object.
     me->gt_part = o_object->get_part_list( ).
+  ENDMETHOD.
+
+
+  METHOD on_object_percentage_complete.
+    RAISE EVENT percentage_complete EXPORTING percentage = percentage text = text.
   ENDMETHOD.
 ENDCLASS.

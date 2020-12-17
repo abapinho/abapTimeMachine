@@ -36,7 +36,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_blame_stats IMPLEMENTATION.
+CLASS ZCL_BLAME_STATS IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -77,10 +77,12 @@ CLASS zcl_blame_stats IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
+
+
   METHOD get_version_count.
-    LOOP AT it_blame REFERENCE INTO DATA(os_blame)
-      GROUP BY ( version = os_blame->version_number ) WITHOUT MEMBERS INTO DATA(group).
-      r_count = r_count + 1.
-    ENDLOOP.
+    r_count = REDUCE #( init count = 0
+                        for groups version_number of s_blame in it_blame
+                        group BY ( version = s_blame-version_number )
+                        next count = count + 1 ).
   ENDMETHOD.
 ENDCLASS.

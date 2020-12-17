@@ -17,7 +17,7 @@ CLASS zcl_blame_asset_html DEFINITION
 
     METHODS pre_render_lines
       IMPORTING
-                VALUE(it_blame) TYPE zblame_line_t
+                it_blame        TYPE zblame_line_t
       RETURNING VALUE(rt_blame) TYPE zblame_line_t.
 ENDCLASS.
 
@@ -28,8 +28,8 @@ CLASS zcl_blame_asset_html IMPLEMENTATION.
 
   METHOD constructor.
     gs_parts = is_parts.
-    LOOP AT gs_parts-t_part REFERENCE INTO DATA(s_part).
-      s_part->t_blame = pre_render_lines( s_part->t_blame ).
+    LOOP AT gs_parts-t_part REFERENCE INTO DATA(o_part).
+      o_part->t_blame = pre_render_lines( o_part->t_blame ).
     ENDLOOP.
   ENDMETHOD.
 
@@ -52,10 +52,6 @@ CLASS zcl_blame_asset_html IMPLEMENTATION.
       s_blame-source = o_highlighter->process_line(  CONV #( s_blame-source ) ).
       INSERT s_blame INTO TABLE rt_blame.
     ENDLOOP.
-*     date_time = |{ is_current-date DATE = USER } { is_current-time TIME = USER }|.
-*    ro_html->add( |<TD class="num">{ condense( val = is_current-line_num del = '0' ) }</TD>| ).
-*    ro_html->add( |<TD class="code">{ o_highlighter->process_line( CONV #( is_current-source ) ) }</TD>| ).
-*    ro_html->add( |<TD class="num">{ condense( val = version_number del = '0' ) }</TD>| ).
   ENDMETHOD.
 
 

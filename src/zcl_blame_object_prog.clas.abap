@@ -25,9 +25,11 @@ CLASS zcl_blame_object_prog IMPLEMENTATION.
 
 
   METHOD zif_blame_object~get_part_list.
+    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = 0 text = CONV #( me->g_name ).
     rt_part = VALUE #( ( NEW #( i_name      = CONV #( me->g_name )
-                                i_vrsd_name = CONV #( me->g_name )
-                                i_vrsd_type = 'REPS' ) ) ).
+                                 i_vrsd_name = CONV #( me->g_name )
+                                 i_vrsd_type = 'REPS' ) ) ).
+    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = 100 text = CONV #( me->g_name ).
   ENDMETHOD.
 
 

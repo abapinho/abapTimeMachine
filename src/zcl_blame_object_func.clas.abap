@@ -18,6 +18,8 @@ ENDCLASS.
 
 
 CLASS zcl_blame_object_func IMPLEMENTATION.
+
+
   METHOD constructor.
     g_name = i_name.
   ENDMETHOD.
@@ -31,7 +33,7 @@ CLASS zcl_blame_object_func IMPLEMENTATION.
         function_not_exist = 1
         OTHERS             = 2.
     r_result = boolc( sy-subrc = 0 ).
- ENDMETHOD.
+  ENDMETHOD.
 
 
   METHOD zif_blame_object~get_name.
@@ -40,8 +42,10 @@ CLASS zcl_blame_object_func IMPLEMENTATION.
 
 
   METHOD zif_blame_object~get_part_list.
+    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = 0 text = CONV #( me->g_name ).
     rt_part = VALUE #( ( NEW #( i_name      = CONV #( me->g_name )
                                 i_vrsd_name = CONV #( me->g_name )
                                 i_vrsd_type = 'FUNC' ) ) ).
+    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = 100 text = CONV #( me->g_name ).
   ENDMETHOD.
 ENDCLASS.
