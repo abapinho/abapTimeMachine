@@ -22,6 +22,7 @@ CLASS zcl_blame_output DEFINITION
   PRIVATE SECTION.
     DATA g_theme TYPE zblame_theme.
     DATA go_html_viewer TYPE REF TO cl_gui_html_viewer .
+    DATA go_handler TYPE REF TO zcl_blame_output_handler.
 
     METHODS add_asset
       IMPORTING
@@ -43,12 +44,6 @@ CLASS zcl_blame_output DEFINITION
       RETURNING
         VALUE(r_output) TYPE xstring .
 
-    METHODS on_html_events
-          FOR EVENT sapevent OF cl_gui_html_viewer
-      IMPORTING
-          !action
-          !getdata .
-
     METHODS register_events .
 
     CLASS-METHODS xstring_2_bintab
@@ -61,7 +56,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_blame_output IMPLEMENTATION.
+CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
 
 
   METHOD add_asset.
@@ -96,32 +91,20 @@ CLASS zcl_blame_output IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD add_main_css.
-    add_asset( NEW zcl_blame_asset_css( g_theme ) ).
+  METHOD add_html.
+    r_url = add_asset( NEW zcl_blame_asset_html( is_parts ) ).
   ENDMETHOD.
 
 
-  METHOD add_html.
-    r_url = add_asset( NEW zcl_blame_asset_html( is_parts ) ).
+  METHOD add_main_css.
+    add_asset( NEW zcl_blame_asset_css( g_theme ) ).
   ENDMETHOD.
 
 
   METHOD constructor.
     g_theme = i_theme.
     go_html_viewer = NEW cl_gui_html_viewer( parent = cl_gui_container=>screen0 ).
-  ENDMETHOD.
-
-
-  METHOD on_html_events.
-    action = condense( action ).
-    CASE action.
-      WHEN 'author'.
-        " TODO
-      WHEN 'request'.
-        " TODO
-      WHEN OTHERS.
-        RETURN.
-    ENDCASE.
+    go_handler = NEW #( ).
   ENDMETHOD.
 
 
@@ -130,7 +113,7 @@ CLASS zcl_blame_output IMPLEMENTATION.
     t_event = VALUE #( ( appl_event = abap_true
                          eventid    = go_html_viewer->m_id_sapevent ) ).
     go_html_viewer->set_registered_events( t_event ).
-    SET HANDLER me->on_html_events FOR go_html_viewer.
+    SET HANDLER go_handler->on_html_events FOR go_html_viewer.
   ENDMETHOD.
 
 
