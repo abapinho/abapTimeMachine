@@ -43,43 +43,19 @@
               <li>
                 <a>
                   <xsl:attribute name="href">#contributors</xsl:attribute>
-
-
-
-
-            Contributors
-
-
-
-
+                  Contributors
                 </a>
               </li>
               <li>
                 <a>
                   <xsl:attribute name="href">#requests</xsl:attribute>
-
-
-
-
-            Requests
-
-
-
-
+                  Requests
                 </a>
               </li>
               <li>
                 <a>
                   <xsl:attribute name="href">#stats</xsl:attribute>
-
-
-
-
-            Statistics
-
-
-
-
+                  Statistics
                 </a>
               </li>
             </ul>
@@ -108,7 +84,14 @@
                     <TH>Request</TH>
                     <TH>Task</TH>
                     <TH class="num">Line</TH>
-                    <TH>Source</TH>
+                    <TH>
+                      <a>
+                        <xsl:attribute name="href">SAPEVENT:source?
+                          <xsl:value-of select="TYPE"/>|<xsl:value-of select="OBJECT_NAME"/>
+                        </xsl:attribute>
+                        Source
+                      </a>
+                    </TH>
                   </TR>
                 </THEAD>
 
@@ -132,7 +115,6 @@
                         </xsl:attribute>
                         <xsl:if test="AUTHOR != ''">
                           <xsl:attribute name="href">SAPEVENT:author?
-
                             <xsl:value-of select="AUTHOR"/>
                           </xsl:attribute>
                         </xsl:if>
