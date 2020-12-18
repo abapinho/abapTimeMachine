@@ -4,7 +4,13 @@ CLASS zcl_blame_version DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    CONSTANTS c_latest_version TYPE versno VALUE 99999.
+    CONSTANTS:
+      BEGIN OF c_version,
+        latest_db TYPE versno VALUE 0,
+        latest    TYPE versno VALUE 99998,
+        active    TYPE versno VALUE 99998,
+        modified  TYPE versno VALUE 99999,
+      END OF c_version.
 
     DATA version_number TYPE versno READ-ONLY.
     DATA request TYPE verskorrno READ-ONLY.
@@ -16,8 +22,7 @@ CLASS zcl_blame_version DEFINITION
 
     METHODS constructor
       IMPORTING
-                !io_part          TYPE REF TO zcl_blame_part
-                !i_version_number TYPE versno
+                !is_vrsd TYPE vrsd
       RAISING   zcx_blame.
 
     METHODS get_source_with_blame
@@ -26,7 +31,7 @@ CLASS zcl_blame_version DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA go_part TYPE REF TO zcl_blame_part.
+    DATA s_vrsd TYPE vrsd.
     DATA gt_source TYPE abaptxt255_tab.
 
     METHODS load_attributes
@@ -47,19 +52,18 @@ CLASS ZCL_BLAME_VERSION IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->go_part = io_part.
-    me->version_number = i_version_number.
-    load_source( ).
+    me->s_vrsd = is_vrsd.
     load_attributes( ).
     load_latest_task( ).
+    load_source( ).
   ENDMETHOD.
 
 
   METHOD get_real_version.
-    " Technically the current version is 0 but in order to keep them properly sorted
-    " we're setting it to 99999. But when we're going to fetch it from the
-    " database we must use 0.
-    r_version = COND #( WHEN me->version_number = c_latest_version THEN 0
+    " Technically the current version is 0 but in order to keep them properly sorted we're
+    " setting it to magic number 99997 (because 'ACTIVE' is 99998 and 'MODIFIED' is 99999.
+    " But when we're going to fetch it from the database we must use 0.
+    r_version = COND #( WHEN me->version_number = c_version-latest THEN 0
                         ELSE me->version_number ).
   ENDMETHOD.
 
@@ -84,16 +88,12 @@ CLASS ZCL_BLAME_VERSION IMPLEMENTATION.
 
 
   METHOD load_attributes.
-    DATA(versno) = get_real_version( ).
-    SELECT SINGLE korrnum author datum zeit name_textc INTO (me->request, me->author, me->date, me->time, me->author_name)
-      FROM vrsd
-      LEFT JOIN user_addr ON user_addr~bname = vrsd~author
-      WHERE objtype = me->go_part->vrsd_type
-        AND objname = me->go_part->vrsd_name
-        AND versno  = versno.
-    IF sy-subrc <> 0.
-      RAISE EXCEPTION TYPE zcx_blame. " TODO
-    ENDIF.
+    me->version_number = s_vrsd-versno.
+    me->author = s_vrsd-author.
+    me->date = s_vrsd-datum.
+    me->time = s_vrsd-zeit.
+    me->author_name = NEW zcl_blame_author( )->get_name( s_vrsd-author ).
+    me->request = s_vrsd-korrnum.
   ENDMETHOD.
 
 
@@ -108,8 +108,8 @@ CLASS ZCL_BLAME_VERSION IMPLEMENTATION.
       LEFT JOIN user_addr ON user_addr~bname = e070~as4user
       UP TO 1 ROWS
       WHERE strkorr = me->request
-        AND object = me->go_part->vrsd_type
-        AND obj_name = me->go_part->vrsd_name
+        AND object = s_vrsd-objtype
+        AND obj_name = s_vrsd-objname
       ORDER BY as4date DESCENDING as4time DESCENDING.
       EXIT.
     ENDSELECT.
@@ -121,8 +121,8 @@ CLASS ZCL_BLAME_VERSION IMPLEMENTATION.
 
     CALL FUNCTION 'SVRS_GET_REPS_FROM_OBJECT'
       EXPORTING
-        object_name = me->go_part->vrsd_name
-        object_type = me->go_part->vrsd_type
+        object_name = s_vrsd-objname
+        object_type = s_vrsd-objtype
         versno      = get_real_version( )
       TABLES
         repos_tab   = gt_source
