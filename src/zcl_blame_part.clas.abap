@@ -30,12 +30,9 @@ CLASS zcl_blame_part DEFINITION
     TYPES ty_t_version TYPE STANDARD TABLE OF REF TO zcl_blame_version WITH KEY table_line.
 
     DATA gt_version TYPE ty_t_version.
+    data go_vrsd type ref to zcl_blame_vrsd.
 
-    METHODS get_numbers
-      RETURNING VALUE(rt_versno) TYPE ty_t_versno.
-
-    METHODS get_versions
-      RETURNING VALUE(rt_version) TYPE ty_t_version
+    METHODS load_versions
       RAISING   zcx_blame.
 
     METHODS get_version
@@ -47,7 +44,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_PART IMPLEMENTATION.
+CLASS zcl_blame_part IMPLEMENTATION.
 
 
   METHOD compute_blame.
@@ -63,7 +60,9 @@ CLASS ZCL_BLAME_PART IMPLEMENTATION.
     me->name = i_name.
     me->vrsd_type = i_vrsd_type.
     me->vrsd_name = i_vrsd_name.
-    me->gt_version = get_versions( ).
+    me->go_vrsd = new #( i_type = i_vrsd_type
+                         i_name = i_vrsd_name ).
+    load_versions( ).
   ENDMETHOD.
 
 
@@ -73,30 +72,13 @@ CLASS ZCL_BLAME_PART IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD get_numbers.
-    DATA versno0 LIKE LINE OF rt_versno.
-    SELECT versno INTO TABLE rt_versno
-      FROM vrsd
-      WHERE objtype = me->vrsd_type
-        AND objname = me->vrsd_name.
-
-*   We consider the current version to be 99999 instead of 0
-    versno0 = 0.
-    DELETE rt_versno WHERE table_line = versno0.
-    IF sy-subrc = 0.
-      INSERT zcl_blame_version=>c_latest_version INTO TABLE rt_versno.
-    ENDIF.
-  ENDMETHOD.
-
-
   METHOD get_version.
-    ro_version = NEW zcl_blame_version( io_part          = me
-                                        i_version_number = i_version_number ).
+    ro_version = NEW zcl_blame_version( go_vrsd->t_vrsd[ versno = i_version_number ] ).
   ENDMETHOD.
 
 
-  METHOD get_versions.
-    rt_version = VALUE #( FOR versno IN get_numbers( )
-                          ( get_version( versno ) ) ).
+  METHOD load_versions.
+    me->gt_version = VALUE #( FOR s_vrsd IN go_vrsd->t_vrsd
+                              ( get_version( s_vrsd-versno ) ) ).
   ENDMETHOD.
 ENDCLASS.

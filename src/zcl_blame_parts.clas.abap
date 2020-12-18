@@ -15,7 +15,7 @@ CLASS zcl_blame_parts DEFINITION
         !i_object_type TYPE zblame_object_type
         !i_object_name TYPE sobj_name.
 
-    METHODS load_parts
+    METHODS load
       RAISING
         zcx_blame .
 
@@ -123,7 +123,7 @@ CLASS zcl_blame_parts IMPLEMENTATION.
                                  ( s_blame ) ).
 
     LOOP AT t_blame_all REFERENCE INTO DATA(os_blame)
-     GROUP BY ( request = os_blame->request date = os_blame->date time = os_blame->time author = os_blame->author name = os_blame->author_name )
+     GROUP BY ( request = os_blame->request author = os_blame->author name = os_blame->author_name )
               ASCENDING
               REFERENCE INTO DATA(os_group).
 
@@ -139,8 +139,6 @@ CLASS zcl_blame_parts IMPLEMENTATION.
 
       rt_request = VALUE #( BASE rt_request
                            ( request = os_group->request
-                             date = os_group->date
-                             time = os_group->time
                              description = NEW zcl_blame_request( os_group->request )->description
                              author = os_group->author
                              name = os_group->name
@@ -158,7 +156,7 @@ CLASS zcl_blame_parts IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD load_parts.
+  METHOD load.
     DATA(o_object) = NEW zcl_blame_object_factory( )->get_instance( i_object_type = me->g_type
                                                                     i_object_name = me->g_name ).
     SET HANDLER me->on_object_percentage_complete FOR o_object.

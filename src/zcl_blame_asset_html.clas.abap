@@ -39,7 +39,7 @@ CLASS zcl_blame_asset_html IMPLEMENTATION.
     DATA s_previous LIKE LINE OF it_blame.
 
     LOOP AT it_blame INTO DATA(s_blame).
-      IF s_blame-version_number = s_previous-version_number.
+      IF s_blame-line_num <> 1 AND s_blame-version_number = s_previous-version_number.
         CLEAR s_blame-author.
         CLEAR s_blame-author_name.
         CLEAR s_blame-version_number.

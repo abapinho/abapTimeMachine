@@ -102,7 +102,8 @@
                     </xsl:if>
                     <TD class="num">
                       <xsl:choose>
-                        <xsl:when test="VERSION_NUMBER = 99999">ACTIVE</xsl:when>
+                        <xsl:when test="VERSION_NUMBER = 99999">MODIFIED</xsl:when>
+                        <xsl:when test="VERSION_NUMBER = 99998">ACTIVE</xsl:when>
                         <xsl:when test="VERSION_NUMBER &gt; 0">
                           <xsl:value-of select="number(VERSION_NUMBER)"/>
                         </xsl:when>
@@ -240,7 +241,6 @@
         <table class="requests">
           <THEAD class="header">
             <tr>
-              <th>Date</th>
               <th>Request</th>
               <th>Description</th>
               <th>Author</th>
@@ -251,11 +251,6 @@
           </THEAD>
           <xsl:for-each select="//PARTS/T_REQUEST/ZBLAME_REQUEST_INFO">
             <tr>
-              <td>
-                <xsl:value-of select="DATE"/>
-                <xsl:text> </xsl:text>
-                <xsl:value-of select="TIME"/>
-              </td>
               <td>
                 <a>
                   <xsl:attribute name="href">SAPEVENT:request?
