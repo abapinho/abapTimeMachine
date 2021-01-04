@@ -12,7 +12,12 @@ CLASS zcl_blame_stats DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    METHODS get_comment_count
+    METHODS get_comment_lines
+      IMPORTING
+                !it_blame      TYPE zblame_line_t
+      RETURNING VALUE(r_count) TYPE i.
+
+    METHODS get_empty_lines
       IMPORTING
                 !it_blame      TYPE zblame_line_t
       RETURNING VALUE(r_count) TYPE i.
@@ -36,19 +41,20 @@ ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_STATS IMPLEMENTATION.
+CLASS zcl_blame_stats IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->stats-line_count = lines( it_blame ).
-    me->stats-comment_count = get_comment_count( it_blame ).
+    me->stats-total_lines = lines( it_blame ).
+    me->stats-comment_lines = get_comment_lines( it_blame ).
+    me->stats-empty_lines = get_empty_lines( it_blame ).
     me->stats-version_count = get_version_count( it_blame ).
     me->stats-date_oldest = get_date_oldest( it_blame ).
     me->stats-date_latest = get_date_latest( it_blame ).
   ENDMETHOD.
 
 
-  METHOD get_comment_count.
+  METHOD get_comment_lines.
     DATA first_char TYPE char1.
     LOOP AT it_blame REFERENCE INTO DATA(os_blame).
       first_char = shift_left( os_blame->source ).
@@ -56,6 +62,13 @@ CLASS ZCL_BLAME_STATS IMPLEMENTATION.
         r_count = r_count + 1.
       ENDIF.
     ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD get_empty_lines.
+    DATA(t_blame) = it_blame.
+    DELETE t_blame WHERE source IS NOT INITIAL.
+    r_count = lines( t_blame ).
   ENDMETHOD.
 
 
@@ -80,9 +93,9 @@ CLASS ZCL_BLAME_STATS IMPLEMENTATION.
 
 
   METHOD get_version_count.
-    r_count = REDUCE #( init count = 0
-                        for groups version_number of s_blame in it_blame
-                        group BY ( version = s_blame-version_number )
-                        next count = count + 1 ).
+    r_count = REDUCE #( INIT count = 0
+                        FOR GROUPS version_number OF s_blame IN it_blame
+                        GROUP BY ( version = s_blame-version_number )
+                        NEXT count = count + 1 ).
   ENDMETHOD.
 ENDCLASS.
