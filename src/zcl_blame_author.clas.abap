@@ -35,7 +35,7 @@ CLASS zcl_blame_author IMPLEMENTATION.
       FROM user_addr
       WHERE bname = i_uname.
       IF sy-subrc <> 0.
-        RAISE EXCEPTION TYPE zcx_blame. " TODO
+        s_author-name = i_uname.
       ENDIF.
       INSERT s_author INTO TABLE gt_author.
     ENDIF.
