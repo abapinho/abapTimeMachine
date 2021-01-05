@@ -1,9 +1,13 @@
+"! Main entry point. Instantiated by the program to run the whole show:
+"! 1. Load all the information
+"! 2. Display results in HTML page
 CLASS zcl_blame_run DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    "! Execute everything
     METHODS go
       IMPORTING
                 !i_object_type TYPE zblame_object_type

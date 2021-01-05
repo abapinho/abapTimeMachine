@@ -1,3 +1,5 @@
+"! Renders the main HTML page from a Transformation which receives the deep
+"! structure with all the required data
 CLASS zcl_blame_asset_html DEFINITION
   PUBLIC
   FINAL
@@ -7,6 +9,9 @@ CLASS zcl_blame_asset_html DEFINITION
 
     INTERFACES zif_blame_asset .
 
+    "! Constructor for the main HTML asset
+    "! @parameter is_parts | Deep structure containing all the information that
+    "! is to be rendered as HTML.
     METHODS constructor
       IMPORTING
         is_parts TYPE zblame_parts.

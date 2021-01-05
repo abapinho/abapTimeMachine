@@ -1,3 +1,5 @@
+"! Representation of a function group object. It will be able to create and
+"! return a list of all the parts the function group is made of.
 CLASS zcl_blame_object_fugr DEFINITION
   PUBLIC
   FINAL
@@ -6,6 +8,8 @@ CLASS zcl_blame_object_fugr DEFINITION
   PUBLIC SECTION.
     INTERFACES zif_blame_object .
 
+    "! Constructor for the function group object.
+    "! @parameter i_name | Function group name
     METHODS constructor
       IMPORTING
         i_name TYPE rs38l_area.

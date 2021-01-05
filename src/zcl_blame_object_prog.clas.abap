@@ -1,3 +1,5 @@
+"! Representation of a program/include object. This object consists of a single part which
+"! this class  will be able to create and return.
 CLASS zcl_blame_object_prog DEFINITION
   PUBLIC
   FINAL
@@ -7,6 +9,8 @@ CLASS zcl_blame_object_prog DEFINITION
 
     INTERFACES zif_blame_object .
 
+    "! Constructor for the program/include object.
+    "! @parameter i_name | Program/include name
     METHODS constructor
       IMPORTING
         !i_name TYPE sobj_name .

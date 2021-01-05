@@ -1,3 +1,5 @@
+"! Takes a deep structure with all the information of the requested object,
+"! renders the HTML and CSS assets based on the requested theme and displays it.
 CLASS zcl_blame_output DEFINITION
   PUBLIC
   FINAL
@@ -10,10 +12,14 @@ CLASS zcl_blame_output DEFINITION
         dark  TYPE zblame_theme VALUE 'DARK',
       END OF c_theme.
 
+    "! Constructor which takes a theme as input
+    "! @parameter i_theme | Theme name
     METHODS constructor
       IMPORTING
         !i_theme TYPE zblame_theme.
 
+    "! Takes a deep structure with all the information of the object, renders
+    "! the HTML and CSS assets and displays them.
     METHODS render
       IMPORTING
         !is_parts TYPE zblame_parts.

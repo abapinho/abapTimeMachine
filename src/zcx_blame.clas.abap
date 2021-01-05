@@ -1,3 +1,4 @@
+"! Exception class for all the ZBLAME classes
 class ZCX_BLAME definition
   public
   inheriting from CX_STATIC_CHECK

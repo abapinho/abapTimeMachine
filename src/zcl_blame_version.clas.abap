@@ -1,3 +1,5 @@
+"! Represents a version of a part of an object, including its source code
+"! and several other attributes like author, request, etc.
 CLASS zcl_blame_version DEFINITION
   PUBLIC
   FINAL
@@ -12,19 +14,35 @@ CLASS zcl_blame_version DEFINITION
         modified  TYPE versno VALUE 99999,
       END OF c_version.
 
+    "! Version number from the VRSD table
     DATA version_number TYPE versno READ-ONLY.
+
+    "! Transport request ID
     DATA request TYPE verskorrno READ-ONLY.
+
+    "! Task ID (if exists)
     DATA task    TYPE verskorrno READ-ONLY.
+
+    " Username
     DATA author  TYPE versuser READ-ONLY.
+
+    " Name of the user (or username if no longer exists)
     DATA author_name TYPE ad_namtext READ-ONLY.
+
+    " Date of version
     DATA date    TYPE versdate READ-ONLY.
+
+    " Time of version
     DATA time    TYPE verstime READ-ONLY.
 
+    "! Takes a line of the VRSD table and fills all the attributes, including
+    "! the source code already with blame information.
     METHODS constructor
       IMPORTING
                 !is_vrsd TYPE vrsd
       RAISING   zcx_blame.
 
+    "! Returns the version source code including blame information.
     METHODS get_source_with_blame
       RETURNING VALUE(rt_blame) TYPE zblame_line_t
       RAISING   zcx_blame.

@@ -1,11 +1,23 @@
+"! Takes a list of code with blame information and fills a structure
+"! with several calculated statistic indicators:
+"! - total lines of code
+"! - number of empty lines
+"! - number of comment lines
+"! - number of versions
+"! - date of oldest version
+"! - date of newest version
 CLASS zcl_blame_stats DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+
+    "! Statistics structure
     DATA stats TYPE zblame_stats READ-ONLY.
 
+    "! Constructor which receives a source code and immediately fills the stats
+    "! structure attribute with all the calculated values.
     METHODS constructor
       IMPORTING
         !it_blame TYPE zblame_line_t.

@@ -1,14 +1,21 @@
+"! HTML screen event handler to deal with user interaction during the HTML
+"! presentation. It will decode the request and process it depending on the
+"! requested action. For example, it will navigate to the requested source code.
 CLASS zcl_blame_output_handler DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    "! Handler method
+    "! @parameter action | Action
+    "! @parameter getdata | Data details
     METHODS on_html_events
           FOR EVENT sapevent OF cl_gui_html_viewer
       IMPORTING
           !action
           !getdata .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     METHODS display_request

@@ -1,3 +1,5 @@
+"! Renders a CSS asset which is generated from a Transformation based on
+"! the provided theme name
 CLASS zcl_blame_asset_css DEFINITION
   PUBLIC
   FINAL
@@ -5,6 +7,9 @@ CLASS zcl_blame_asset_css DEFINITION
 
   PUBLIC SECTION.
 
+    "! Constructor for a CSS asset
+    "! @parameter i_theme | Theme name which will determine which transformation to use
+    "! to generate the CSS asset
     METHODS constructor
       IMPORTING
         !i_theme TYPE zblame_theme.

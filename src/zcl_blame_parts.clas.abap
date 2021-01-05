@@ -1,3 +1,4 @@
+"! List of parts of an object.
 CLASS zcl_blame_parts DEFINITION
   PUBLIC
   FINAL
@@ -5,20 +6,27 @@ CLASS zcl_blame_parts DEFINITION
 
   PUBLIC SECTION.
 
+    "! Event to be raised when percentage complete
     EVENTS percentage_complete
       EXPORTING
         VALUE(percentage) TYPE i
         VALUE(text) TYPE string.
 
+    "! Constructor for an object parts
+    "! @parameter i_object_type | Object type
+    "! @parameter i_object_name | Object name
     METHODS constructor
       IMPORTING
         !i_object_type TYPE zblame_object_type
         !i_object_name TYPE sobj_name.
 
+    "! Load all the data, creating the actual parts
+    "! which will load all the versions
     METHODS load
       RAISING
         zcx_blame .
 
+    "! Returns a deep structure containing all the details for all the parts.
     METHODS get_data
       IMPORTING
         !io_options    TYPE REF TO zcl_blame_options

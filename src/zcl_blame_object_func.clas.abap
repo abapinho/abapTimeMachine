@@ -1,3 +1,5 @@
+"! Representation of a function module object. It will be able to create and
+"! return a list of all the parts the function module is made of.
 CLASS zcl_blame_object_func DEFINITION
   PUBLIC
   FINAL
@@ -7,6 +9,8 @@ CLASS zcl_blame_object_func DEFINITION
 
     INTERFACES zif_blame_object .
 
+    "! Constructor for the function module object.
+    "! @parameter i_name | Function module name
     METHODS constructor
       IMPORTING
         !i_name TYPE rs38l_fnam .

@@ -1,3 +1,5 @@
+"! Class which implements a syntax highlighter for ABAP. It was copied from
+"! the abapGit project as-is and used here as a black box that just works :)
 CLASS zcl_blame_syntax_abap DEFINITION
   PUBLIC
   INHERITING FROM zcl_blame_syntax_highlighter
@@ -43,7 +45,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_blame_syntax_abap IMPLEMENTATION.
+CLASS ZCL_BLAME_SYNTAX_ABAP IMPLEMENTATION.
 
 
   METHOD class_constructor.

@@ -1,8 +1,5 @@
-*&---------------------------------------------------------------------*
-*& Report ZABAPBLAME
-*&---------------------------------------------------------------------*
-*&
-*&---------------------------------------------------------------------*
+"! Takes an object type and name, calculates the blame information for the source
+"! code of all its parts and displays it as HTML.
 REPORT zblame.
 
 SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-sel.

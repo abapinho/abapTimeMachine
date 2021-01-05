@@ -1,9 +1,11 @@
+"! An SAP user
 CLASS zcl_blame_author DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    "! Returns the user's name (or the username if the user no longer exists)
     METHODS get_name
       IMPORTING
                 i_uname       TYPE syuname

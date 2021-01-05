@@ -1,12 +1,18 @@
+"! Represents an SAP transport request
 CLASS zcl_blame_request DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+
+    "! Transport request ID
     DATA id TYPE trkorr READ-ONLY.
+
+    "! Transport request description
     DATA description TYPE as4text READ-ONLY.
 
+    "! Constructs an instance for the given request ID
     METHODS constructor
       IMPORTING
         !i_request TYPE trkorr.

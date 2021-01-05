@@ -1,3 +1,8 @@
+"! Factory class for the object family:
+"! - Class
+"! - Function group
+"! - Function module
+"! - Program
 CLASS zcl_blame_object_factory DEFINITION
   PUBLIC
   FINAL
@@ -12,6 +17,9 @@ CLASS zcl_blame_object_factory DEFINITION
         function       TYPE zblame_object_type VALUE 'FUNC',
       END OF gc_object_type.
 
+    "! Creates and returns an instance to the requested object
+    "! @parameter i_object_type | Object type
+    "! @parameter i_object_name | Object name
     METHODS get_instance
       IMPORTING
                 i_object_type    TYPE zblame_object_type

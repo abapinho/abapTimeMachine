@@ -5,8 +5,13 @@ CLASS zcl_blame_options DEFINITION
 
   PUBLIC SECTION.
 
+    "! Diff operation should ignore case
     DATA ignore_case TYPE boolean READ-ONLY .
+
+    "! Diff operation should ignore indentation
     DATA ignore_indentation TYPE boolean READ-ONLY .
+
+    "! CSS theme name
     DATA theme TYPE zblame_theme READ-ONLY.
 
     METHODS constructor

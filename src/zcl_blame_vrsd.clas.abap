@@ -1,11 +1,17 @@
+"! List of VRSD lines for existing versions of a given object.
 CLASS zcl_blame_vrsd DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    "! List of relevant lines of VRSD table (plus artificial lines created
+    "! for the active and modified versions).
     DATA t_vrsd TYPE vrsd_tab READ-ONLY.
 
+    "! Constructor which takes an object type and name and loads all the VRSD
+    "! data, as well as the eventual artificial lines for the active and modified
+    "! versions.
     METHODS constructor
       IMPORTING
                 i_type TYPE versobjtyp

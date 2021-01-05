@@ -5,15 +5,23 @@ CLASS zcl_blame_diff DEFINITION
 
   PUBLIC SECTION.
 
+    "! @parameter io_options | User run options that determine the diff behavior
     METHODS constructor
       IMPORTING
         !io_options TYPE REF TO zcl_blame_options .
+
+    "! Takes two source lists - old and new - and returns a new source list
+    "! which merges both, adding for each line an indicator of how it changed
+    "! between both versions: (I)nsert/(D)elete/(U)pdate.
+    "! @parameter it_old | Old source list
+    "! @parameter it_new | New source list
     METHODS compute
       IMPORTING
         !it_old         TYPE zblame_line_t
         !it_new         TYPE zblame_line_t
       RETURNING
         VALUE(rt_blame) TYPE zblame_line_t .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:
@@ -129,7 +137,9 @@ CLASS ZCL_BLAME_DIFF IMPLEMENTATION.
 
 
   METHOD get_source.
-    rt_source = VALUE abaptxt255_tab( FOR s_blame IN it_blame ( line = process_line( s_blame-source ) ) ).
+    rt_source = VALUE abaptxt255_tab(
+      FOR s_blame IN it_blame
+      ( line = process_line( s_blame-source ) ) ).
   ENDMETHOD.
 
 

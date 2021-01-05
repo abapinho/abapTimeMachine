@@ -1,3 +1,5 @@
+"! Abstract class representing a generic syntax highlighter. It was copied from
+"! the abapGit project as-is and used as a black box that just works :)
 class ZCL_BLAME_SYNTAX_HIGHLIGHTER definition
   public
   abstract

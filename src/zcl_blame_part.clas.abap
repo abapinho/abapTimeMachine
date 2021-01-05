@@ -1,13 +1,24 @@
+"! Represents a part of an object, including all the versions of that part that
+"! exist in the system.
 CLASS zcl_blame_part DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    "! Object name
     DATA name TYPE string READ-ONLY.
+
+    "! Part type
     DATA vrsd_type TYPE versobjtyp READ-ONLY.
+
+    "! Part name
     DATA vrsd_name TYPE versobjnam READ-ONLY.
 
+    "! Constructs a new part
+    "! @parameter i_name | Object name
+    "! @parameter i_vrsd_type | Part type
+    "! @parameter i_vrsd_name | Part object
     METHODS constructor
       IMPORTING
                 !i_name      TYPE string
@@ -15,12 +26,16 @@ CLASS zcl_blame_part DEFINITION
                 !i_vrsd_name TYPE versobjnam
       RAISING   zcx_blame.
 
+    "! Calculates and returns a list of the source already filled with blame
+    "! details.
+    "! @parameter io_options | Instance of options
     METHODS compute_blame
       IMPORTING
                 !io_options     TYPE REF TO zcl_blame_options
       RETURNING VALUE(rt_blame) TYPE zblame_line_t
       RAISING   zcx_blame.
 
+    "! Returns list of authors involved in the different existing versions.
     METHODS get_authors
       RETURNING VALUE(rt_author) TYPE zblame_author_info_t.
 

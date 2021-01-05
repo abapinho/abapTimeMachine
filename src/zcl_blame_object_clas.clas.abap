@@ -1,3 +1,5 @@
+"! Representation of a class object. It will be able to create and return a list
+"! of all the parts the class is made of.
 CLASS zcl_blame_object_clas DEFINITION
   PUBLIC
   FINAL
@@ -7,6 +9,8 @@ CLASS zcl_blame_object_clas DEFINITION
 
     INTERFACES zif_blame_object .
 
+    "! Constructor for the class object.
+    "! @parameter i_name | Class name
     METHODS constructor
       IMPORTING
         !i_name TYPE seoclsname.
