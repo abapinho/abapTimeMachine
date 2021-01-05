@@ -8,15 +8,25 @@ CLASS zcl_blame_counter DEFINITION
   FINAL.
 
   PUBLIC SECTION.
-    "! @parameter i_total_parts | Total number of parts
-    METHODS constructor
-      IMPORTING
-        !i_total_parts TYPE i .
+    "! So that external instances can keep track of the percentage of the object
+    "! which is already loaded.
+    EVENTS percentage_changed
+      EXPORTING
+        VALUE(percentage) TYPE i
+        VALUE(text) TYPE string.
 
-    "! Increment counter and return the new calculated percentage of increments
-    "! that were done against the total of parts (which represents 100%)
+    "! Initialize with total parts
+    "! @parameter i_total_parts | Total number of parts
+    METHODS initialize
+      IMPORTING
+        i_total_parts TYPE i.
+
+    "! Increment counter and raises event with the new calculated percentage of
+    "! increments that were done against the total of parts (which represents 100%).
     METHODS next
-      RETURNING VALUE(r_percentage) TYPE i.
+      IMPORTING
+                i_text TYPE string
+      RAISING   zcx_blame.
   PROTECTED SECTION.
 
   PRIVATE SECTION.
@@ -29,13 +39,19 @@ ENDCLASS.
 CLASS ZCL_BLAME_COUNTER IMPLEMENTATION.
 
 
-  METHOD constructor.
+  METHOD initialize.
     g_total_parts = i_total_parts.
   ENDMETHOD.
 
 
   METHOD next.
+    IF g_total_parts IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_blame.
+    ENDIF.
+
+    DATA percentage TYPE i.
     g_cursor = g_cursor + 1.
-    r_percentage = 100 * g_cursor / g_total_parts.
+    percentage = 100 * g_cursor / g_total_parts.
+    RAISE EVENT percentage_changed EXPORTING percentage = percentage text = i_text.
   ENDMETHOD.
 ENDCLASS.

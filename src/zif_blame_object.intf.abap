@@ -1,15 +1,10 @@
 INTERFACE zif_blame_object
   PUBLIC .
 
-  "! So that external instances can keep track of the percentage of the object
-  "! which is already loaded
-  EVENTS percentage_complete
-    EXPORTING
-      VALUE(percentage) TYPE i
-      VALUE(text) TYPE string.
-
   "! Returns a table of references to part instances
   METHODS get_part_list
+    IMPORTING
+      io_counter type ref to zcl_blame_counter
     RETURNING
       VALUE(rt_part) TYPE zblame_part_ref_t
     RAISING

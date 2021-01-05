@@ -6,7 +6,6 @@ CLASS zcl_blame_object_clas DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
     INTERFACES zif_blame_object .
 
     "! Constructor for the class object.
@@ -27,30 +26,31 @@ CLASS zcl_blame_object_clas IMPLEMENTATION.
     g_name = i_name.
   ENDMETHOD.
 
+
   METHOD zif_blame_object~get_part_list.
     DATA(t_method_include) = cl_oo_classname_service=>get_all_method_includes( g_name ).
 
-    DATA(o_counter) = NEW zcl_blame_counter( 9 + lines( t_method_include ) ).
+    io_counter->initialize( 9 + lines( t_method_include ) ).
 
     INSERT NEW #( i_name = 'Class pool'
                   i_vrsd_name = CONV #( g_name )
                   i_vrsd_type = 'CLSD' ) INTO TABLE rt_part.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Class pool { g_name }|.
+    io_counter->next( |Class pool { g_name }| ).
 
     INSERT NEW #( i_name = 'Public section'
                   i_vrsd_name = CONV #( g_name )
                   i_vrsd_type = 'CPUB' ) INTO TABLE rt_part.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Public section { g_name }|.
+    io_counter->next( |Public section { g_name }| ).
 
     INSERT NEW #( i_name = 'Protected section'
                   i_vrsd_name = CONV #( g_name )
                   i_vrsd_type = 'CPRO' ) INTO TABLE rt_part.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Protected section { g_name }|.
+    io_counter->next( |Protected section { g_name }| ).
 
     INSERT NEW #( i_name = 'Private section'
                   i_vrsd_name = CONV #( g_name )
                   i_vrsd_type = 'CPRI' ) INTO TABLE rt_part.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Private section { g_name }|.
+    io_counter->next( |Private section { g_name }| ).
 
     TRY.
         INSERT NEW #( i_name = 'Local class definition'
@@ -59,7 +59,7 @@ CLASS zcl_blame_object_clas IMPLEMENTATION.
       CATCH zcx_blame.
         ASSERT 1 = 1. " Doesn't exist? Carry on
     ENDTRY.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Local class definition { g_name }|.
+    io_counter->next( |Local class definition { g_name }| ).
 
     TRY.
         INSERT NEW #( i_name = 'Local class implementation'
@@ -68,7 +68,7 @@ CLASS zcl_blame_object_clas IMPLEMENTATION.
       CATCH zcx_blame.
         ASSERT 1 = 1. " Doesn't exist? Carry on
     ENDTRY.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Local class implementation { g_name }|.
+    io_counter->next( |Local class implementation { g_name }| ).
 
     TRY.
         INSERT NEW #( i_name = 'Local macros'
@@ -77,7 +77,7 @@ CLASS zcl_blame_object_clas IMPLEMENTATION.
       CATCH zcx_blame.
         ASSERT 1 = 1. " Doesn't exist? Carry on
     ENDTRY.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Local macros { g_name }|.
+    io_counter->next( |Local macros { g_name }| ).
 
     TRY.
         INSERT NEW #( i_name = 'Local types'
@@ -86,7 +86,7 @@ CLASS zcl_blame_object_clas IMPLEMENTATION.
       CATCH zcx_blame.
         ASSERT 1 = 1. " Doesn't exist? Carry on
     ENDTRY.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Local types { g_name }|.
+    io_counter->next( |Local types { g_name }| ).
 
     TRY.
         INSERT NEW #( i_name = 'Local test classes'
@@ -95,14 +95,14 @@ CLASS zcl_blame_object_clas IMPLEMENTATION.
       CATCH zcx_blame.
         ASSERT 1 = 1. " Doesn't exist? Carry on
     ENDTRY.
-    RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Local test classes { g_name }|.
+    io_counter->next( |Local test classes { g_name }| ).
 
     LOOP AT cl_oo_classname_service=>get_all_method_includes( g_name ) INTO DATA(s_method_include).
       DATA(method_name) = cl_oo_classname_service=>get_method_by_include( s_method_include-incname )-cpdname.
       INSERT NEW #( i_name = |{ to_lower( method_name ) }()|
                     i_vrsd_name = |{ g_name WIDTH = 30 }{ method_name }|
                     i_vrsd_type = 'METH' ) INTO TABLE rt_part.
-      RAISE EVENT zif_blame_object~percentage_complete EXPORTING percentage = o_counter->next( ) text = |Method { to_lower( method_name ) }()|.
+      io_counter->next( |Method { to_lower( method_name ) }()| ).
     ENDLOOP.
   ENDMETHOD.
 

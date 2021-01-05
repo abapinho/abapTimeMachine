@@ -17,8 +17,8 @@ CLASS zcl_blame_run DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    METHODS on_parts_percentage_complete
-          FOR EVENT percentage_complete OF zcl_blame_parts
+    METHODS on_percentage_changed
+          FOR EVENT percentage_changed OF zcl_blame_counter
       IMPORTING
           !percentage
           !text.
@@ -30,14 +30,15 @@ CLASS zcl_blame_run IMPLEMENTATION.
   METHOD go.
     DATA(o_parts) = NEW zcl_blame_parts( i_object_type = i_object_type
                                          i_object_name = i_object_name ).
-    SET HANDLER me->on_parts_percentage_complete FOR o_parts.
-    o_parts->load( ).
+    data(o_counter) = new zcl_blame_counter( ).
+    SET HANDLER me->on_percentage_changed FOR o_counter.
+    o_parts->load( o_counter ).
     DATA(s_parts) = o_parts->get_data( io_options ).
     NEW zcl_blame_output( io_options->theme )->render( s_parts ).
   ENDMETHOD.
 
 
-  METHOD on_parts_percentage_complete.
+  METHOD on_percentage_changed.
     CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
       EXPORTING
         percentage = percentage
