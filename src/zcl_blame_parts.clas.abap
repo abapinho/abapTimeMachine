@@ -6,12 +6,6 @@ CLASS zcl_blame_parts DEFINITION
 
   PUBLIC SECTION.
 
-    "! Event to be raised when percentage complete
-    EVENTS percentage_complete
-      EXPORTING
-        VALUE(percentage) TYPE i
-        VALUE(text) TYPE string.
-
     "! Constructor for an object parts
     "! @parameter i_object_type | Object type
     "! @parameter i_object_name | Object name
@@ -22,7 +16,10 @@ CLASS zcl_blame_parts DEFINITION
 
     "! Load all the data, creating the actual parts
     "! which will load all the versions
+    "! @parameter io_counter | To keep track of progress
     METHODS load
+      IMPORTING
+        io_counter type ref to zcl_blame_counter
       RAISING
         zcx_blame .
 
@@ -58,12 +55,6 @@ CLASS zcl_blame_parts DEFINITION
         !it_part        TYPE zblame_part_t
       RETURNING
         VALUE(rs_stats) TYPE zblame_stats .
-
-    METHODS on_object_percentage_complete
-          FOR EVENT percentage_complete OF zif_blame_object
-      IMPORTING
-          !percentage
-          !text.
 ENDCLASS.
 
 
@@ -167,12 +158,6 @@ CLASS zcl_blame_parts IMPLEMENTATION.
   METHOD load.
     DATA(o_object) = NEW zcl_blame_object_factory( )->get_instance( i_object_type = me->g_type
                                                                     i_object_name = me->g_name ).
-    SET HANDLER me->on_object_percentage_complete FOR o_object.
-    me->gt_part = o_object->get_part_list( ).
-  ENDMETHOD.
-
-
-  METHOD on_object_percentage_complete.
-    RAISE EVENT percentage_complete EXPORTING percentage = percentage text = text.
+    me->gt_part = o_object->get_part_list( io_counter ).
   ENDMETHOD.
 ENDCLASS.
