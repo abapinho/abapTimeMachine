@@ -27,14 +27,16 @@ ENDCLASS.
 
 
 CLASS zcl_blame_run IMPLEMENTATION.
+
+
   METHOD go.
     DATA(o_parts) = NEW zcl_blame_parts( i_object_type = i_object_type
                                          i_object_name = i_object_name ).
-    data(o_counter) = new zcl_blame_counter( ).
+    DATA(o_counter) = NEW zcl_blame_counter( ).
     SET HANDLER me->on_percentage_changed FOR o_counter.
     o_parts->load( o_counter ).
-    DATA(s_parts) = o_parts->get_data( io_options ).
-    NEW zcl_blame_output( io_options->theme )->render( s_parts ).
+    NEW zcl_blame_gui( io_options = io_options
+                       io_parts = o_parts )->display( ).
   ENDMETHOD.
 
 

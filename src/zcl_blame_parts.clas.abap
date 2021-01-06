@@ -19,7 +19,7 @@ CLASS zcl_blame_parts DEFINITION
     "! @parameter io_counter | To keep track of progress
     METHODS load
       IMPORTING
-        io_counter type ref to zcl_blame_counter
+        io_counter TYPE REF TO zcl_blame_counter
       RAISING
         zcx_blame .
 
@@ -32,11 +32,16 @@ CLASS zcl_blame_parts DEFINITION
       RAISING
         zcx_blame .
 
+    METHODS filter
+      IMPORTING
+        io_parts_filter TYPE REF TO zcl_blame_parts_filter.
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA g_type TYPE zblame_object_type .
     DATA g_name TYPE sobj_name .
     DATA gt_part TYPE zblame_part_ref_t .
+    DATA go_parts_filter TYPE REF TO zcl_blame_parts_filter.
 
     METHODS get_authors
       IMPORTING
@@ -55,6 +60,9 @@ CLASS zcl_blame_parts DEFINITION
         !it_part        TYPE zblame_part_t
       RETURNING
         VALUE(rs_stats) TYPE zblame_stats .
+
+    METHODS get_filtered_parts
+      RETURNING VALUE(rt_part) TYPE zblame_part_ref_t.
 ENDCLASS.
 
 
@@ -65,6 +73,20 @@ CLASS zcl_blame_parts IMPLEMENTATION.
   METHOD constructor.
     me->g_type = i_object_type.
     me->g_name = i_object_name.
+    filter( NEW #( ) ).
+  ENDMETHOD.
+
+
+  METHOD filter.
+    go_parts_filter = io_parts_filter.
+  ENDMETHOD.
+
+
+  METHOD get_filtered_parts.
+    rt_part = VALUE #( FOR part IN gt_part
+                       WHERE ( table_line->vrsd_type IN go_parts_filter->r_object_type AND
+                               table_line->vrsd_name IN go_parts_filter->r_object_name )
+                               ( part ) ).
   ENDMETHOD.
 
 
@@ -99,11 +121,13 @@ CLASS zcl_blame_parts IMPLEMENTATION.
 
 
   METHOD get_data.
-    DATA(t_part) = VALUE zblame_part_t( FOR o_part IN gt_part
-                                        ( name = o_part->name
-                                          type = o_part->vrsd_type
-                                          object_name = o_part->vrsd_name
-                                          t_blame = o_part->compute_blame( io_options ) ) ).
+    DATA(t_part) =
+      VALUE zblame_part_t( FOR o_part IN get_filtered_parts( )
+                           ( name = o_part->name
+                             type = o_part->vrsd_type
+                             object_name = o_part->vrsd_name
+                             t_blame = o_part->compute_blame( io_options = io_options
+                                                              i_version_number = go_parts_filter->version_number ) ) ).
 
     rs_data = VALUE #( name = g_name
                        type = g_type
@@ -111,7 +135,8 @@ CLASS zcl_blame_parts IMPLEMENTATION.
                        t_author = get_authors( t_part )
                        t_request = get_requests( t_part )
                        t_part = t_part
-                       s_stats = get_stats( t_part ) ).
+                       s_stats = get_stats( t_part )
+                       is_filtered = go_parts_filter->is_filtered ).
   ENDMETHOD.
 
 

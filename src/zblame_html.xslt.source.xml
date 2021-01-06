@@ -18,7 +18,14 @@
             </xsl:choose>
             <xsl:text> </xsl:text>
             <xsl:value-of select="//PARTS/NAME"/>
+            <xsl:if test="//PARTS/IS_FILTERED = 'X'"> (filtered)</xsl:if>
           </h1>
+           <xsl:if test="//PARTS/IS_FILTERED = 'X'">
+             <a>
+               <xsl:attribute name="href">SAPEVENT:filter?||00000</xsl:attribute>
+               Remove filter
+             </a>
+           </xsl:if>
         </div>
 
         <h2>Table of contents</h2>
@@ -101,13 +108,18 @@
                       <xsl:attribute name="class">versionfirstrow</xsl:attribute>
                     </xsl:if>
                     <TD class="num">
-                      <xsl:choose>
-                        <xsl:when test="VERSION_NUMBER = 99999">MODIFIED</xsl:when>
-                        <xsl:when test="VERSION_NUMBER = 99998">ACTIVE</xsl:when>
-                        <xsl:when test="VERSION_NUMBER &gt; 0">
-                          <xsl:value-of select="number(VERSION_NUMBER)"/>
-                        </xsl:when>
-                      </xsl:choose>
+                      <a>
+                        <xsl:attribute name="href">SAPEVENT:filter?
+                          <xsl:value-of select="../../TYPE"/>|<xsl:value-of select="../../OBJECT_NAME"/>|<xsl:value-of select="VERSION_NUMBER"/>
+                        </xsl:attribute>
+                        <xsl:choose>
+                          <xsl:when test="VERSION_NUMBER = 99999">MODIFIED</xsl:when>
+                          <xsl:when test="VERSION_NUMBER = 99998">ACTIVE</xsl:when>
+                          <xsl:when test="VERSION_NUMBER &gt; 0">
+                            <xsl:value-of select="number(VERSION_NUMBER)"/>
+                          </xsl:when>
+                        </xsl:choose>
+                      </a>
                     </TD>
                     <TD>
                       <a>
@@ -172,15 +184,7 @@
         <h2 class="contributors">
           <a>
             <xsl:attribute name="name">contributors</xsl:attribute>
-
-
-
-
-         Contributors
-
-
-
-
+            Contributors
           </a>
         </h2>
 
@@ -199,9 +203,6 @@
               <td>
                 <a>
                   <xsl:attribute name="href">SAPEVENT:author?
-
-
-
                     <xsl:value-of select="AUTHOR"/>
                   </xsl:attribute>
                   <xsl:value-of select="AUTHOR"/>
@@ -226,15 +227,7 @@
         <h2 class="requests">
           <a>
             <xsl:attribute name="name">requests</xsl:attribute>
-
-
-
-
-         Requests
-
-
-
-
+            Requests
           </a>
         </h2>
 
@@ -254,9 +247,6 @@
               <td>
                 <a>
                   <xsl:attribute name="href">SAPEVENT:request?
-
-
-
                     <xsl:value-of select="REQUEST"/>
                   </xsl:attribute>
                   <xsl:value-of select="REQUEST"/>
@@ -284,15 +274,7 @@
         <h2 class="stats">
           <a>
             <xsl:attribute name="name">stats</xsl:attribute>
-
-
-
-
-       Statistics
-
-
-
-
+            Statistics
           </a>
         </h2>
 
@@ -359,15 +341,7 @@
 
         <div id="footer">
           <P/>
-
-
-
-
-          Version:
-
-
-
-
+          Version
           <xsl:text> </xsl:text>
           <xsl:value-of select="//PARTS/ABAPBLAME_VERSION"/>
         </div>

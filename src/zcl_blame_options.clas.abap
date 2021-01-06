@@ -18,7 +18,7 @@ CLASS zcl_blame_options DEFINITION
       IMPORTING
         !i_ignore_case        TYPE boolean DEFAULT abap_false
         !i_ignore_indentation TYPE boolean DEFAULT abap_false
-        !i_theme              TYPE zblame_theme DEFAULT zcl_blame_output=>c_theme-light.
+        !i_theme              TYPE zblame_theme DEFAULT zcl_blame_gui_viewer=>c_theme-light.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.

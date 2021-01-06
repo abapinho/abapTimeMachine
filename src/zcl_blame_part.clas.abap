@@ -31,8 +31,9 @@ CLASS zcl_blame_part DEFINITION
     "! @parameter io_options | Instance of options
     METHODS compute_blame
       IMPORTING
-                !io_options     TYPE REF TO zcl_blame_options
-      RETURNING VALUE(rt_blame) TYPE zblame_line_t
+                !io_options       TYPE REF TO zcl_blame_options
+                !i_version_number TYPE versno
+      RETURNING VALUE(rt_blame)   TYPE zblame_line_t
       RAISING   zcx_blame.
 
     "! Returns list of authors involved in the different existing versions.
@@ -45,10 +46,10 @@ CLASS zcl_blame_part DEFINITION
     TYPES ty_t_version TYPE STANDARD TABLE OF REF TO zcl_blame_version WITH KEY table_line.
 
     DATA gt_version TYPE ty_t_version.
-    data go_vrsd type ref to zcl_blame_vrsd.
+    DATA go_vrsd TYPE REF TO zcl_blame_vrsd.
 
     METHODS load_versions
-      RAISING   zcx_blame.
+      RAISING zcx_blame.
 
     METHODS get_version
       IMPORTING
@@ -64,7 +65,7 @@ CLASS zcl_blame_part IMPLEMENTATION.
 
   METHOD compute_blame.
     DATA(o_diff) = NEW zcl_blame_diff( io_options ).
-    LOOP AT gt_version INTO DATA(o_version).
+    LOOP AT gt_version INTO DATA(o_version) WHERE table_line->version_number <= i_version_number.
       rt_blame = o_diff->compute( it_old = rt_blame
                                   it_new =  o_version->get_source_with_blame( ) ).
     ENDLOOP.
@@ -75,7 +76,7 @@ CLASS zcl_blame_part IMPLEMENTATION.
     me->name = i_name.
     me->vrsd_type = i_vrsd_type.
     me->vrsd_name = i_vrsd_name.
-    me->go_vrsd = new #( i_type = i_vrsd_type
+    me->go_vrsd = NEW #( i_type = i_vrsd_type
                          i_name = i_vrsd_name ).
     load_versions( ).
   ENDMETHOD.
