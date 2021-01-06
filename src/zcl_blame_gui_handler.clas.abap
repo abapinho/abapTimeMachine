@@ -1,12 +1,17 @@
 "! HTML screen event handler to deal with user interaction during the HTML
 "! presentation. It will decode the request and process it depending on the
 "! requested action. For example, it will navigate to the requested source code.
-CLASS zcl_blame_output_handler DEFINITION
+CLASS zcl_blame_gui_handler DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    METHODS constructor
+      IMPORTING
+        io_gui TYPE REF TO zcl_blame_gui.
+
+
     "! Handler method
     "! @parameter action | Action
     "! @parameter getdata | Data details
@@ -18,6 +23,8 @@ CLASS zcl_blame_output_handler DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
+    DATA go_gui TYPE REF TO zcl_blame_gui.
+
     METHODS display_request
       IMPORTING
         i_request TYPE trkorr.
@@ -29,19 +36,28 @@ CLASS zcl_blame_output_handler DEFINITION
     METHODS display_source
       IMPORTING
         i_type        TYPE versobjtyp
-        i_object_name TYPE string.
+        i_object_name TYPE versobjnam.
+
+    METHODS display_version
+      IMPORTING
+        io_parts_filter TYPE ref to zcl_blame_parts_filter.
 
     METHODS decode_source_type_and_name
       IMPORTING
         i_getdata     TYPE c
       EXPORTING
         e_type        TYPE versobjtyp
-        e_object_name TYPE string.
+        e_object_name TYPE versobjnam.
 ENDCLASS.
 
 
 
-CLASS zcl_blame_output_handler IMPLEMENTATION.
+CLASS ZCL_BLAME_GUI_HANDLER IMPLEMENTATION.
+
+
+  METHOD constructor.
+    go_gui = io_gui.
+  ENDMETHOD.
 
 
   METHOD decode_source_type_and_name.
@@ -127,6 +143,16 @@ CLASS zcl_blame_output_handler IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD display_version.
+    TRY.
+        go_gui->filter_parts( io_parts_filter ).
+        go_gui->display( ).
+      CATCH zcx_blame.
+        RETURN. " Ignore error
+    ENDTRY.
+  ENDMETHOD.
+
+
   METHOD on_html_events.
     action = condense( action ).
     getdata = condense( getdata ).
@@ -142,8 +168,15 @@ CLASS zcl_blame_output_handler IMPLEMENTATION.
           IMPORTING
             e_type = DATA(type)
             e_object_name = DATA(object_name) ).
-        display_source( i_type = CONV #( type )
+        display_source( i_type = type
                         i_object_name = object_name ).
+      WHEN 'filter'.
+        DATA object_type TYPE versobjtyp.
+        DATA version_number TYPE versno.
+        SPLIT getdata AT '|' INTO object_type object_name version_number.
+        display_version( new #( i_object_name    = object_name
+                                i_object_type    = object_type
+                                i_version_number = version_number ) ).
       WHEN OTHERS.
         RETURN.
     ENDCASE.

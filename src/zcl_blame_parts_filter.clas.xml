@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_BLAME_OUTPUT_HANDLER</CLSNAME>
+    <CLSNAME>ZCL_BLAME_PARTS_FILTER</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>abapBlame output events</DESCRIPT>
+    <DESCRIPT>abapBlame Parts Filter</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

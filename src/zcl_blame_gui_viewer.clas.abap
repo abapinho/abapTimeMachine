@@ -1,6 +1,6 @@
 "! Takes a deep structure with all the information of the requested object,
 "! renders the HTML and CSS assets based on the requested theme and displays it.
-CLASS zcl_blame_output DEFINITION
+CLASS zcl_blame_gui_viewer DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC.
@@ -16,19 +16,20 @@ CLASS zcl_blame_output DEFINITION
     "! @parameter i_theme | Theme name
     METHODS constructor
       IMPORTING
-        !i_theme TYPE zblame_theme.
+        !io_options TYPE REF TO zcl_blame_options
+        !io_handler type ref to zcl_blame_gui_handler.
 
     "! Takes a deep structure with all the information of the object, renders
     "! the HTML and CSS assets and displays them.
     METHODS render
       IMPORTING
-        !is_parts TYPE zblame_parts.
+                !io_parts TYPE REF TO zcl_blame_parts
+      RAISING   zcx_blame.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA g_theme TYPE zblame_theme.
-    DATA go_html_viewer TYPE REF TO cl_gui_html_viewer .
-    DATA go_handler TYPE REF TO zcl_blame_output_handler.
+    DATA go_options TYPE REF TO zcl_blame_options.
+    DATA go_html_viewer TYPE REF TO cl_gui_html_viewer.
 
     METHODS add_asset
       IMPORTING
@@ -50,7 +51,9 @@ CLASS zcl_blame_output DEFINITION
       RETURNING
         VALUE(r_output) TYPE xstring .
 
-    METHODS register_events .
+    METHODS register_events
+      IMPORTING
+        io_handler type ref to zcl_blame_gui_handler.
 
     CLASS-METHODS xstring_2_bintab
       IMPORTING
@@ -62,7 +65,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
+CLASS ZCL_BLAME_GUI_VIEWER IMPLEMENTATION.
 
 
   METHOD add_asset.
@@ -103,14 +106,15 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
 
 
   METHOD add_main_css.
-    add_asset( NEW zcl_blame_asset_css( g_theme ) ).
+    add_asset( NEW zcl_blame_asset_css( go_options->theme ) ).
   ENDMETHOD.
 
 
   METHOD constructor.
-    g_theme = i_theme.
-    go_html_viewer = NEW cl_gui_html_viewer( parent = cl_gui_container=>screen0 ).
-    go_handler = NEW #( ).
+    go_options = io_options.
+    go_html_viewer = NEW cl_gui_html_viewer( parent                   = cl_gui_container=>screen0
+                                             query_table_disabled     = abap_true ).
+    register_events( io_handler ).
   ENDMETHOD.
 
 
@@ -119,15 +123,16 @@ CLASS ZCL_BLAME_OUTPUT IMPLEMENTATION.
     t_event = VALUE #( ( appl_event = abap_true
                          eventid    = go_html_viewer->m_id_sapevent ) ).
     go_html_viewer->set_registered_events( t_event ).
-    SET HANDLER go_handler->on_html_events FOR go_html_viewer.
+    SET HANDLER io_handler->on_html_events FOR go_html_viewer.
   ENDMETHOD.
 
 
   METHOD render.
+    DATA(s_parts) = io_parts->get_data( go_options ).
+
     SKIP. " Creates the screen0 container
     add_main_css( ).
-    DATA(url) = add_html( is_parts ).
-    register_events( ).
+    DATA(url) = add_html( s_parts ).
     go_html_viewer->show_url(
       EXPORTING
         url = url
