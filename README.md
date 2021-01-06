@@ -1,5 +1,3 @@
-(This is still in alpha stage.)
-
 # abapBlame
 
 A simple blame tool for ABAP code.
