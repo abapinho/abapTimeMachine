@@ -61,19 +61,21 @@ CLASS zcl_blame_version DEFINITION
     METHODS get_real_version
       RETURNING VALUE(r_version) TYPE versno.
 
+    "! Try to find the object in the request tasks because sometimes the request was created
+    "! by someone who was not the actual developer. The tasks better reflects the object's author.
+    "! If we find a task, we overwrite the author. We choose to pick the latest task.
     METHODS load_latest_task.
 ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_VERSION IMPLEMENTATION.
+CLASS zcl_blame_version IMPLEMENTATION.
 
 
   METHOD constructor.
     me->s_vrsd = is_vrsd.
     load_attributes( ).
     load_latest_task( ).
-    load_source( ).
   ENDMETHOD.
 
 
@@ -97,6 +99,8 @@ CLASS ZCL_BLAME_VERSION IMPLEMENTATION.
     s_source_with_blame-date = me->date.
     s_source_with_blame-time = me->time.
 
+    load_source( ).
+
     LOOP AT gt_source INTO DATA(source_int).
       s_source_with_blame-line_num = sy-tabix.
       s_source_with_blame-source = source_int.
@@ -116,9 +120,9 @@ CLASS ZCL_BLAME_VERSION IMPLEMENTATION.
 
 
   METHOD load_latest_task.
-    " Try to find the object in the request tasks because sometimes the request was created
-    " by someone who was not the actual developer. The tasks better reflects the object's author.
-    " If we find a task, we overwrite the author. We choose to pick the latest task.
+    IF me->request IS INITIAL.
+      RETURN.
+    ENDIF.
     SELECT e070~trkorr as4user as4date as4time name_textc
       INTO (me->task, me->author, me->date, me->time, me->author_name)
       FROM e070
@@ -136,6 +140,11 @@ CLASS ZCL_BLAME_VERSION IMPLEMENTATION.
 
   METHOD load_source.
     DATA t_trdir TYPE trdir_it.
+
+    " If already loaded, skip it
+    IF gt_source[] IS NOT INITIAL.
+      RETURN.
+    ENDIF.
 
     CALL FUNCTION 'SVRS_GET_REPS_FROM_OBJECT'
       EXPORTING

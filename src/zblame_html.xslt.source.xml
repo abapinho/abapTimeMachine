@@ -18,14 +18,22 @@
             </xsl:choose>
             <xsl:text> </xsl:text>
             <xsl:value-of select="//PARTS/NAME"/>
-            <xsl:if test="//PARTS/IS_FILTERED = 'X'"> (filtered)</xsl:if>
           </h1>
-           <xsl:if test="//PARTS/IS_FILTERED = 'X'">
-             <a>
-               <xsl:attribute name="href">SAPEVENT:filter?||00000</xsl:attribute>
-               Remove filter
-             </a>
-           </xsl:if>
+        </div>
+        <div class="metadata">
+          <div>Threshold: <xsl:value-of select="//PARTS/DATE"/>&amp;nbsp;<xsl:value-of select="//PARTS/TIME"/></div>
+          <div>Ignore case:
+            <xsl:choose>
+              <xsl:when test="//PARTS/IGNORE_CASE = 'X'">Yes</xsl:when>
+              <xsl:otherwise>No</xsl:otherwise>
+            </xsl:choose>
+          </div>
+          <div>Ignore indentation:
+            <xsl:choose>
+              <xsl:when test="//PARTS/IGNORE_CASE = 'X'">Yes</xsl:when>
+              <xsl:otherwise>No</xsl:otherwise>
+            </xsl:choose>
+          </div>
         </div>
 
         <h2>Table of contents</h2>
@@ -73,9 +81,7 @@
 
           <h2 class="blame">
             <a>
-              <xsl:attribute name="name">
-                <xsl:value-of select="NAME"/>
-              </xsl:attribute>
+              <xsl:attribute name="name"><xsl:value-of select="NAME"/></xsl:attribute>
               <xsl:value-of select="NAME"/>
             </a>
           </h2>
@@ -108,18 +114,13 @@
                       <xsl:attribute name="class">versionfirstrow</xsl:attribute>
                     </xsl:if>
                     <TD class="num">
-                      <a>
-                        <xsl:attribute name="href">SAPEVENT:filter?
-                          <xsl:value-of select="../../TYPE"/>|<xsl:value-of select="../../OBJECT_NAME"/>|<xsl:value-of select="VERSION_NUMBER"/>
-                        </xsl:attribute>
-                        <xsl:choose>
-                          <xsl:when test="VERSION_NUMBER = 99999">MODIFIED</xsl:when>
-                          <xsl:when test="VERSION_NUMBER = 99998">ACTIVE</xsl:when>
-                          <xsl:when test="VERSION_NUMBER &gt; 0">
-                            <xsl:value-of select="number(VERSION_NUMBER)"/>
-                          </xsl:when>
-                        </xsl:choose>
-                      </a>
+                      <xsl:choose>
+                        <xsl:when test="VERSION_NUMBER = 99999">MODIFIED</xsl:when>
+                        <xsl:when test="VERSION_NUMBER = 99998">ACTIVE</xsl:when>
+                        <xsl:when test="VERSION_NUMBER &gt; 0">
+                          <xsl:value-of select="number(VERSION_NUMBER)"/>
+                        </xsl:when>
+                      </xsl:choose>
                     </TD>
                     <TD>
                       <a>
@@ -127,30 +128,26 @@
                           <xsl:value-of select="AUTHOR_NAME"/>
                         </xsl:attribute>
                         <xsl:if test="AUTHOR != ''">
-                          <xsl:attribute name="href">SAPEVENT:author?
-                            <xsl:value-of select="AUTHOR"/>
-                          </xsl:attribute>
+                          <xsl:attribute name="href">SAPEVENT:author?<xsl:value-of select="AUTHOR"/></xsl:attribute>
                         </xsl:if>
                         <xsl:value-of select="AUTHOR"/>
                       </a>
                     </TD>
                     <TD>
                       <xsl:if test="TIME != '00:00:00'">
-                        <xsl:value-of select="DATE"/>
-                        <xsl:text> </xsl:text>
-                        <xsl:value-of select="TIME"/>
+                        <a>
+                        <xsl:attribute name="title">Show versions only until <xsl:value-of select="DATE"/>&amp;nbsp;<xsl:value-of select="TIME"/></xsl:attribute>
+                          <xsl:attribute name="href">SAPEVENT:threshold?<xsl:value-of select="DATE"/>|<xsl:value-of select="TIME"/></xsl:attribute>
+                          <xsl:value-of select="DATE"/>&amp;nbsp;<xsl:value-of select="TIME"/>
+                        </a>
                       </xsl:if>
                     </TD>
                     <TD>
                       <xsl:choose>
                         <xsl:when test="REQUEST != ''">
                           <a>
-                            <xsl:attribute name="href">SAPEVENT:request?
-
-
-
-                              <xsl:value-of select="REQUEST"/>
-                            </xsl:attribute>
+                            <xsl:attribute name="title">Jump to request <xsl:value-of select="REQUEST"/></xsl:attribute>
+                            <xsl:attribute name="href">SAPEVENT:request?<xsl:value-of select="REQUEST"/></xsl:attribute>
                             <xsl:value-of select="REQUEST"/>
                           </a>
                         </xsl:when>
@@ -184,7 +181,11 @@
         <h2 class="contributors">
           <a>
             <xsl:attribute name="name">contributors</xsl:attribute>
+
+
             Contributors
+
+
           </a>
         </h2>
 
@@ -202,9 +203,7 @@
             <tr>
               <td>
                 <a>
-                  <xsl:attribute name="href">SAPEVENT:author?
-                    <xsl:value-of select="AUTHOR"/>
-                  </xsl:attribute>
+                  <xsl:attribute name="href">SAPEVENT:author?<xsl:value-of select="AUTHOR"/></xsl:attribute>
                   <xsl:value-of select="AUTHOR"/>
                 </a>
               </td>
@@ -246,9 +245,8 @@
             <tr>
               <td>
                 <a>
-                  <xsl:attribute name="href">SAPEVENT:request?
-                    <xsl:value-of select="REQUEST"/>
-                  </xsl:attribute>
+                  <xsl:attribute name="title">Jump to request <xsl:value-of select="REQUEST"/></xsl:attribute>
+                  <xsl:attribute name="href">SAPEVENT:request?<xsl:value-of select="REQUEST"/></xsl:attribute>
                   <xsl:value-of select="REQUEST"/>
                 </a>
               </td>
@@ -274,7 +272,11 @@
         <h2 class="stats">
           <a>
             <xsl:attribute name="name">stats</xsl:attribute>
+
+
             Statistics
+
+
           </a>
         </h2>
 
@@ -323,12 +325,6 @@
               </td>
             </tr>
             <tr>
-              <td>Surviving versions:</td>
-              <td>
-                <xsl:value-of select="VERSION_COUNT"/>
-              </td>
-            </tr>
-            <tr>
               <td>Activity interval:</td>
               <td>
                 <xsl:value-of select="DATE_OLDEST"/>
@@ -341,7 +337,11 @@
 
         <div id="footer">
           <P/>
+
+
           Version
+
+
           <xsl:text> </xsl:text>
           <xsl:value-of select="//PARTS/ABAPBLAME_VERSION"/>
         </div>

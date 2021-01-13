@@ -5,11 +5,6 @@ CLASS zcl_blame_diff DEFINITION
 
   PUBLIC SECTION.
 
-    "! @parameter io_options | User run options that determine the diff behavior
-    METHODS constructor
-      IMPORTING
-        !io_options TYPE REF TO zcl_blame_options .
-
     "! Takes two source lists - old and new - and returns a new source list
     "! which merges both, adding for each line an indicator of how it changed
     "! between both versions: (I)nsert/(D)elete/(U)pdate.
@@ -30,8 +25,6 @@ CLASS zcl_blame_diff DEFINITION
         delete TYPE c LENGTH 1 VALUE 'D',
         update TYPE c LENGTH 1 VALUE 'U',
       END OF c_diff .
-
-    DATA go_options TYPE REF TO zcl_blame_options.
 
     METHODS compute_delta
       IMPORTING
@@ -130,12 +123,6 @@ CLASS ZCL_BLAME_DIFF IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD constructor.
-    ASSERT io_options IS BOUND.
-    go_options = io_options.
-  ENDMETHOD.
-
-
   METHOD get_source.
     rt_source = VALUE abaptxt255_tab(
       FOR s_blame IN it_blame
@@ -145,10 +132,10 @@ CLASS ZCL_BLAME_DIFF IMPLEMENTATION.
 
   METHOD process_line.
     r_line = i_line.
-    IF go_options->ignore_case = abap_true.
+    IF zcl_blame_options=>get_instance( )->ignore_case = abap_true.
       r_line = to_upper( r_line ).
     ENDIF.
-    IF go_options->ignore_indentation = abap_true.
+    IF zcl_blame_options=>get_instance( )->ignore_indentation = abap_true.
       SHIFT r_line LEFT DELETING LEADING space.
     ENDIF.
   ENDMETHOD.

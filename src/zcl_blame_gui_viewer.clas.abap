@@ -16,7 +16,6 @@ CLASS zcl_blame_gui_viewer DEFINITION
     "! @parameter i_theme | Theme name
     METHODS constructor
       IMPORTING
-        !io_options TYPE REF TO zcl_blame_options
         !io_handler type ref to zcl_blame_gui_handler.
 
     "! Takes a deep structure with all the information of the object, renders
@@ -28,7 +27,6 @@ CLASS zcl_blame_gui_viewer DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA go_options TYPE REF TO zcl_blame_options.
     DATA go_html_viewer TYPE REF TO cl_gui_html_viewer.
 
     METHODS add_asset
@@ -106,12 +104,11 @@ CLASS ZCL_BLAME_GUI_VIEWER IMPLEMENTATION.
 
 
   METHOD add_main_css.
-    add_asset( NEW zcl_blame_asset_css( go_options->theme ) ).
+    add_asset( NEW zcl_blame_asset_css( zcl_blame_options=>get_instance( )->theme ) ).
   ENDMETHOD.
 
 
   METHOD constructor.
-    go_options = io_options.
     go_html_viewer = NEW cl_gui_html_viewer( parent                   = cl_gui_container=>screen0
                                              query_table_disabled     = abap_true ).
     register_events( io_handler ).
@@ -128,7 +125,7 @@ CLASS ZCL_BLAME_GUI_VIEWER IMPLEMENTATION.
 
 
   METHOD render.
-    DATA(s_parts) = io_parts->get_data( go_options ).
+    DATA(s_parts) = io_parts->get_data( ).
 
     SKIP. " Creates the screen0 container
     add_main_css( ).
