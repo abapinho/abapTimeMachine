@@ -14,8 +14,8 @@ CLASS zcl_blame_vrsd DEFINITION
     "! versions.
     METHODS constructor
       IMPORTING
-                i_type TYPE versobjtyp
-                i_name TYPE versobjnam
+                i_type     TYPE versobjtyp
+                i_name     TYPE versobjnam
       RAISING   zcx_blame.
 
   PROTECTED SECTION.
@@ -38,7 +38,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_blame_vrsd IMPLEMENTATION.
+CLASS ZCL_BLAME_VRSD IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -48,64 +48,6 @@ CLASS zcl_blame_vrsd IMPLEMENTATION.
     load_active_or_modified( zcl_blame_version=>c_version-active ).
     load_active_or_modified( zcl_blame_version=>c_version-modified ).
     SORT me->t_vrsd BY versno.
-  ENDMETHOD.
-
-
-  METHOD load_active_or_modified.
-    DATA(s_obj) = VALUE svrs2_versionable_object(
-      objtype = me->type
-      data_pointer = me->type
-      objname = me->name
-      header_only = abap_true ).
-    CALL FUNCTION 'SVRS_INITIALIZE_DATAPOINTER'
-      CHANGING
-        objtype      = me->type
-        data_pointer = me->type.
-    data(mode) = switch char1(
-      i_versno
-      when zcl_blame_version=>c_version-active then 'A'
-      when zcl_blame_version=>c_version-modified then 'M' ).
-    CALL FUNCTION 'SVRS_GET_VERSION_REPOSITORY'
-      EXPORTING
-        mode      = mode
-      CHANGING
-        obj       = s_obj
-      EXCEPTIONS
-        not_found = 1
-        OTHERS    = 2.
-    IF sy-subrc <> 0.
-      RETURN.
-    ENDIF.
-
-    DATA s_vrsd TYPE vrsd.
-    CALL FUNCTION 'SVRS_EXTRACT_INFO_FROM_OBJECT'
-      EXPORTING
-        object    = s_obj
-      CHANGING
-        vrsd_info = s_vrsd.
-    IF s_vrsd-author IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_blame. " TODO
-    ENDIF.
-
-    s_vrsd-versno = i_versno.
-    s_vrsd-objtype = me->type.
-    s_vrsd-objname = me->name.
-    s_vrsd-korrnum = get_request_active_modif( ).
-    INSERT s_vrsd INTO TABLE me->t_vrsd.
-  ENDMETHOD.
-
-
-  METHOD load_from_table.
-    SELECT * INTO TABLE me->t_vrsd
-      FROM vrsd
-      WHERE objtype = me->type
-        AND objname = me->name.
-
-    " We consider the current version to be 99998 instead of 0
-    LOOP AT me->t_vrsd ASSIGNING FIELD-SYMBOL(<s_vrsd>)
-      WHERE versno = zcl_blame_version=>c_version-latest_db.
-      <s_vrsd>-versno = zcl_blame_version=>c_version-latest.
-    ENDLOOP.
   ENDMETHOD.
 
 
@@ -163,5 +105,63 @@ CLASS zcl_blame_vrsd IMPLEMENTATION.
     ENDIF.
 
     r_request = request_active_modif = s_tlock-trkorr.
+  ENDMETHOD.
+
+
+  METHOD load_active_or_modified.
+    DATA(s_obj) = VALUE svrs2_versionable_object(
+      objtype = me->type
+      data_pointer = me->type
+      objname = me->name
+      header_only = abap_true ).
+    CALL FUNCTION 'SVRS_INITIALIZE_DATAPOINTER'
+      CHANGING
+        objtype      = me->type
+        data_pointer = me->type.
+    DATA(mode) = SWITCH char1(
+      i_versno
+      WHEN zcl_blame_version=>c_version-active THEN 'A'
+      WHEN zcl_blame_version=>c_version-modified THEN 'M' ).
+    CALL FUNCTION 'SVRS_GET_VERSION_REPOSITORY'
+      EXPORTING
+        mode      = mode
+      CHANGING
+        obj       = s_obj
+      EXCEPTIONS
+        not_found = 1
+        OTHERS    = 2.
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
+
+    DATA s_vrsd TYPE vrsd.
+    CALL FUNCTION 'SVRS_EXTRACT_INFO_FROM_OBJECT'
+      EXPORTING
+        object    = s_obj
+      CHANGING
+        vrsd_info = s_vrsd.
+    IF s_vrsd-author IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_blame. " TODO
+    ENDIF.
+
+    s_vrsd-versno = i_versno.
+    s_vrsd-objtype = me->type.
+    s_vrsd-objname = me->name.
+    s_vrsd-korrnum = get_request_active_modif( ).
+    INSERT s_vrsd INTO TABLE me->t_vrsd.
+  ENDMETHOD.
+
+
+  METHOD load_from_table.
+    SELECT * INTO TABLE me->t_vrsd
+      FROM vrsd
+      WHERE objtype = me->type
+        AND objname = me->name.
+
+    " We consider the current version to be 99998 instead of 0
+    LOOP AT me->t_vrsd ASSIGNING FIELD-SYMBOL(<s_vrsd>)
+      WHERE versno = zcl_blame_version=>c_version-latest_db.
+      <s_vrsd>-versno = zcl_blame_version=>c_version-latest.
+    ENDLOOP.
   ENDMETHOD.
 ENDCLASS.

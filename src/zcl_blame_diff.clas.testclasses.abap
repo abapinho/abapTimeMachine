@@ -4,7 +4,9 @@ CLASS ltcl_diff DEFINITION FINAL FOR TESTING
   RISK LEVEL HARMLESS.
 
   PRIVATE SECTION.
+    data: o_diff type ref to zcl_blame_diff.
     METHODS:
+      setup,
       changed_line FOR TESTING RAISING cx_static_check,
       ignore_case FOR TESTING RAISING cx_static_check,
       ignore_indentation FOR TESTING RAISING cx_static_check,
@@ -15,8 +17,12 @@ ENDCLASS.
 
 
 CLASS ltcl_diff IMPLEMENTATION.
+  method setup.
+    o_diff = new #( ).
+  ENDMETHOD.
+
+
   METHOD changed_line.
-    DATA(o_diff) = NEW zcl_blame_diff( NEW zcl_blame_options( ) ).
     DATA(t_blame) = o_diff->compute( it_old   = VALUE #( ( source = 'AaA' author = 'A' ) )
                                      it_new   = VALUE #( ( source = 'aAa' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author
@@ -25,7 +31,7 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD ignore_case.
-    DATA(o_diff) = NEW zcl_blame_diff( NEW zcl_blame_options( i_ignore_case = abap_true ) ).
+    zcl_blame_options=>get_instance( )->set( i_ignore_case = abap_true ).
     DATA(t_blame) = o_diff->compute( it_old   = VALUE #( ( source = 'AaA' author = 'A' ) )
                                      it_new   = VALUE #( ( source = 'aAa' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author
@@ -34,7 +40,7 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD ignore_indentation.
-    DATA(o_diff) = NEW zcl_blame_diff( NEW zcl_blame_options( i_ignore_indentation = abap_true ) ).
+    zcl_blame_options=>get_instance( )->set( i_ignore_indentation = abap_true ).
     DATA(t_blame) = o_diff->compute( it_old   = VALUE #( ( source = '  AaA' author = 'A' ) )
                                      it_new   = VALUE #( ( source = '    AaA' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author
@@ -43,7 +49,6 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD empty_old.
-    DATA(o_diff) = NEW zcl_blame_diff( NEW zcl_blame_options( ) ).
     DATA(t_blame) = o_diff->compute( it_old   = VALUE #( )
                                      it_new   = VALUE #( ( source = 'bbb' author = 'B' )
                                                          ( source = 'bbb' author = 'B' ) ) ).
@@ -55,7 +60,6 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD empty_new.
-    DATA(o_diff) = NEW zcl_blame_diff( NEW zcl_blame_options( ) ).
     DATA(t_blame) = o_diff->compute( it_old   = VALUE #( ( source = 'bbb' author = 'B' )
                                                          ( source = 'bbb' author = 'B' ) )
                                      it_new   = VALUE #( ) ).
@@ -65,7 +69,6 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD empty_both.
-    DATA(o_diff) = NEW zcl_blame_diff( NEW zcl_blame_options( ) ).
     DATA(t_blame) = o_diff->compute( it_old   = VALUE #( )
                                      it_new   = VALUE #( ) ).
     cl_abap_unit_assert=>assert_equals( act = lines( t_blame )

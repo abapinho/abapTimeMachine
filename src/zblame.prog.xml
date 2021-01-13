@@ -74,6 +74,12 @@
    <TPOOL>
     <item>
      <ID>I</ID>
+     <KEY>FLT</KEY>
+     <ENTRY>Filters</ENTRY>
+     <LENGTH>17</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>OPT</KEY>
      <ENTRY>Diff options</ENTRY>
      <LENGTH>17</LENGTH>
@@ -94,6 +100,13 @@
      <ID>R</ID>
      <ENTRY>abapBlame</ENTRY>
      <LENGTH>9</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_DATE</KEY>
+     <ENTRY>.</ENTRY>
+     <LENGTH>12</LENGTH>
+     <SPLIT>D</SPLIT>
     </item>
     <item>
      <ID>S</ID>
@@ -123,9 +136,9 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_THEME</KEY>
+     <KEY>P_TIME</KEY>
      <ENTRY>.</ENTRY>
-     <LENGTH>13</LENGTH>
+     <LENGTH>9</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
    </TPOOL>

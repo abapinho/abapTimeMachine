@@ -12,7 +12,6 @@ CLASS zcl_blame_run DEFINITION
       IMPORTING
                 !i_object_type TYPE zblame_object_type
                 !i_object_name TYPE sobj_name
-                !io_options    TYPE REF TO zcl_blame_options
       RAISING   zcx_blame.
 
   PROTECTED SECTION.
@@ -35,8 +34,7 @@ CLASS zcl_blame_run IMPLEMENTATION.
     DATA(o_counter) = NEW zcl_blame_counter( ).
     SET HANDLER me->on_percentage_changed FOR o_counter.
     o_parts->load( o_counter ).
-    NEW zcl_blame_gui( io_options = io_options
-                       io_parts = o_parts )->display( ).
+    NEW zcl_blame_gui( o_parts )->display( ).
   ENDMETHOD.
 
 

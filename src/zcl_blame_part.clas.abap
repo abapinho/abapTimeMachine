@@ -28,11 +28,7 @@ CLASS zcl_blame_part DEFINITION
 
     "! Calculates and returns a list of the source already filled with blame
     "! details.
-    "! @parameter io_options | Instance of options
     METHODS compute_blame
-      IMPORTING
-                !io_options       TYPE REF TO zcl_blame_options
-                !i_version_number TYPE versno
       RETURNING VALUE(rt_blame)   TYPE zblame_line_t
       RAISING   zcx_blame.
 
@@ -42,30 +38,28 @@ CLASS zcl_blame_part DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    TYPES: ty_t_versno TYPE SORTED TABLE OF versno WITH UNIQUE KEY table_line.
     TYPES ty_t_version TYPE STANDARD TABLE OF REF TO zcl_blame_version WITH KEY table_line.
 
     DATA gt_version TYPE ty_t_version.
-    DATA go_vrsd TYPE REF TO zcl_blame_vrsd.
 
     METHODS load_versions
-      RAISING zcx_blame.
-
-    METHODS get_version
       IMPORTING
-                !i_version_number TYPE versno
-      RETURNING VALUE(ro_version) TYPE REF TO zcl_blame_version
+                !i_vrsd_type TYPE versobjtyp
+                !i_vrsd_name TYPE versobjnam
       RAISING   zcx_blame.
+
+    METHODS get_versions_until_threshold
+      RETURNING VALUE(rt_version) TYPE ty_t_version.
 ENDCLASS.
 
 
 
-CLASS zcl_blame_part IMPLEMENTATION.
+CLASS ZCL_BLAME_PART IMPLEMENTATION.
 
 
   METHOD compute_blame.
-    DATA(o_diff) = NEW zcl_blame_diff( io_options ).
-    LOOP AT gt_version INTO DATA(o_version) WHERE table_line->version_number <= i_version_number.
+    DATA(o_diff) = NEW zcl_blame_diff( ).
+    LOOP AT get_versions_until_threshold( ) INTO DATA(o_version).
       rt_blame = o_diff->compute( it_old = rt_blame
                                   it_new =  o_version->get_source_with_blame( ) ).
     ENDLOOP.
@@ -76,25 +70,33 @@ CLASS zcl_blame_part IMPLEMENTATION.
     me->name = i_name.
     me->vrsd_type = i_vrsd_type.
     me->vrsd_name = i_vrsd_name.
-    me->go_vrsd = NEW #( i_type = i_vrsd_type
-                         i_name = i_vrsd_name ).
-    load_versions( ).
+    load_versions( i_vrsd_type = i_vrsd_type
+                   i_vrsd_name = i_vrsd_name ).
   ENDMETHOD.
 
 
   METHOD get_authors.
-    rt_author = VALUE #( FOR o_version IN gt_version
+    rt_author = VALUE #( FOR o_version IN get_versions_until_threshold( )
                          ( author = o_version->author name = o_version->author_name ) ).
   ENDMETHOD.
 
 
-  METHOD get_version.
-    ro_version = NEW zcl_blame_version( go_vrsd->t_vrsd[ versno = i_version_number ] ).
+  METHOD get_versions_until_threshold.
+    rt_version = VALUE #(
+      FOR o_version IN gt_version
+        WHERE (
+          table_line->date < zcl_blame_options=>get_instance( )->date OR
+          ( table_line->date = zcl_blame_options=>get_instance( )->date AND
+            table_line->time <= zcl_blame_options=>get_instance( )->time ) )
+        ( o_version ) ).
   ENDMETHOD.
 
 
   METHOD load_versions.
-    me->gt_version = VALUE #( FOR s_vrsd IN go_vrsd->t_vrsd
-                              ( get_version( s_vrsd-versno ) ) ).
+    DATA(o_vrsd) = NEW zcl_blame_vrsd( i_type = i_vrsd_type
+                                       i_name = i_vrsd_name ).
+
+    me->gt_version = VALUE #( FOR s_vrsd IN o_vrsd->t_vrsd
+                              ( NEW zcl_blame_version( s_vrsd ) ) ).
   ENDMETHOD.
 ENDCLASS.

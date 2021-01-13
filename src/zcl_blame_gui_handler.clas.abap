@@ -38,9 +38,7 @@ CLASS zcl_blame_gui_handler DEFINITION
         i_type        TYPE versobjtyp
         i_object_name TYPE versobjnam.
 
-    METHODS display_version
-      IMPORTING
-        io_parts_filter TYPE ref to zcl_blame_parts_filter.
+    METHODS display_version.
 
     METHODS decode_source_type_and_name
       IMPORTING
@@ -48,6 +46,13 @@ CLASS zcl_blame_gui_handler DEFINITION
       EXPORTING
         e_type        TYPE versobjtyp
         e_object_name TYPE versobjnam.
+
+    METHODS decode_date_and_time
+      IMPORTING
+        i_getdata TYPE c
+      EXPORTING
+        e_date    TYPE datum
+        e_time    TYPE uzeit.
 ENDCLASS.
 
 
@@ -57,6 +62,17 @@ CLASS ZCL_BLAME_GUI_HANDLER IMPLEMENTATION.
 
   METHOD constructor.
     go_gui = io_gui.
+  ENDMETHOD.
+
+
+  METHOD decode_date_and_time.
+    DATA date_str TYPE char100.
+    DATA time_str TYPE char100.
+    SPLIT i_getdata AT '|' INTO date_str time_str.
+    CONDENSE date_str NO-GAPS.
+    CONDENSE time_str NO-GAPS.
+    e_date = |{ date_str(4) }{ date_str+5(2) }{ date_str+8(2) }|.
+    e_time = |{ time_str(2) }{ time_str+3(2) }{ time_str+6(2) }|.
   ENDMETHOD.
 
 
@@ -97,7 +113,6 @@ CLASS ZCL_BLAME_GUI_HANDLER IMPLEMENTATION.
                      WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
         ENDIF.
         e_type = 'PROG'.
-
       WHEN OTHERS.
         RETURN.
     ENDCASE.
@@ -145,7 +160,6 @@ CLASS ZCL_BLAME_GUI_HANDLER IMPLEMENTATION.
 
   METHOD display_version.
     TRY.
-        go_gui->filter_parts( io_parts_filter ).
         go_gui->display( ).
       CATCH zcx_blame.
         RETURN. " Ignore error
@@ -170,13 +184,17 @@ CLASS ZCL_BLAME_GUI_HANDLER IMPLEMENTATION.
             e_object_name = DATA(object_name) ).
         display_source( i_type = type
                         i_object_name = object_name ).
-      WHEN 'filter'.
-        DATA object_type TYPE versobjtyp.
-        DATA version_number TYPE versno.
-        SPLIT getdata AT '|' INTO object_type object_name version_number.
-        display_version( new #( i_object_name    = object_name
-                                i_object_type    = object_type
-                                i_version_number = version_number ) ).
+      WHEN 'threshold'.
+        decode_date_and_time(
+          EXPORTING
+            i_getdata = getdata
+          IMPORTING
+            e_date = DATA(date)
+            e_time = DATA(time) ).
+        zcl_blame_options=>get_instance( )->set(
+          i_date = date
+          i_time = time ).
+        display_version( ).
       WHEN OTHERS.
         RETURN.
     ENDCASE.

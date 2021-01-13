@@ -2,5 +2,5 @@ INTERFACE zif_blame_consts
   PUBLIC .
 
 
-  CONSTANTS version TYPE char10 VALUE '0.20b' ##NO_TEXT.
+  CONSTANTS version TYPE char10 VALUE '0.21b' ##NO_TEXT.
 ENDINTERFACE.

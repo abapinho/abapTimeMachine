@@ -43,12 +43,6 @@ CLASS zcl_blame_stats DEFINITION
       IMPORTING
                 !it_blame     TYPE zblame_line_t
       RETURNING VALUE(r_date) TYPE datum.
-
-    METHODS get_version_count
-      IMPORTING
-                !it_blame      TYPE zblame_line_t
-      RETURNING VALUE(r_count) TYPE i.
-
 ENDCLASS.
 
 
@@ -60,7 +54,6 @@ CLASS zcl_blame_stats IMPLEMENTATION.
     me->stats-total_lines = lines( it_blame ).
     me->stats-comment_lines = get_comment_lines( it_blame ).
     me->stats-empty_lines = get_empty_lines( it_blame ).
-    me->stats-version_count = get_version_count( it_blame ).
     me->stats-date_oldest = get_date_oldest( it_blame ).
     me->stats-date_latest = get_date_latest( it_blame ).
   ENDMETHOD.
@@ -101,13 +94,5 @@ CLASS zcl_blame_stats IMPLEMENTATION.
         r_date = os_blame->date.
       ENDIF.
     ENDLOOP.
-  ENDMETHOD.
-
-
-  METHOD get_version_count.
-    r_count = REDUCE #( INIT count = 0
-                        FOR GROUPS version_number OF s_blame IN it_blame
-                        GROUP BY ( version = s_blame-version_number )
-                        NEXT count = count + 1 ).
   ENDMETHOD.
 ENDCLASS.
