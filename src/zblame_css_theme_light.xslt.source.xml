@@ -10,6 +10,7 @@ table td.code span.keyword { color: #0a69ce; }
 table td.code span.text { color: #48ce4f; }
 table td.code span.comment { color: #808080; font-style: italic; }
 table.contributors th,table.requests th { border-bottom: 1pt dotted #707070; }
+#footer { color: #707070; }
     </css>
   </xsl:template>
 </xsl:transform>

@@ -4,6 +4,9 @@ CLASS zcl_blame_options DEFINITION
   CREATE PRIVATE .
 
   PUBLIC SECTION.
+    "! Mode (Blame or Time Machine)
+    DATA mode TYPE zblame_mode READ-ONLY.
+
     "! Diff operation should ignore case
     DATA ignore_case TYPE boolean READ-ONLY .
 
@@ -13,10 +16,13 @@ CLASS zcl_blame_options DEFINITION
     "! CSS theme name
     DATA theme TYPE zblame_theme READ-ONLY.
 
-    " Date
+    "! Timestamp
+    DATA timestamp TYPE timestamp READ-ONLY.
+
+    "! Date
     DATA date TYPE datum READ-ONLY.
 
-    " Time
+    "! Time
     DATA time TYPE uzeit READ-ONLY.
 
     CLASS-METHODS class_constructor.
@@ -26,10 +32,10 @@ CLASS zcl_blame_options DEFINITION
 
     METHODS set
       IMPORTING
+        !i_mode               TYPE zblame_mode OPTIONAL
         !i_ignore_case        TYPE boolean OPTIONAL
         !i_ignore_indentation TYPE boolean OPTIONAL
-        !i_date               TYPE datum OPTIONAL
-        !i_time               TYPE uzeit OPTIONAL
+        !i_timestamp          TYPE timestamp OPTIONAL
         !i_theme              TYPE zblame_theme OPTIONAL.
 
   PROTECTED SECTION.
@@ -39,16 +45,16 @@ ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_OPTIONS IMPLEMENTATION.
+CLASS zcl_blame_options IMPLEMENTATION.
 
 
   METHOD class_constructor.
     go_instance = NEW #( ).
     go_instance->set(
+        i_mode               = zif_blame_consts=>mode-blame
         i_ignore_case        = abap_false
         i_ignore_indentation = abap_false
-        i_date               = sy-datum
-        i_time               = '235959'
+        i_timestamp          = CONV #( |{ sy-datum }235959| )
         i_theme              = zcl_blame_gui_viewer=>c_theme-light ).
   ENDMETHOD.
 
@@ -59,6 +65,10 @@ CLASS ZCL_BLAME_OPTIONS IMPLEMENTATION.
 
 
   METHOD set.
+    IF i_mode IS SUPPLIED.
+      me->mode = i_mode.
+    ENDIF.
+
     IF i_ignore_case IS SUPPLIED.
       me->ignore_case = i_ignore_case.
     ENDIF.
@@ -71,12 +81,9 @@ CLASS ZCL_BLAME_OPTIONS IMPLEMENTATION.
       me->theme = i_theme.
     ENDIF.
 
-    IF i_date IS SUPPLIED.
-      me->date = i_date.
-    ENDIF.
-
-    IF i_time IS SUPPLIED.
-      me->time = i_time.
+    IF i_timestamp IS SUPPLIED.
+      me->timestamp = i_timestamp.
+      CONVERT TIME STAMP i_timestamp TIME ZONE sy-zonlo INTO DATE me->date TIME me->time.
     ENDIF.
   ENDMETHOD.
 ENDCLASS.

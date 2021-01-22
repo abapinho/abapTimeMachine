@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_BLAME_COUNTER</CLSNAME>
+    <CLSNAME>ZCL_BLAME_ASSET_HTML_TMACHINE</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>abapBlame object (abstract)</DESCRIPT>
+    <DESCRIPT>abapBlame Asset HTML</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

@@ -102,12 +102,9 @@ CLASS zcl_blame_object_fugr IMPLEMENTATION.
       RAISE EXCEPTION TYPE zcx_blame.
     ENDIF.
 
-    io_counter->initialize( 1 + lines( t_include ) ).
-
     rt_part = VALUE #( ( NEW #( i_name = |Program { main_program }|
                               i_vrsd_name = CONV #( main_program )
                               i_vrsd_type = 'REPS' ) ) ).
-    io_counter->next( |Program { main_program }| ).
 
     DATA(t_function) = get_functions( ).
     LOOP AT t_include INTO DATA(include).
@@ -116,7 +113,6 @@ CLASS zcl_blame_object_fugr IMPLEMENTATION.
                          ( NEW #( i_name = |Include { include }|
                                   i_vrsd_name = CONV #( include )
                                   i_vrsd_type = 'REPS' ) ) ).
-        io_counter->next( |Include { include }| ).
       ENDIF.
     ENDLOOP.
 
@@ -125,7 +121,6 @@ CLASS zcl_blame_object_fugr IMPLEMENTATION.
                          ( NEW #( i_name      = |Function module { os_function->funcname }|
                                 i_vrsd_name = CONV #( os_function->funcname )
                                 i_vrsd_type = 'FUNC' ) ) ).
-      io_counter->next( |Function module { os_function->funcname }| ).
     ENDLOOP.
   ENDMETHOD.
 ENDCLASS.

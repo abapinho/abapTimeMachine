@@ -46,18 +46,11 @@ CLASS zcl_blame_gui_handler DEFINITION
       EXPORTING
         e_type        TYPE versobjtyp
         e_object_name TYPE versobjnam.
-
-    METHODS decode_date_and_time
-      IMPORTING
-        i_getdata TYPE c
-      EXPORTING
-        e_date    TYPE datum
-        e_time    TYPE uzeit.
 ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_GUI_HANDLER IMPLEMENTATION.
+CLASS zcl_blame_gui_handler IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -65,20 +58,11 @@ CLASS ZCL_BLAME_GUI_HANDLER IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD decode_date_and_time.
-    DATA date_str TYPE char100.
-    DATA time_str TYPE char100.
-    SPLIT i_getdata AT '|' INTO date_str time_str.
-    CONDENSE date_str NO-GAPS.
-    CONDENSE time_str NO-GAPS.
-    e_date = |{ date_str(4) }{ date_str+5(2) }{ date_str+8(2) }|.
-    e_time = |{ time_str(2) }{ time_str+3(2) }{ time_str+6(2) }|.
-  ENDMETHOD.
-
-
   METHOD decode_source_type_and_name.
     DATA mtdkey TYPE seocpdkey.
     SPLIT i_getdata AT '|' INTO e_type e_object_name.
+    SHIFT e_type LEFT DELETING LEADING space.
+    SHIFT e_object_name LEFT DELETING LEADING space.
 
     CASE e_type.
       WHEN 'CPUB'.
@@ -184,16 +168,10 @@ CLASS ZCL_BLAME_GUI_HANDLER IMPLEMENTATION.
             e_object_name = DATA(object_name) ).
         display_source( i_type = type
                         i_object_name = object_name ).
-      WHEN 'threshold'.
-        decode_date_and_time(
-          EXPORTING
-            i_getdata = getdata
-          IMPORTING
-            e_date = DATA(date)
-            e_time = DATA(time) ).
-        zcl_blame_options=>get_instance( )->set(
-          i_date = date
-          i_time = time ).
+      WHEN 'timestamp'.
+        " Depending on the link, getdata may be just the timestamp xxx or be like timestamp=xxx
+        DATA(ts) = COND timestamp( WHEN getdata(10) = 'timestamp=' THEN getdata+10 ELSE getdata ).
+        zcl_blame_options=>get_instance( )->set( i_timestamp = ts ).
         display_version( ).
       WHEN OTHERS.
         RETURN.

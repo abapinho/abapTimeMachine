@@ -14,6 +14,13 @@ CLASS zcl_blame_version DEFINITION
         modified  TYPE versno VALUE 99999,
       END OF c_version.
 
+    "! Loading source event
+    EVENTS loading_source
+      EXPORTING
+        VALUE(type)           TYPE versobjtyp
+        VALUE(name)           TYPE versobjnam
+        VALUE(version_number) TYPE versno.
+
     "! Version number from the VRSD table
     DATA version_number TYPE versno READ-ONLY.
 
@@ -43,8 +50,8 @@ CLASS zcl_blame_version DEFINITION
       RAISING   zcx_blame.
 
     "! Returns the version source code including blame information.
-    METHODS get_source_with_blame
-      RETURNING VALUE(rt_blame) TYPE zblame_line_t
+    METHODS get_source
+      RETURNING VALUE(rt_line) TYPE zblame_line_t
       RAISING   zcx_blame.
 
   PROTECTED SECTION.
@@ -88,23 +95,24 @@ CLASS zcl_blame_version IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD get_source_with_blame.
-    DATA: s_source_with_blame LIKE LINE OF rt_blame.
+  METHOD get_source.
+    DATA: s_line LIKE LINE OF rt_line.
 
-    s_source_with_blame-version_number = me->version_number.
-    s_source_with_blame-request = me->request.
-    s_source_with_blame-task = me->task.
-    s_source_with_blame-author = me->author.
-    s_source_with_blame-author_name = me->author_name.
-    s_source_with_blame-date = me->date.
-    s_source_with_blame-time = me->time.
+    s_line-version_number = me->version_number.
+    s_line-request = me->request.
+    s_line-task = me->task.
+    s_line-author = me->author.
+    s_line-author_name = me->author_name.
+    s_line-date = me->date.
+    s_line-time = me->time.
+    s_line-timestamp = |{ me->date }{ me->time }|.
 
     load_source( ).
 
     LOOP AT gt_source INTO DATA(source_int).
-      s_source_with_blame-line_num = sy-tabix.
-      s_source_with_blame-source = source_int.
-      INSERT s_source_with_blame INTO TABLE rt_blame.
+      s_line-line_num = sy-tabix.
+      s_line-source = source_int.
+      INSERT s_line INTO TABLE rt_line.
     ENDLOOP.
   ENDMETHOD.
 
@@ -139,13 +147,18 @@ CLASS zcl_blame_version IMPLEMENTATION.
 
 
   METHOD load_source.
-    DATA t_trdir TYPE trdir_it.
-
     " If already loaded, skip it
     IF gt_source[] IS NOT INITIAL.
       RETURN.
     ENDIF.
 
+    RAISE EVENT loading_source
+      EXPORTING
+        type           = s_vrsd-objtype
+        name           = s_vrsd-objname
+        version_number = me->version_number.
+
+    DATA t_trdir TYPE trdir_it.
     CALL FUNCTION 'SVRS_GET_REPS_FROM_OBJECT'
       EXPORTING
         object_name = s_vrsd-objname
@@ -158,7 +171,7 @@ CLASS zcl_blame_version IMPLEMENTATION.
         no_version  = 1
         OTHERS      = 2.
     IF sy-subrc <> 0.
-      RAISE EXCEPTION TYPE zcx_blame. " TODO
+      RETURN.
     ENDIF.
   ENDMETHOD.
 ENDCLASS.

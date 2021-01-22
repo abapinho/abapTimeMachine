@@ -22,7 +22,7 @@ CLASS zcl_blame_gui_viewer DEFINITION
     "! the HTML and CSS assets and displays them.
     METHODS render
       IMPORTING
-                !io_parts TYPE REF TO zcl_blame_parts
+                !is_parts TYPE zblame_parts
       RAISING   zcx_blame.
 
   PROTECTED SECTION.
@@ -32,14 +32,6 @@ CLASS zcl_blame_gui_viewer DEFINITION
     METHODS add_asset
       IMPORTING
         !io_asset    TYPE REF TO zif_blame_asset
-      RETURNING
-        VALUE(r_url) TYPE w3url .
-
-    METHODS add_main_css .
-
-    METHODS add_html
-      IMPORTING
-        !is_parts    TYPE zblame_parts
       RETURNING
         VALUE(r_url) TYPE w3url .
 
@@ -98,16 +90,6 @@ CLASS ZCL_BLAME_GUI_VIEWER IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD add_html.
-    r_url = add_asset( NEW zcl_blame_asset_html( is_parts ) ).
-  ENDMETHOD.
-
-
-  METHOD add_main_css.
-    add_asset( NEW zcl_blame_asset_css( zcl_blame_options=>get_instance( )->theme ) ).
-  ENDMETHOD.
-
-
   METHOD constructor.
     go_html_viewer = NEW cl_gui_html_viewer( parent                   = cl_gui_container=>screen0
                                              query_table_disabled     = abap_true ).
@@ -125,11 +107,15 @@ CLASS ZCL_BLAME_GUI_VIEWER IMPLEMENTATION.
 
 
   METHOD render.
-    DATA(s_parts) = io_parts->get_data( ).
-
     SKIP. " Creates the screen0 container
-    add_main_css( ).
-    DATA(url) = add_html( s_parts ).
+    add_asset( new zcl_blame_asset_factory( )->create_instance(
+      i_asset_type = zif_blame_consts=>asset_type-css
+      is_parts     = is_parts ) ).
+
+    DATA(url) = add_asset( new zcl_blame_asset_factory( )->create_instance(
+      i_asset_type = zif_blame_consts=>asset_type-html
+      is_parts     = is_parts ) ).
+
     go_html_viewer->show_url(
       EXPORTING
         url = url

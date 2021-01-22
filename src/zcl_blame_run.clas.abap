@@ -16,32 +16,30 @@ CLASS zcl_blame_run DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    METHODS on_percentage_changed
-          FOR EVENT percentage_changed OF zcl_blame_counter
+    METHODS on_loading_version_source
+          FOR EVENT loading_source OF zcl_blame_version
       IMPORTING
-          !percentage
-          !text.
+          !type
+          !name
+          !version_number.
 ENDCLASS.
 
 
 
-CLASS zcl_blame_run IMPLEMENTATION.
+CLASS ZCL_BLAME_RUN IMPLEMENTATION.
 
 
   METHOD go.
+    SET HANDLER me->on_loading_version_source FOR ALL INSTANCES.
     DATA(o_parts) = NEW zcl_blame_parts( i_object_type = i_object_type
                                          i_object_name = i_object_name ).
-    DATA(o_counter) = NEW zcl_blame_counter( ).
-    SET HANDLER me->on_percentage_changed FOR o_counter.
-    o_parts->load( o_counter ).
     NEW zcl_blame_gui( o_parts )->display( ).
   ENDMETHOD.
 
 
-  METHOD on_percentage_changed.
+  METHOD on_loading_version_source.
     CALL FUNCTION 'SAPGUI_PROGRESS_INDICATOR'
       EXPORTING
-        percentage = percentage
-        text       = |Loading { text }|.
+        text       = |Loading { type } { name } { version_number }|.
   ENDMETHOD.
 ENDCLASS.

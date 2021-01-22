@@ -33,7 +33,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_OBJECT_FACTORY IMPLEMENTATION.
+CLASS zcl_blame_object_factory IMPLEMENTATION.
 
 
   METHOD get_instance.
@@ -43,7 +43,9 @@ CLASS ZCL_BLAME_OBJECT_FACTORY IMPLEMENTATION.
                         WHEN gc_object_type-function_group THEN NEW zcl_blame_object_fugr( CONV #( i_object_name ) )
                         WHEN gc_object_type-function THEN NEW zcl_blame_object_func( CONV #( i_object_name ) ) ).
     IF ro_object IS NOT BOUND OR NOT ro_object->check_exists( ).
-      RAISE EXCEPTION TYPE zcx_blame. " TODO
+      RAISE EXCEPTION TYPE zcx_blame
+        EXPORTING
+          textid = zcx_blame=>object_not_found.
     ENDIF.
   ENDMETHOD.
 ENDCLASS.
