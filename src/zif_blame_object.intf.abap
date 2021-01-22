@@ -3,8 +3,6 @@ INTERFACE zif_blame_object
 
   "! Returns a table of references to part instances
   METHODS get_part_list
-    IMPORTING
-      io_counter type ref to zcl_blame_counter
     RETURNING
       VALUE(rt_part) TYPE zblame_part_ref_t
     RAISING

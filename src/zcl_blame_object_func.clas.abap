@@ -46,10 +46,8 @@ CLASS zcl_blame_object_func IMPLEMENTATION.
 
 
   METHOD zif_blame_object~get_part_list.
-    io_counter->initialize( 1 ).
     rt_part = VALUE #( ( NEW #( i_name      = CONV #( me->g_name )
                                 i_vrsd_name = CONV #( me->g_name )
                                 i_vrsd_type = 'FUNC' ) ) ).
-    io_counter->next( CONV #( me->g_name ) ).
   ENDMETHOD.
 ENDCLASS.

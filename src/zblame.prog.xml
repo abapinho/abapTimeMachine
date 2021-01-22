@@ -80,9 +80,15 @@
     </item>
     <item>
      <ID>I</ID>
+     <KEY>MDE</KEY>
+     <ENTRY>Output mode</ENTRY>
+     <LENGTH>21</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
      <KEY>OPT</KEY>
-     <ENTRY>Diff options</ENTRY>
-     <LENGTH>17</LENGTH>
+     <ENTRY>Blame options</ENTRY>
+     <LENGTH>18</LENGTH>
     </item>
     <item>
      <ID>I</ID>
@@ -122,6 +128,18 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>P_MBLAME</KEY>
+     <ENTRY>Blame</ENTRY>
+     <LENGTH>13</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_MTMACH</KEY>
+     <ENTRY>Time machine</ENTRY>
+     <LENGTH>20</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>P_NAME</KEY>
      <ENTRY>.</ENTRY>
      <LENGTH>19</LENGTH>
@@ -138,7 +156,7 @@
      <ID>S</ID>
      <KEY>P_TIME</KEY>
      <ENTRY>.</ENTRY>
-     <LENGTH>9</LENGTH>
+     <LENGTH>12</LENGTH>
      <SPLIT>D</SPLIT>
     </item>
    </TPOOL>

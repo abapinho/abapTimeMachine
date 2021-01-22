@@ -40,8 +40,8 @@ CLASS zcl_blame_diff DEFINITION
 
     METHODS process_line
       IMPORTING
-                !i_line       TYPE text255
-      RETURNING VALUE(r_line) TYPE text255.
+                !i_line       TYPE text1000
+      RETURNING VALUE(r_line) TYPE text1000.
 ENDCLASS.
 
 

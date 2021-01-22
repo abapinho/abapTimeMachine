@@ -26,15 +26,16 @@ CLASS zcl_blame_part DEFINITION
                 !i_vrsd_name TYPE versobjnam
       RAISING   zcx_blame.
 
-    "! Calculates and returns a list of the source already filled with blame
-    "! details.
-    METHODS compute_blame
-      RETURNING VALUE(rt_blame)   TYPE zblame_line_t
-      RAISING   zcx_blame.
-
     "! Returns list of authors involved in the different existing versions.
     METHODS get_authors
       RETURNING VALUE(rt_author) TYPE zblame_author_info_t.
+
+    METHODS get_timestamps
+      RETURNING VALUE(rt_timestamp) TYPE zblame_timestamp_t.
+
+    METHODS get_source
+      RETURNING VALUE(rt_line) TYPE zblame_line_t
+      RAISING   zcx_blame.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -48,22 +49,26 @@ CLASS zcl_blame_part DEFINITION
                 !i_vrsd_name TYPE versobjnam
       RAISING   zcx_blame.
 
+    METHODS get_version_at_threshold
+      RETURNING VALUE(ro_version) TYPE REF TO zcl_blame_version.
+
     METHODS get_versions_until_threshold
       RETURNING VALUE(rt_version) TYPE ty_t_version.
+
+    "! Calculates and returns a list of the diffed source already filled with blame
+    "! details.
+    METHODS get_diffed_source_with_blame
+      RETURNING VALUE(rt_line) TYPE zblame_line_t
+      RAISING   zcx_blame.
+
+    METHODS get_source_at_threshold
+      RETURNING VALUE(rt_line) TYPE zblame_line_t
+      RAISING   zcx_blame.
 ENDCLASS.
 
 
 
-CLASS ZCL_BLAME_PART IMPLEMENTATION.
-
-
-  METHOD compute_blame.
-    DATA(o_diff) = NEW zcl_blame_diff( ).
-    LOOP AT get_versions_until_threshold( ) INTO DATA(o_version).
-      rt_blame = o_diff->compute( it_old = rt_blame
-                                  it_new =  o_version->get_source_with_blame( ) ).
-    ENDLOOP.
-  ENDMETHOD.
+CLASS zcl_blame_part IMPLEMENTATION.
 
 
   METHOD  constructor.
@@ -81,6 +86,32 @@ CLASS ZCL_BLAME_PART IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD get_diffed_source_with_blame.
+    DATA(o_diff) = NEW zcl_blame_diff( ).
+    LOOP AT get_versions_until_threshold( ) INTO DATA(o_version).
+      rt_line = o_diff->compute( it_old = rt_line
+                                  it_new =  o_version->get_source( ) ).
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD get_source_at_threshold.
+    DATA(o_version) = get_version_at_threshold( ).
+    IF o_version IS BOUND.
+      rt_line = o_version->get_source( ).
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD get_timestamps.
+    DATA ts LIKE LINE OF rt_timestamp.
+    LOOP AT gt_version INTO DATA(o_version).
+      ts = |{ o_version->date }{ o_version->time }|.
+      COLLECT ts INTO rt_timestamp.
+    ENDLOOP.
+  ENDMETHOD.
+
+
   METHOD get_versions_until_threshold.
     rt_version = VALUE #(
       FOR o_version IN gt_version
@@ -89,6 +120,24 @@ CLASS ZCL_BLAME_PART IMPLEMENTATION.
           ( table_line->date = zcl_blame_options=>get_instance( )->date AND
             table_line->time <= zcl_blame_options=>get_instance( )->time ) )
         ( o_version ) ).
+  ENDMETHOD.
+
+
+  METHOD get_version_at_threshold.
+    " The last one should be the one we want
+    LOOP AT gt_version INTO ro_version WHERE
+          table_line->date < zcl_blame_options=>get_instance( )->date OR
+          ( table_line->date = zcl_blame_options=>get_instance( )->date AND
+            table_line->time <= zcl_blame_options=>get_instance( )->time ).
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD get_source.
+    rt_line = SWITCH #(
+      zcl_blame_options=>get_instance( )->mode
+      WHEN zif_blame_consts=>mode-blame THEN get_diffed_source_with_blame( )
+      WHEN zif_blame_consts=>mode-time_machine THEN get_source_at_threshold( ) ).
   ENDMETHOD.
 
 
