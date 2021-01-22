@@ -6,7 +6,8 @@ A simple blame tool for ABAP code.
 
 According to the [git-blame documentation](https://www.git-scm.com/docs/git-blame) it "show what revision and author last modified each line of a file".
 
-`ZBLAME` is a simple to use ABAP program which, given a piece of code, tries to do exactly this.
+`ZBLAME` is a simple to use ABAP program which, given a piece of code, implements the same functionality on top of SAP's ABAP code versioning.
+It also allows you to see how that object was at a given time in the past.
 
 ## Why
 
