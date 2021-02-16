@@ -26,7 +26,7 @@ CLASS zcl_blame_parts DEFINITION
   PRIVATE SECTION.
     DATA g_type TYPE zblame_object_type .
     DATA g_name TYPE sobj_name .
-    DATA gt_part TYPE zblame_part_ref_t .
+    DATA gt_part TYPE zif_blame_object=>ty_t_part_ref .
 
     "! Load all the data, creating the actual parts
     "! which will load all the versions
