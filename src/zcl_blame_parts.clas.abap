@@ -130,7 +130,7 @@ CLASS zcl_blame_parts IMPLEMENTATION.
 
     LOOP AT t_line REFERENCE INTO DATA(os_blame)
       WHERE request IS NOT INITIAL
-      GROUP BY ( request = os_blame->request author = os_blame->author name = os_blame->author_name )
+      GROUP BY ( request = os_blame->request )
         ASCENDING
         ASSIGNING FIELD-SYMBOL(<t_group>).
 
@@ -147,8 +147,6 @@ CLASS zcl_blame_parts IMPLEMENTATION.
       rt_request = VALUE #( BASE rt_request
                            ( request = <t_group>-request
                              description = NEW zcl_blame_request( <t_group>-request )->description
-                             author = <t_group>-author
-                             name = <t_group>-name
                              line_count = lines( t_request )
                              blame_percentage = lines( t_request ) / lines( t_line ) ) ).
     ENDLOOP.
