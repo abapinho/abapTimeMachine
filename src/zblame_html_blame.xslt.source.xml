@@ -248,8 +248,6 @@
             <tr>
               <th>Request</th>
               <th>Description</th>
-              <th>Author</th>
-              <th>Name</th>
               <th class="num">Lines</th>
               <th class="num">Percentage</th>
             </tr>
@@ -265,12 +263,6 @@
               </td>
               <td>
                 <xsl:value-of select="DESCRIPTION"/>
-              </td>
-              <td>
-                <xsl:value-of select="AUTHOR"/>
-              </td>
-              <td>
-                <xsl:value-of select="NAME"/>
               </td>
               <td class="num">
                 <xsl:value-of select="number(LINE_COUNT)"/>
