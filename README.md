@@ -1,6 +1,10 @@
-# abapBlame
+# abapTimeMachine
 
-A simple blame tool for ABAP code.
+A simple way to look at past versions of classes, function groups, etc, as a whole (as opposed to the crappy native include-oriented approach).
+
+(abapTimeMachine used to be called abapBlame but it was renamed because the new Time Machine functionality seems to be so much more useful.)
+
+(The README and the Wiki still need to be updated.)
 
 ## What
 
