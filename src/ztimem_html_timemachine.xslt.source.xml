@@ -1,0 +1,157 @@
+<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output method="text"/>
+  <xsl:template match="/">
+    <html>
+      <head>
+        <title>ABAP Time Machine</title>
+        <link href="abaptimemachine.css" rel="stylesheet" type="text/css"/>
+      </head>
+      <body>
+        <div class="header">
+          <h1>
+            <xsl:choose>
+              <xsl:when test="//PARTS/TYPE = 'CLAS'">Class</xsl:when>
+              <xsl:when test="//PARTS/TYPE = 'PROG'">Program</xsl:when>
+              <xsl:when test="//PARTS/TYPE = 'FUGR'">Function group</xsl:when>
+              <xsl:when test="//PARTS/TYPE = 'FUNC'">Function module</xsl:when>
+            </xsl:choose>
+            <xsl:text> </xsl:text>
+            <xsl:value-of select="//PARTS/NAME"/>
+          </h1>
+        </div>
+        <div class="metadata">
+          <form method="get" action="SAPEVENT:timestamp">
+          <label for="timestamps">Moment: </label>
+          <select id="timestamp" name="timestamp" onchange='this.form.submit();'>
+            <xsl:for-each select="//PARTS/T_TIMESTAMP/TIMESTAMP">
+              <option>
+                <xsl:attribute name="value"><xsl:value-of select="."/></xsl:attribute>
+                <xsl:if test=". = //PARTS/TIMESTAMP">
+                  <xsl:attribute name="selected">selected</xsl:attribute>
+                </xsl:if>
+                <xsl:value-of select="substring(.,1,4)"/>-<xsl:value-of select="substring(.,5,2)"/>-<xsl:value-of select="substring(.,7,2)"/>
+                &amp;nbsp;
+                <xsl:value-of select="substring(.,9,2)"/>:<xsl:value-of select="substring(.,11,2)"/>:<xsl:value-of select="substring(.,13,2)"/>
+              </option>
+            </xsl:for-each>
+          </select>
+          </form>
+        </div>
+        <h2>Table of contents</h2>
+        <div class="toc">
+          <div class="toc-child">
+            <ul>
+              <xsl:for-each select="//PARTS/T_PART/ZTIMEM_PART">
+                <li>
+                  <a>
+                    <xsl:attribute name="href"><xsl:text>#</xsl:text><xsl:value-of select="NAME"/></xsl:attribute>
+                    <xsl:value-of select="NAME"/>
+                  </a>
+                </li>
+              </xsl:for-each>
+            </ul>
+          </div>
+          <div class="toc-child">
+            <ul>
+              <li>
+                <a>
+                  <xsl:attribute name="href">#stats</xsl:attribute>
+                  Statistics
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <xsl:for-each select="//PARTS/T_PART/ZTIMEM_PART">
+          <h2 class="blame">
+            <a>
+              <xsl:attribute name="name"><xsl:value-of select="NAME"/></xsl:attribute>
+              <xsl:value-of select="NAME"/>
+            </a>
+          </h2>
+          <table class="blame">
+            <THEAD class="header">
+              <TR>
+                <TH class="num">Line</TH>
+                <TH>
+                  <a>
+                    <xsl:attribute name="href">SAPEVENT:source?<xsl:value-of select="TYPE"/>|<xsl:value-of select="OBJECT_NAME"/></xsl:attribute>
+                    Source
+                  </a>
+                </TH>
+              </TR>
+            </THEAD>
+            <xsl:for-each select="T_LINE/ZTIMEM_LINE">
+              <TR>
+                <xsl:attribute name="class">versionfirstrow</xsl:attribute>
+                <TD class="num"><xsl:value-of select="number(LINE_NUM)"/></TD>
+                <TD class="code"><PRE><xsl:value-of select="SOURCE"/></PRE></TD>
+              </TR>
+            </xsl:for-each>
+          </table>
+        </xsl:for-each>
+        <h2 class="stats">
+          <a>
+            <xsl:attribute name="name">stats</xsl:attribute>
+            Statistics
+          </a>
+        </h2>
+        <xsl:for-each select="//PARTS/S_STATS">
+          <table>
+            <tr>
+              <td>Total lines:</td>
+              <td>
+                <xsl:value-of select="TOTAL_LINES"/>
+              </td>
+            </tr>
+            <tr>
+              <td>SLOC:</td>
+              <td>
+                <xsl:value-of select="TOTAL_LINES - COMMENT_LINES - EMPTY_LINES"/>
+                <xsl:text> </xsl:text>
+                <xsl:text>(</xsl:text>
+                <xsl:value-of select="format-number(1 - ( COMMENT_LINES + EMPTY_LINES ) div TOTAL_LINES, '#%')"/>
+                <xsl:text>)</xsl:text>
+              </td>
+            </tr>
+            <tr>
+              <td>Comment lines:</td>
+              <td>
+                <xsl:value-of select="COMMENT_LINES"/>
+                <xsl:text> </xsl:text>
+                <xsl:text>(</xsl:text>
+                <xsl:value-of select="format-number(COMMENT_LINES div TOTAL_LINES, '#%')"/>
+                <xsl:text>)</xsl:text>
+              </td>
+            </tr>
+            <tr>
+              <td>Empty lines:</td>
+              <td>
+                <xsl:value-of select="EMPTY_LINES"/>
+                <xsl:text> </xsl:text>
+
+                <xsl:text>(</xsl:text>
+                <xsl:value-of select="format-number(EMPTY_LINES div TOTAL_LINES, '#%')"/>
+                <xsl:text>)</xsl:text>
+              </td>
+            </tr>
+            <tr>
+              <td>Activity interval:</td>
+              <td>
+                <xsl:value-of select="DATE_OLDEST"/>
+                <xsl:text> to </xsl:text>
+                <xsl:value-of select="DATE_LATEST"/>
+              </td>
+            </tr>
+          </table>
+        </xsl:for-each>
+        <div id="footer">
+          <P/>
+          Version
+          <xsl:text> </xsl:text>
+          <xsl:value-of select="//PARTS/VERSION"/>
+        </div>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:transform>
