@@ -1,25 +1,14 @@
 # abapTimeMachine
 
-A simple way to look at past versions of classes, function groups, etc, as a whole (as opposed to the crappy native include-oriented approach).
-
-(abapTimeMachine used to be called abapBlame but it was renamed because the new Time Machine functionality seems to be so much more useful.)
-
-(The README and the Wiki still need to be updated.)
-
-## What
-
-According to the [git-blame documentation](https://www.git-scm.com/docs/git-blame) it "show what revision and author last modified each line of a file".
-
-`ZBLAME` is a simple to use ABAP program which, given a piece of code, implements the same functionality on top of SAP's ABAP code versioning.
-It also allows you to see how that object was at a given time in the past.
+`abapTimeMachine` provides a simple way to look at past versions of classes, function groups, etc, as a whole (as opposed to the crappy native include-oriented approach). Alternatively, it also partially emulates [git-blame](https://www.git-scm.com/docs/git-blame) by showing "what revision and author last modified each line of a file" for any given version.
 
 ## Why
 
-ABAP's versioning system is unbelievably bad. Blame is just one of the dozens of things you should be able to do but, for some mysterious reason, are not. Enabling blame in ABAP code is the sole purpose of this simple but hopefully useful project.
+ABAP's versioning system is unbelievably bad. There is no native way to see how a whole class or a whole function group were at a given time in the past. Besides, it makes it very hard to find out which user was responsible for which changes. `abapTimeMachine` is here to solve both these problems.
 
 ## How
 
-Please read the [Wiki](https://github.com/abapinho/abapBlame/wiki) to learn how to install and use `ZBLAME`.
+Please read the [Wiki](https://github.com/abapinho/abapTimeMachine/wiki) to learn how to install and use `ZTIMEMACHINE`.
 
 ## Requirements
 
@@ -28,7 +17,7 @@ Please read the [Wiki](https://github.com/abapinho/abapBlame/wiki) to learn how 
 
 ## FAQ
 
-For questions/comments/bugs/feature requests/wishes please create an [issue](https://github.com/abapinho/abapblame/issues).
+For questions/comments/bugs/feature requests/wishes please create an [issue](https://github.com/abapinho/abapTimeMachine/issues).
 
 ## Credits
 
