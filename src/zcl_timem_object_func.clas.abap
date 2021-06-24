@@ -14,9 +14,10 @@ public section.
   methods CONSTRUCTOR
     importing
       !I_NAME type RS38L_FNAM .
-  PROTECTED SECTION.
-  PRIVATE SECTION.
-    DATA g_name TYPE rs38l_fnam .
+protected section.
+private section.
+
+  data G_NAME type RS38L_FNAM .
 ENDCLASS.
 
 
@@ -36,18 +37,19 @@ CLASS ZCL_TIMEM_OBJECT_FUNC IMPLEMENTATION.
       EXCEPTIONS
         function_not_exist = 1
         OTHERS             = 2.
-    r_result = boolc( sy-subrc = 0 ).
+    result = boolc( sy-subrc = 0 ).
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_name.
-    r_name = g_name.
+    result = g_name.
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_part_list.
-    rt_part = VALUE #( ( NEW #( i_name      = CONV #( me->g_name )
-                                i_vrsd_name = CONV #( me->g_name )
-                                i_vrsd_type = 'FUNC' ) ) ).
+    result = VALUE #( (
+      name        = CONV #( me->g_name )
+      object_name = CONV #( me->g_name )
+      type        = 'FUNC' ) ).
   ENDMETHOD.
 ENDCLASS.

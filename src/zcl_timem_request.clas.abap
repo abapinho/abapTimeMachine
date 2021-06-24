@@ -15,12 +15,13 @@ public section.
   methods CONSTRUCTOR
     importing
       !I_REQUEST type TRKORR .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     METHODS get_description
       IMPORTING
                 !i_request           TYPE trkorr
-      RETURNING VALUE(r_description) TYPE as4text.
+      RETURNING VALUE(result) TYPE as4text.
 ENDCLASS.
 
 
@@ -35,7 +36,7 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
 
 
   METHOD get_description.
-    SELECT SINGLE as4text INTO r_description
+    SELECT SINGLE as4text INTO result
     FROM e07t
     WHERE trkorr = i_request
       AND langu  = 'E'.

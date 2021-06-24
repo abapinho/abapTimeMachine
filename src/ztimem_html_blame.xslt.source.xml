@@ -1,6 +1,6 @@
 <xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
   <xsl:output method="text"/>
-  <xsl:template match="/">
+  <xsl:template match="PARTS">
     <html>
       <head>
         <title>ABAP Blame</title>
@@ -10,25 +10,25 @@
         <div class="header">
           <h1>
             <xsl:choose>
-              <xsl:when test="//PARTS/TYPE = 'CLAS'">Class</xsl:when>
-              <xsl:when test="//PARTS/TYPE = 'PROG'">Program</xsl:when>
-              <xsl:when test="//PARTS/TYPE = 'FUGR'">Function group</xsl:when>
-              <xsl:when test="//PARTS/TYPE = 'FUNC'">Function module</xsl:when>
+              <xsl:when test="TYPE = 'CLAS'">Class</xsl:when>
+              <xsl:when test="TYPE = 'PROG'">Program</xsl:when>
+              <xsl:when test="TYPE = 'FUGR'">Function group</xsl:when>
+              <xsl:when test="TYPE = 'FUNC'">Function module</xsl:when>
             </xsl:choose>
             <xsl:text> </xsl:text>
-            <xsl:value-of select="//PARTS/NAME"/>
+            <xsl:value-of select="NAME"/>
           </h1>
         </div>
         <div class="metadata">
           <form method="get" action="SAPEVENT:timestamp">
           <label for="timestamps">Moment: </label>
           <select id="timestamp" name="timestamp" onchange='this.form.submit();'>
-            <xsl:for-each select="//PARTS/T_TIMESTAMP/TIMESTAMP">
+            <xsl:for-each select="T_TIMESTAMP/TIMESTAMP">
               <option>
                 <xsl:attribute name="value">
                   <xsl:value-of select="."/>
                 </xsl:attribute>
-                <xsl:if test=". = //PARTS/TIMESTAMP">
+                <xsl:if test=". = ../../TIMESTAMP">
                   <xsl:attribute name="selected">selected</xsl:attribute>
                 </xsl:if>
                 <xsl:value-of select="substring(.,1,4)"/>-<xsl:value-of select="substring(.,5,2)"/>-<xsl:value-of select="substring(.,7,2)"/>
@@ -41,13 +41,13 @@
           <br/>
           <div>Ignore case:
             <xsl:choose>
-              <xsl:when test="//PARTS/IGNORE_CASE = 'X'">Yes</xsl:when>
+              <xsl:when test="IGNORE_CASE = 'X'">Yes</xsl:when>
               <xsl:otherwise>No</xsl:otherwise>
             </xsl:choose>
           </div>
           <div>Ignore indentation:
             <xsl:choose>
-              <xsl:when test="//PARTS/IGNORE_CASE = 'X'">Yes</xsl:when>
+              <xsl:when test="IGNORE_INDENTATION = 'X'">Yes</xsl:when>
               <xsl:otherwise>No</xsl:otherwise>
             </xsl:choose>
           </div>
@@ -56,7 +56,7 @@
         <div class="toc">
           <div class="toc-child">
             <ul>
-              <xsl:for-each select="//PARTS/T_PART/ZTIMEM_PART">
+              <xsl:for-each select="T_PART/ZTIMEM_PART_SOURCE">
                 <li>
                   <a>
                     <xsl:attribute name="href">
@@ -98,7 +98,7 @@
             </ul>
           </div>
         </div>
-        <xsl:for-each select="//PARTS/T_PART/ZTIMEM_PART">
+        <xsl:for-each select="T_PART/ZTIMEM_PART_SOURCE">
           <h2 class="blame">
             <a>
               <xsl:attribute name="name">
@@ -110,11 +110,29 @@
           <table class="blame">
             <THEAD class="header">
               <TR>
-                <TH class="num">Version</TH>
+                <TH class="num">V</TH>
                 <TH>Author</TH>
                 <TH>Date</TH>
                 <TH>Request</TH>
                 <TH>Task</TH>
+                <TH>
+                  <xsl:if test="../../CUSTOM1_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="../../CUSTOM1_TITLE"/>
+                </TH>
+                <TH>
+                  <xsl:if test="../../CUSTOM2_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="../../CUSTOM2_TITLE"/>
+                </TH>
+                <TH>
+                  <xsl:if test="../../CUSTOM3_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="../../CUSTOM3_TITLE"/>
+                </TH>
                 <TH class="num">Line</TH>
                 <TH>
                   <a>
@@ -189,6 +207,24 @@
                 <TD>
                   <xsl:value-of select="TASK"/>
                 </TD>
+                <TD>
+                  <xsl:if test="../../../../CUSTOM1_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="CUSTOM1"/>
+                </TD>
+                <TD>
+                  <xsl:if test="../../../../CUSTOM2_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="CUSTOM2"/>
+                </TD>
+                <TD>
+                  <xsl:if test="../../../../CUSTOM3_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="CUSTOM3"/>
+                </TD>
                 <TD class="num">
                   <xsl:value-of select="number(LINE_NUM)"/>
                 </TD>
@@ -217,7 +253,7 @@
               <th class="num">Requests</th>
             </tr>
           </THEAD>
-          <xsl:for-each select="//PARTS/T_AUTHOR/ZTIMEM_AUTHOR_INFO">
+          <xsl:for-each select="T_AUTHOR/ZTIMEM_AUTHOR_INFO">
             <tr>
               <td>
                 <a>
@@ -252,7 +288,7 @@
               <th class="num">Percentage</th>
             </tr>
           </THEAD>
-          <xsl:for-each select="//PARTS/T_REQUEST/ZTIMEM_REQUEST_INFO">
+          <xsl:for-each select="T_REQUEST/ZTIMEM_REQUEST_INFO">
             <tr>
               <td>
                 <a>
@@ -279,7 +315,7 @@
             Statistics
           </a>
         </h2>
-        <xsl:for-each select="//PARTS/S_STATS">
+        <xsl:for-each select="S_STATS">
           <table>
             <tr>
               <td>Total lines:</td>
@@ -331,7 +367,7 @@
           <P/>
           Version
           <xsl:text> </xsl:text>
-          <xsl:value-of select="//PARTS/VERSION"/>
+          <xsl:value-of select="VERSION"/>
         </div>
       </body>
     </html>

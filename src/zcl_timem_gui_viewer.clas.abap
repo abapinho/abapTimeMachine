@@ -1,49 +1,51 @@
 "! Takes a deep structure with all the information of the requested object,
 "! renders the HTML and CSS assets based on the requested theme and displays it.
-class ZCL_TIMEM_GUI_VIEWER definition
-  public
-  final
-  create public .
+CLASS zcl_timem_gui_viewer DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  constants:
-    BEGIN OF c_theme,
+    CONSTANTS:
+      BEGIN OF c_theme,
         light TYPE ztimem_theme VALUE 'LIGHT',
         dark  TYPE ztimem_theme VALUE 'DARK',
       END OF c_theme .
 
     "! Constructor which takes a theme as input
     "! @parameter i_theme | Theme name
-  methods CONSTRUCTOR
-    importing
-      !IO_HANDLER type ref to ZCL_TIMEM_GUI_HANDLER .
+    METHODS constructor
+      IMPORTING
+        !io_handler TYPE REF TO zcl_timem_gui_handler .
     "! Takes a deep structure with all the information of the object, renders
     "! the HTML and CSS assets and displays them.
-  methods RENDER
-    importing
-      !IS_PARTS type ZTIMEM_PARTS
-    raising
-      ZCX_TIMEM .
+
+    METHODS render
+      IMPORTING
+        !is_parts TYPE ztimem_parts
+      RAISING
+        zcx_timem .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA go_html_viewer TYPE REF TO cl_gui_html_viewer.
 
     METHODS add_asset
       IMPORTING
-        !io_asset    TYPE REF TO zif_timem_asset
+        !io_asset     TYPE REF TO zif_timem_asset
       RETURNING
-        VALUE(r_url) TYPE w3url .
+        VALUE(result) TYPE w3url .
 
     METHODS string_2_xstring
       IMPORTING
-        !i_input        TYPE string
+        !i_input      TYPE string
       RETURNING
-        VALUE(r_output) TYPE xstring .
+        VALUE(result) TYPE xstring .
 
     METHODS register_events
       IMPORTING
-        io_handler type ref to zcl_timem_gui_handler.
+        io_handler TYPE REF TO zcl_timem_gui_handler.
 
     CLASS-METHODS xstring_2_bintab
       IMPORTING
@@ -60,6 +62,13 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
 
   METHOD add_asset.
     DATA(content) = io_asset->get_content( ).
+
+    NEW zcl_timem_userexits( )->modify_asset_content(
+      EXPORTING
+        subtype = io_asset->get_subtype( )
+      CHANGING
+        content = content ).
+
     DATA(xstr) = string_2_xstring( content ).
 
     xstring_2_bintab(
@@ -86,7 +95,7 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
       MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
                  WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
     ENDIF.
-    r_url = io_asset->get_url( ).
+    result = io_asset->get_url( ).
   ENDMETHOD.
 
 
@@ -102,17 +111,17 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
     t_event = VALUE #( ( appl_event = abap_true
                          eventid    = go_html_viewer->m_id_sapevent ) ).
     go_html_viewer->set_registered_events( t_event ).
-    SET HANDLER io_handler->on_html_events FOR go_html_viewer.
+    SET HANDLER io_handler->on_sapevent FOR go_html_viewer.
   ENDMETHOD.
 
 
   METHOD render.
     SKIP. " Creates the screen0 container
-    add_asset( new zcl_timem_asset_factory( )->create_instance(
+    add_asset( NEW zcl_timem_asset_factory( )->create_instance(
       i_asset_type = zif_timem_consts=>asset_type-css
       is_parts     = is_parts ) ).
 
-    DATA(url) = add_asset( new zcl_timem_asset_factory( )->create_instance(
+    DATA(url) = add_asset( NEW zcl_timem_asset_factory( )->create_instance(
       i_asset_type = zif_timem_consts=>asset_type-html
       is_parts     = is_parts ) ).
 
@@ -137,7 +146,7 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
       EXPORTING
         text   = i_input
       IMPORTING
-        buffer = r_output
+        buffer = result
       EXCEPTIONS
         OTHERS = 1.
     IF sy-subrc <> 0.

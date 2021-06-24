@@ -38,22 +38,22 @@ CLASS ZCL_TIMEM_ASSET_CSS IMPLEMENTATION.
 
     CALL TRANSFORMATION ztimem_css_main
     SOURCE XML css
-    RESULT XML r_content.
+    RESULT XML result.
 
     CALL TRANSFORMATION (g_theme_transformation)
     SOURCE XML css
     RESULT XML theme_css.
 
-    r_content = |{ r_content }{ theme_css }|.
+    result = |{ result }{ theme_css }|.
   ENDMETHOD.
 
 
   METHOD zif_timem_asset~get_subtype.
-    r_subtype = 'css'.
+    result = 'css'.
   ENDMETHOD.
 
 
   METHOD zif_timem_asset~get_url.
-    r_url = 'abaptimemachine.css'.
+    result = 'abaptimemachine.css'.
   ENDMETHOD.
 ENDCLASS.

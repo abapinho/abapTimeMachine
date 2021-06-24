@@ -14,9 +14,10 @@ public section.
   methods CONSTRUCTOR
     importing
       !I_NAME type SOBJ_NAME .
-  PROTECTED SECTION.
-  PRIVATE SECTION.
-    DATA g_name TYPE sobj_name .
+protected section.
+private section.
+
+  data G_NAME type SOBJ_NAME .
 ENDCLASS.
 
 
@@ -33,18 +34,19 @@ CLASS ZCL_TIMEM_OBJECT_PROG IMPLEMENTATION.
     SELECT SINGLE name INTO @data(name)
       FROM trdir
       WHERE name   = @g_name.
-    r_result = boolc( sy-subrc = 0 ).
+    result = boolc( sy-subrc = 0 ).
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_name.
-    r_name = g_name.
+    result = g_name.
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_part_list.
-    rt_part = VALUE #( ( NEW #( i_name      = CONV #( me->g_name )
-                                 i_vrsd_name = CONV #( me->g_name )
-                                 i_vrsd_type = 'REPS' ) ) ).
+    result = VALUE #( (
+      name        = CONV #( me->g_name )
+      object_name = CONV #( me->g_name )
+      type        = 'REPS' ) ).
   ENDMETHOD.
 ENDCLASS.

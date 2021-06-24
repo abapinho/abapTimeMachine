@@ -1,27 +1,30 @@
 "! HTML screen event handler to deal with user interaction during the HTML
 "! presentation. It will decode the request and process it depending on the
 "! requested action. For example, it will navigate to the requested source code.
-class ZCL_TIMEM_GUI_HANDLER definition
-  public
-  final
-  create public .
+CLASS zcl_timem_gui_handler DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods CONSTRUCTOR
-    importing
-      !IO_GUI type ref to ZCL_TIMEM_GUI .
+    METHODS constructor
+      IMPORTING
+        !io_gui TYPE REF TO zcl_timem_gui .
+
     "! Handler method
     "! @parameter action | Action
     "! @parameter getdata | Data details
-  methods ON_HTML_EVENTS
-    for event SAPEVENT of CL_GUI_HTML_VIEWER
-    importing
-      !ACTION
-      !GETDATA .
+    METHODS on_sapevent
+          FOR EVENT sapevent OF cl_gui_html_viewer
+      IMPORTING
+          !action
+          !getdata .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA go_gui TYPE REF TO zcl_timem_gui.
+    data userexits type ref to zcl_timem_userexits.
 
     METHODS display_request
       IMPORTING
@@ -53,6 +56,7 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
 
   METHOD constructor.
     go_gui = io_gui.
+    userexits = new #( ).
   ENDMETHOD.
 
 
@@ -149,14 +153,16 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD on_html_events.
+  METHOD on_sapevent.
     action = condense( action ).
     getdata = condense( getdata ).
     CASE action.
       WHEN 'author'.
         display_user( CONV #( getdata ) ).
+
       WHEN 'request'.
         display_request( CONV #( getdata ) ).
+
       WHEN 'source'.
         decode_source_type_and_name(
           EXPORTING
@@ -166,13 +172,17 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
             e_object_name = DATA(object_name) ).
         display_source( i_type = type
                         i_object_name = object_name ).
+
       WHEN 'timestamp'.
         " Depending on the link, getdata may be just the timestamp xxx or be like timestamp=xxx
         DATA(ts) = COND timestamp( WHEN getdata(10) = 'timestamp=' THEN getdata+10 ELSE getdata ).
         zcl_timem_options=>get_instance( )->set( i_timestamp = ts ).
         display_version( ).
+
       WHEN OTHERS.
-        RETURN.
+        userexits->on_sapevent(
+          action  = action
+          getdata = getdata ).
     ENDCASE.
   ENDMETHOD.
 ENDCLASS.
