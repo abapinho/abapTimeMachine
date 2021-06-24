@@ -1,16 +1,16 @@
-class ZCL_TIMEM_ASSET_FACTORY definition
-  public
-  final
-  create public .
+CLASS zcl_timem_asset_factory DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods CREATE_INSTANCE
-    importing
-      !I_ASSET_TYPE type STRING
-      !IS_PARTS type ZTIMEM_PARTS
-    returning
-      value(RO_ASSET) type ref to ZIF_TIMEM_ASSET .
+    METHODS create_instance
+      IMPORTING
+        !i_asset_type TYPE string
+        !is_parts     TYPE ztimem_parts
+      RETURNING
+        VALUE(result) TYPE REF TO zif_timem_asset .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -22,9 +22,9 @@ CLASS ZCL_TIMEM_ASSET_FACTORY IMPLEMENTATION.
 
   METHOD create_instance.
     DATA(o_options) = zcl_timem_options=>get_instance( ).
-    ro_asset = SWITCH #(
+    result = SWITCH #(
       i_asset_type
-      WHEN 'CSS' THEN NEW zcl_TIMEM_asset_css( o_options->theme )
+      WHEN 'CSS' THEN NEW zcl_timem_asset_css( o_options->theme )
       WHEN 'HTML' THEN
         SWITCH #(
           o_options->mode

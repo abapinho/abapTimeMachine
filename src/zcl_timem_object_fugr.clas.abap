@@ -14,16 +14,17 @@ public section.
   methods CONSTRUCTOR
     importing
       !I_NAME type RS38L_AREA .
-  PROTECTED SECTION.
-  PRIVATE SECTION.
-    DATA g_name TYPE rs38l_area.
+protected section.
+private section.
 
-    METHODS get_main_name
-      RETURNING
-        VALUE(r_program) TYPE program.
+  data G_NAME type RS38L_AREA .
 
-    METHODS get_functions
-      RETURNING VALUE(rt_function) TYPE re_t_funcincl.
+  methods GET_MAIN_NAME
+    returning
+      value(RESULT) type PROGRAM .
+  methods GET_FUNCTIONS
+    returning
+      value(RESULT) type RE_T_FUNCINCL .
 ENDCLASS.
 
 
@@ -41,13 +42,13 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
       EXPORTING
         function_pool           = g_name
       TABLES
-        functab                 = rt_function
+        functab                 = result
       EXCEPTIONS
         function_pool_not_found = 1
         OTHERS                  = 2.
     IF sy-subrc = 0.
-      SORT rt_function BY funcname ASCENDING.
-      DELETE ADJACENT DUPLICATES FROM rt_function COMPARING funcname.
+      SORT result BY funcname ASCENDING.
+      DELETE ADJACENT DUPLICATES FROM result COMPARING funcname.
     ENDIF.
   ENDMETHOD.
 
@@ -65,7 +66,7 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
       EXCEPTIONS
         OTHERS        = 1.
     IF sy-subrc = 0.
-      r_program = |{ namespace }SAPL{ group }|.
+      result = |{ namespace }SAPL{ group }|.
     ENDIF.
   ENDMETHOD.
 
@@ -76,12 +77,12 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
         function_pool   = g_name
       EXCEPTIONS
         pool_not_exists = 1.
-    r_result = boolc( sy-subrc = 0 ).
+    result = boolc( sy-subrc = 0 ).
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_name.
-    r_name = g_name.
+    result = g_name.
   ENDMETHOD.
 
 
@@ -102,25 +103,26 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
       RAISE EXCEPTION TYPE zcx_timem.
     ENDIF.
 
-    rt_part = VALUE #( ( NEW #( i_name = |Program { main_program }|
-                              i_vrsd_name = CONV #( main_program )
-                              i_vrsd_type = 'REPS' ) ) ).
+    result = VALUE #( (
+      name        = |Program { main_program }|
+      object_name = CONV #( main_program )
+      type        = 'REPS' ) ).
 
     DATA(t_function) = get_functions( ).
     LOOP AT t_include INTO DATA(include).
       IF NOT line_exists( t_function[ include = include ] ).
-        rt_part = VALUE #( BASE rt_part
-                         ( NEW #( i_name = |Include { include }|
-                                  i_vrsd_name = CONV #( include )
-                                  i_vrsd_type = 'REPS' ) ) ).
+        result = VALUE #( BASE result
+                         ( name        = |Include { include }|
+                           object_name = CONV #( include )
+                           type        = 'REPS' ) ).
       ENDIF.
     ENDLOOP.
 
     LOOP AT t_function REFERENCE INTO DATA(os_function).
-      rt_part = VALUE #( BASE rt_part
-                         ( NEW #( i_name      = |Function module { os_function->funcname }|
-                                i_vrsd_name = CONV #( os_function->funcname )
-                                i_vrsd_type = 'FUNC' ) ) ).
+      result = VALUE #( BASE result
+                         ( name        = |Function module { os_function->funcname }|
+                           object_name = CONV #( os_function->funcname )
+                           type        = 'FUNC' ) ).
     ENDLOOP.
   ENDMETHOD.
 ENDCLASS.

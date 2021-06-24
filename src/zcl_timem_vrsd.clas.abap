@@ -1,24 +1,25 @@
 "! List of VRSD lines for existing versions of a given object.
-class ZCL_TIMEM_VRSD definition
-  public
-  final
-  create public .
+CLASS zcl_timem_vrsd DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
     "! List of relevant lines of VRSD table (plus artificial lines created
     "! for the active and modified versions).
-  data T_VRSD type VRSD_TAB read-only .
+    DATA t_vrsd TYPE vrsd_tab READ-ONLY .
 
     "! Constructor which takes an object type and name and loads all the VRSD
     "! data, as well as the eventual artificial lines for the active and modified
     "! versions.
-  methods CONSTRUCTOR
-    importing
-      !I_TYPE type VERSOBJTYP
-      !I_NAME type VERSOBJNAM
-    raising
-      ZCX_TIMEM .
+    METHODS constructor
+      IMPORTING
+        !i_type TYPE versobjtyp
+        !i_name TYPE versobjnam
+      RAISING
+        zcx_timem .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA type TYPE versobjtyp.
@@ -33,7 +34,7 @@ public section.
       RAISING   zcx_timem.
 
     METHODS get_request_active_modif
-      RETURNING VALUE(r_request) TYPE trkorr
+      RETURNING VALUE(result) TYPE trkorr
       RAISING   zcx_timem.
 ENDCLASS.
 
@@ -54,7 +55,7 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
 
   METHOD get_request_active_modif.
     IF request_active_modif IS NOT INITIAL.
-      r_request = request_active_modif.
+      result = request_active_modif.
     ENDIF.
 
     DATA s_ko100 TYPE ko100.
@@ -105,7 +106,7 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    r_request = request_active_modif = s_tlock-trkorr.
+    result = request_active_modif = s_tlock-trkorr.
   ENDMETHOD.
 
 

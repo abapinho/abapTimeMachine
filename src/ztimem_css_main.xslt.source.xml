@@ -21,6 +21,7 @@ table td,th {
   white-space:nowrap;
   vertical-align: top;
 }
+table td.hide,th.hide {display:none;}
 table td.line {width:1%;}
 table td.code {width:99%;}
 #footer { font-size: 6pt; }

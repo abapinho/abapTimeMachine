@@ -36,17 +36,17 @@ CLASS ZCL_TIMEM_ASSET_HTML_BLAME IMPLEMENTATION.
   METHOD zif_timem_asset~get_content.
     CALL TRANSFORMATION ztimem_html_blame
     SOURCE parts = gs_parts
-    RESULT XML r_content
+    RESULT XML result
     OPTIONS xml_header = 'NO'.
   ENDMETHOD.
 
 
   METHOD zif_timem_asset~get_subtype.
-    r_subtype = 'html'.
+    result = 'html'.
   ENDMETHOD.
 
 
   METHOD zif_timem_asset~get_url.
-    r_url = 'blame.html'.
+    result = 'blame.html'.
   ENDMETHOD.
 ENDCLASS.

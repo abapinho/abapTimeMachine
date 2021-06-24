@@ -11,7 +11,7 @@ public section.
     importing
       !I_UNAME type SYUNAME
     returning
-      value(R_NAME) type STRING
+      value(result) type STRING
     raising
       ZCX_TIMEM .
   PROTECTED SECTION.
@@ -45,6 +45,6 @@ CLASS ZCL_TIMEM_AUTHOR IMPLEMENTATION.
       ENDIF.
       INSERT s_author INTO TABLE gt_author.
     ENDIF.
-    r_name = s_author-name.
+    result = s_author-name.
   ENDMETHOD.
 ENDCLASS.

@@ -28,22 +28,25 @@ CLASS zcl_timem_stats DEFINITION
       IMPORTING
         !it_line       TYPE ztimem_line_t
       RETURNING
-        VALUE(r_count) TYPE i .
+        VALUE(result) TYPE i .
+
     METHODS get_empty_lines
       IMPORTING
         !it_line       TYPE ztimem_line_t
       RETURNING
-        VALUE(r_count) TYPE i .
+        VALUE(result) TYPE i .
+
     METHODS get_date_oldest
       IMPORTING
         !it_line      TYPE ztimem_line_t
       RETURNING
-        VALUE(r_date) TYPE datum .
+        VALUE(result) TYPE datum .
+
     METHODS get_date_latest
       IMPORTING
         !it_line      TYPE ztimem_line_t
       RETURNING
-        VALUE(r_date) TYPE datum .
+        VALUE(result) TYPE datum .
 ENDCLASS.
 
 
@@ -65,27 +68,27 @@ CLASS ZCL_TIMEM_STATS IMPLEMENTATION.
     LOOP AT it_line REFERENCE INTO DATA(os_line).
       first_char = shift_left( os_line->source ).
       IF first_char CO '*"'.
-        r_count = r_count + 1.
+        result = result + 1.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
 
   METHOD get_date_latest.
-    r_date = '00000000'.
+    result = '00000000'.
     LOOP AT it_line REFERENCE INTO DATA(os_line).
-      IF os_line->date > r_date.
-        r_date = os_line->date.
+      IF os_line->date > result.
+        result = os_line->date.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
 
   METHOD get_date_oldest.
-    r_date = '999999999'.
+    result = '999999999'.
     LOOP AT it_line REFERENCE INTO DATA(os_line).
-      IF os_line->date < r_date.
-        r_date = os_line->date.
+      IF os_line->date < result.
+        result = os_line->date.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
@@ -94,6 +97,6 @@ CLASS ZCL_TIMEM_STATS IMPLEMENTATION.
   METHOD get_empty_lines.
     DATA(t_line) = it_line.
     DELETE t_line WHERE source IS NOT INITIAL.
-    r_count = lines( t_line ).
+    result = lines( t_line ).
   ENDMETHOD.
 ENDCLASS.

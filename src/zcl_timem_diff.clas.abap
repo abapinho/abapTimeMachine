@@ -12,10 +12,10 @@ CLASS zcl_timem_diff DEFINITION
     "! @parameter it_new | New source list
     METHODS compute
       IMPORTING
-        !it_old        TYPE ztimem_line_t
-        !it_new        TYPE ztimem_line_t
+        !it_old       TYPE ztimem_line_t
+        !it_new       TYPE ztimem_line_t
       RETURNING
-        VALUE(rt_line) TYPE ztimem_line_t .
+        VALUE(result) TYPE ztimem_line_t .
   PROTECTED SECTION.
   PRIVATE SECTION.
     CONSTANTS:
@@ -27,20 +27,20 @@ CLASS zcl_timem_diff DEFINITION
 
     METHODS compute_delta
       IMPORTING
-        !it_old         TYPE ztimem_line_t
-        !it_new         TYPE ztimem_line_t
+        !it_old       TYPE ztimem_line_t
+        !it_new       TYPE ztimem_line_t
       RETURNING
-        VALUE(rt_delta) TYPE vxabapt255_tab .
+        VALUE(result) TYPE vxabapt255_tab .
 
     METHODS get_source
       IMPORTING
-                !it_line         TYPE ztimem_line_t
-      RETURNING VALUE(rt_source) TYPE abaptxt255_tab.
+                !it_line      TYPE ztimem_line_t
+      RETURNING VALUE(result) TYPE abaptxt255_tab.
 
     METHODS process_line
       IMPORTING
                 !i_line       TYPE text1000
-      RETURNING VALUE(r_line) TYPE text1000.
+      RETURNING VALUE(result) TYPE text1000.
 ENDCLASS.
 
 
@@ -51,10 +51,10 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
   METHOD compute.
     DATA: old_index TYPE i VALUE 1,
           new_index TYPE i VALUE 1,
-          s_line    LIKE LINE OF rt_line.
+          s_line    LIKE LINE OF result.
 
     IF it_old IS INITIAL.
-      rt_line = it_new.
+      result = it_new.
       RETURN.
     ENDIF.
 
@@ -73,13 +73,13 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
             READ TABLE it_new INTO s_line INDEX new_index.
             ASSERT sy-subrc = 0.
             s_line-source = s_delta-line.
-            INSERT s_line INTO TABLE rt_line.
+            INSERT s_line INTO TABLE result.
             new_index = new_index + 1.
 
           WHEN c_diff-update.
             READ TABLE it_new INTO s_line INDEX new_index.
             ASSERT sy-subrc = 0.
-            INSERT s_line INTO TABLE rt_line.
+            INSERT s_line INTO TABLE result.
             new_index = new_index + 1.
             old_index = old_index + 1.
 
@@ -90,7 +90,7 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
       ELSE.
         READ TABLE it_old INTO s_line INDEX old_index.
         ASSERT sy-subrc = 0.
-        INSERT s_line INTO TABLE rt_line.
+        INSERT s_line INTO TABLE result.
         new_index = new_index + 1.
         old_index = old_index + 1.
 
@@ -118,24 +118,24 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
         trdirtab_old = t_trdirtab_old
         trdirtab_new = t_trdirtab_new
         trdir_delta  = t_trdir_delta
-        text_delta   = rt_delta.
+        text_delta   = result.
   ENDMETHOD.
 
 
   METHOD get_source.
-    rt_source = VALUE abaptxt255_tab(
+    result = VALUE abaptxt255_tab(
       FOR s_line IN it_line
       ( line = process_line( s_line-source ) ) ).
   ENDMETHOD.
 
 
   METHOD process_line.
-    r_line = i_line.
+    result = i_line.
     IF zcl_timem_options=>get_instance( )->ignore_case = abap_true.
-      r_line = to_upper( r_line ).
+      result = to_upper( result ).
     ENDIF.
     IF zcl_timem_options=>get_instance( )->ignore_indentation = abap_true.
-      SHIFT r_line LEFT DELETING LEADING space.
+      SHIFT result LEFT DELETING LEADING space.
     ENDIF.
   ENDMETHOD.
 ENDCLASS.

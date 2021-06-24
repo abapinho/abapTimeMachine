@@ -1,22 +1,22 @@
-INTERFACE zif_timem_object
-  PUBLIC .
+interface ZIF_TIMEM_OBJECT
+  public .
 
-  TYPES: ty_t_part_ref TYPE STANDARD TABLE OF REF TO zcl_timem_part with key TABLE_LINE.
+
+  types:
+    ty_t_part_ref TYPE STANDARD TABLE OF REF TO zcl_timem_part WITH KEY table_line .
 
   "! Returns a list of references to part instances
-  METHODS get_part_list
-    RETURNING
-      VALUE(rt_part) TYPE ty_t_part_ref
-    RAISING
-      zcx_timem .
-
+  methods GET_PART_LIST
+    returning
+      value(RESULT) type ZTIMEM_PART_T
+    raising
+      ZCX_TIMEM .
   "! Returns the object name
-  METHODS get_name
-    RETURNING
-      VALUE(r_name) TYPE string .
-
+  methods GET_NAME
+    returning
+      value(RESULT) type STRING .
   "! Checks if the object exists in the system
-  METHODS check_exists
-    RETURNING
-      VALUE(r_result) TYPE boolean .
-ENDINTERFACE.
+  methods CHECK_EXISTS
+    returning
+      value(RESULT) type BOOLEAN .
+endinterface.

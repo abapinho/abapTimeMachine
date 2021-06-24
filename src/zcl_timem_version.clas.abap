@@ -1,54 +1,56 @@
 "! Represents a version of a part of an object, including its source code
 "! and several other attributes like author, request, etc.
-class ZCL_TIMEM_VERSION definition
-  public
-  final
-  create public .
+CLASS zcl_timem_version DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  constants:
-    BEGIN OF c_version,
+    CONSTANTS:
+      BEGIN OF c_version,
         latest_db TYPE versno VALUE 0,
         latest    TYPE versno VALUE 99998,
         active    TYPE versno VALUE 99998,
         modified  TYPE versno VALUE 99999,
       END OF c_version .
     "! Version number from the VRSD table
-  data VERSION_NUMBER type VERSNO read-only .
+    DATA version_number TYPE versno READ-ONLY .
     "! Transport request ID
-  data REQUEST type VERSKORRNO read-only .
+    DATA request TYPE verskorrno READ-ONLY .
     "! Task ID (if exists)
-  data TASK type VERSKORRNO read-only .
+    DATA task TYPE verskorrno READ-ONLY .
     " Username
-  data AUTHOR type VERSUSER read-only .
+    DATA author TYPE versuser READ-ONLY .
     " Name of the user (or username if no longer exists)
-  data AUTHOR_NAME type AD_NAMTEXT read-only .
+    DATA author_name TYPE ad_namtext READ-ONLY .
     " Date of version
-  data DATE type VERSDATE read-only .
+    DATA date TYPE versdate READ-ONLY .
     " Time of version
-  data TIME type VERSTIME read-only .
+    DATA time TYPE verstime READ-ONLY .
 
     "! Loading source event
-  events LOADING_SOURCE
-    exporting
-      value(TYPE) type VERSOBJTYP
-      value(NAME) type VERSOBJNAM
-      value(VERSION_NUMBER) type VERSNO .
+    EVENTS loading_source
+      EXPORTING
+        VALUE(type) TYPE versobjtyp
+        VALUE(name) TYPE versobjnam
+        VALUE(version_number) TYPE versno .
 
     "! Takes a line of the VRSD table and fills all the attributes, including
     "! the source code already with blame information.
-  methods CONSTRUCTOR
-    importing
-      !IS_VRSD type VRSD
-    raising
-      ZCX_TIMEM .
+    METHODS constructor
+      IMPORTING
+        !is_vrsd TYPE vrsd
+      RAISING
+        zcx_timem .
     "! Returns the version source code including blame information.
-  methods GET_SOURCE
-    returning
-      value(RT_LINE) type ZTIMEM_LINE_T
-    raising
-      ZCX_TIMEM .
+
+    METHODS get_source
+      RETURNING
+        VALUE(result) TYPE ztimem_line_t
+      RAISING
+        zcx_timem .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA s_vrsd TYPE vrsd.
@@ -61,7 +63,7 @@ public section.
       RAISING zcx_timem.
 
     METHODS get_real_version
-      RETURNING VALUE(r_version) TYPE versno.
+      RETURNING VALUE(result) TYPE versno.
 
     "! Try to find the object in the request tasks because sometimes the request was created
     "! by someone who was not the actual developer. The tasks better reflects the object's author.
@@ -85,13 +87,13 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
     " Technically the current version is 0 but in order to keep them properly sorted we're
     " setting it to magic number 99997 (because 'ACTIVE' is 99998 and 'MODIFIED' is 99999.
     " But when we're going to fetch it from the database we must use 0.
-    r_version = COND #( WHEN me->version_number = c_version-latest THEN 0
-                        ELSE me->version_number ).
+    result = COND #( WHEN me->version_number = c_version-latest THEN 0
+                     ELSE me->version_number ).
   ENDMETHOD.
 
 
   METHOD get_source.
-    DATA: s_line LIKE LINE OF rt_line.
+    DATA: s_line LIKE LINE OF result.
 
     s_line-version_number = me->version_number.
     s_line-request = me->request.
@@ -107,7 +109,7 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
     LOOP AT gt_source INTO DATA(source_int).
       s_line-line_num = sy-tabix.
       s_line-source = source_int.
-      INSERT s_line INTO TABLE rt_line.
+      INSERT s_line INTO TABLE result.
     ENDLOOP.
   ENDMETHOD.
 
