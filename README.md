@@ -21,5 +21,5 @@ For questions/comments/bugs/feature requests/wishes please create an [issue](htt
 
 ## Credits
 
-* Most code by [Nuno Godinho](https://github.com/orgs/abapinho/people/nununo)
-* Diff algorithm and syntax highlighter parcially copied from [abapGit](http://abapgit.org/)
+* Most code by [Nuno Godinho](https://github.com/nununo)
+* Diff algorithm and syntax highlighter parcially copied from [abapGit](https://abapgit.org)
