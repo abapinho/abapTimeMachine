@@ -16,7 +16,7 @@ CLASS zcl_timem_request DEFINITION
     "! Constructs an instance for the given request ID
     METHODS constructor
       IMPORTING
-        !i_id TYPE trkorr .
+        !id TYPE trkorr .
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -42,7 +42,8 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
     FROM e070
     INNER JOIN e07t ON e07t~trkorr = e070~trkorr
     WHERE e070~trkorr = id
-      AND langu  = 'E'.
+      AND langu  = 'E'
+    ORDER BY as4text trstatus.
       EXIT.
     ENDSELECT.
   ENDMETHOD.
