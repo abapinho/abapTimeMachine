@@ -16,13 +16,13 @@ CLASS zcl_timem_request DEFINITION
     "! Constructs an instance for the given request ID
     METHODS constructor
       IMPORTING
-        !i_request TYPE trkorr .
+        !id TYPE trkorr .
 
   PROTECTED SECTION.
   PRIVATE SECTION.
     METHODS populate_details
       IMPORTING
-        !i_request TYPE trkorr.
+        !id TYPE trkorr.
 ENDCLASS.
 
 
@@ -31,16 +31,20 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->id = i_request.
-    populate_details( i_request ).
+    me->id = id.
+    populate_details( id ).
   ENDMETHOD.
 
 
   METHOD populate_details.
-    SELECT SINGLE as4text trstatus INTO (description, status)
+    SELECT as4text trstatus INTO (description, status)
+    UP TO 1 ROWS
     FROM e070
     INNER JOIN e07t ON e07t~trkorr = e070~trkorr
-    WHERE e070~trkorr = i_request
-      AND langu  = 'E'.
+    WHERE e070~trkorr = id
+      AND langu  = 'E'
+    ORDER BY as4text trstatus.
+      EXIT.
+    ENDSELECT.
   ENDMETHOD.
 ENDCLASS.

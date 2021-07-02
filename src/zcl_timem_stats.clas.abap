@@ -20,31 +20,31 @@ CLASS zcl_timem_stats DEFINITION
     "! structure attribute with all the calculated values.
     METHODS constructor
       IMPORTING
-        !it_line TYPE ztimem_line_t .
+        !lines TYPE ztimem_line_t .
   PROTECTED SECTION.
   PRIVATE SECTION.
 
     METHODS get_comment_lines
       IMPORTING
-        !it_line       TYPE ztimem_line_t
+        !lines        TYPE ztimem_line_t
       RETURNING
         VALUE(result) TYPE i .
 
     METHODS get_empty_lines
       IMPORTING
-        !it_line       TYPE ztimem_line_t
+        !lines        TYPE ztimem_line_t
       RETURNING
         VALUE(result) TYPE i .
 
     METHODS get_date_oldest
       IMPORTING
-        !it_line      TYPE ztimem_line_t
+        !lines        TYPE ztimem_line_t
       RETURNING
         VALUE(result) TYPE datum .
 
     METHODS get_date_latest
       IMPORTING
-        !it_line      TYPE ztimem_line_t
+        !lines        TYPE ztimem_line_t
       RETURNING
         VALUE(result) TYPE datum .
 ENDCLASS.
@@ -55,18 +55,19 @@ CLASS ZCL_TIMEM_STATS IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->stats-total_lines = lines( it_line ).
-    me->stats-comment_lines = get_comment_lines( it_line ).
-    me->stats-empty_lines = get_empty_lines( it_line ).
-    me->stats-date_oldest = get_date_oldest( it_line ).
-    me->stats-date_latest = get_date_latest( it_line ).
+    stats = VALUE #(
+      total_lines = lines( lines )
+      comment_lines = get_comment_lines( lines )
+      empty_lines = get_empty_lines( lines )
+      date_oldest = get_date_oldest( lines )
+      date_latest = get_date_latest( lines ) ).
   ENDMETHOD.
 
 
   METHOD get_comment_lines.
     DATA first_char TYPE char1.
-    LOOP AT it_line REFERENCE INTO DATA(os_line).
-      first_char = shift_left( os_line->source ).
+    LOOP AT lines REFERENCE INTO DATA(line).
+      first_char = shift_left( line->source ).
       IF first_char CO '*"'.
         result = result + 1.
       ENDIF.
@@ -76,9 +77,9 @@ CLASS ZCL_TIMEM_STATS IMPLEMENTATION.
 
   METHOD get_date_latest.
     result = '00000000'.
-    LOOP AT it_line REFERENCE INTO DATA(os_line).
-      IF os_line->date > result.
-        result = os_line->date.
+    LOOP AT lines REFERENCE INTO DATA(line).
+      IF line->date > result.
+        result = line->date.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
@@ -86,17 +87,17 @@ CLASS ZCL_TIMEM_STATS IMPLEMENTATION.
 
   METHOD get_date_oldest.
     result = '999999999'.
-    LOOP AT it_line REFERENCE INTO DATA(os_line).
-      IF os_line->date < result.
-        result = os_line->date.
+    LOOP AT lines REFERENCE INTO DATA(line).
+      IF line->date < result.
+        result = line->date.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
 
 
   METHOD get_empty_lines.
-    DATA(t_line) = it_line.
-    DELETE t_line WHERE source IS NOT INITIAL.
-    result = lines( t_line ).
+    DATA(lines_aux) = lines.
+    DELETE lines_aux WHERE source IS NOT INITIAL.
+    result = lines( lines_aux ).
   ENDMETHOD.
 ENDCLASS.

@@ -1,23 +1,23 @@
 "! Representation of a program/include object. This object consists of a single part which
 "! this class  will be able to create and return.
-class ZCL_TIMEM_OBJECT_PROG definition
-  public
-  final
-  create public .
+CLASS zcl_timem_object_prog DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces ZIF_TIMEM_OBJECT .
+    INTERFACES zif_timem_object .
 
     "! Constructor for the program/include object.
     "! @parameter i_name | Program/include name
-  methods CONSTRUCTOR
-    importing
-      !I_NAME type SOBJ_NAME .
-protected section.
-private section.
+    METHODS constructor
+      IMPORTING
+        !name TYPE sobj_name .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 
-  data G_NAME type SOBJ_NAME .
+    DATA name TYPE sobj_name .
 ENDCLASS.
 
 
@@ -26,27 +26,27 @@ CLASS ZCL_TIMEM_OBJECT_PROG IMPLEMENTATION.
 
 
   METHOD constructor.
-    g_name = i_name.
+    me->name = name.
   ENDMETHOD.
 
 
   METHOD zif_timem_object~check_exists.
-    SELECT SINGLE name INTO g_name
+    SELECT SINGLE name INTO name
       FROM trdir
-      WHERE name   = g_name.
+      WHERE name   = name.
     result = boolc( sy-subrc = 0 ).
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_name.
-    result = g_name.
+    result = name.
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_part_list.
     result = VALUE #( (
-      name        = CONV #( me->g_name )
-      object_name = CONV #( me->g_name )
+      name        = CONV #( name )
+      object_name = CONV #( name )
       type        = 'REPS' ) ).
   ENDMETHOD.
 ENDCLASS.

@@ -1,19 +1,19 @@
 "! An SAP user
-class ZCL_TIMEM_AUTHOR definition
-  public
-  final
-  create public .
+CLASS zcl_timem_author DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
     "! Returns the user's name (or the username if the user no longer exists)
-  methods GET_NAME
-    importing
-      !UNAME type SYUNAME
-    returning
-      value(result) type STRING
-    raising
-      ZCX_TIMEM .
+    METHODS get_name
+      IMPORTING
+        !uname        TYPE syuname
+      RETURNING
+        VALUE(result) TYPE string
+      RAISING
+        zcx_timem .
   PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES:
@@ -37,9 +37,13 @@ CLASS ZCL_TIMEM_AUTHOR IMPLEMENTATION.
     READ TABLE authors INTO author WITH KEY uname = uname.
     IF sy-subrc <> 0.
       author-uname = uname.
-      SELECT SINGLE name_textc INTO author-name
+      SELECT name_textc INTO author-name
+      UP TO 1 ROWS
       FROM user_addr
-      WHERE bname = uname.
+      WHERE bname = uname
+      ORDER BY name_textc.
+        EXIT.
+      ENDSELECT.
       IF sy-subrc <> 0.
         author-name = uname.
       ENDIF.

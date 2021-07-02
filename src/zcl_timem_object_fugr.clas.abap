@@ -1,30 +1,30 @@
 "! Representation of a function group object. It will be able to create and
 "! return a list of all the parts the function group is made of.
-class ZCL_TIMEM_OBJECT_FUGR definition
-  public
-  final
-  create public .
+CLASS zcl_timem_object_fugr DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces ZIF_TIMEM_OBJECT .
+    INTERFACES zif_timem_object .
 
     "! Constructor for the function group object.
     "! @parameter i_name | Function group name
-  methods CONSTRUCTOR
-    importing
-      !I_NAME type RS38L_AREA .
-protected section.
-private section.
+    METHODS constructor
+      IMPORTING
+        !name TYPE rs38l_area .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 
-  data G_NAME type RS38L_AREA .
+    DATA name TYPE rs38l_area .
 
-  methods GET_MAIN_NAME
-    returning
-      value(RESULT) type PROGRAM .
-  methods GET_FUNCTIONS
-    returning
-      value(RESULT) type RE_T_FUNCINCL .
+    METHODS get_main_name
+      RETURNING
+        VALUE(result) TYPE program .
+    METHODS get_functions
+      RETURNING
+        VALUE(result) TYPE re_t_funcincl .
 ENDCLASS.
 
 
@@ -33,14 +33,14 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
 
 
   METHOD constructor.
-    g_name = i_name.
+    me->name = name.
   ENDMETHOD.
 
 
   METHOD get_functions.
     CALL FUNCTION 'RS_FUNCTION_POOL_CONTENTS'
       EXPORTING
-        function_pool           = g_name
+        function_pool           = name
       TABLES
         functab                 = result
       EXCEPTIONS
@@ -59,7 +59,7 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
 
     CALL FUNCTION 'FUNCTION_INCLUDE_SPLIT'
       EXPORTING
-        complete_area = me->g_name
+        complete_area = name
       IMPORTING
         namespace     = namespace
         group         = group
@@ -74,7 +74,7 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
   METHOD zif_timem_object~check_exists.
     CALL FUNCTION 'RS_FUNCTION_POOL_EXISTS'
       EXPORTING
-        function_pool   = g_name
+        function_pool   = name
       EXCEPTIONS
         pool_not_exists = 1.
     result = boolc( sy-subrc = 0 ).
@@ -82,7 +82,7 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
 
 
   METHOD zif_timem_object~get_name.
-    result = g_name.
+    result = name.
   ENDMETHOD.
 
 

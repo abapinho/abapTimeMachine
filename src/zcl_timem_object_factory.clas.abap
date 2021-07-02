@@ -24,8 +24,8 @@ CLASS zcl_timem_object_factory DEFINITION
     "! @parameter i_object_name | Object name
     METHODS get_instance
       IMPORTING
-        !i_object_type TYPE ztimem_object_type
-        !i_object_name TYPE sobj_name
+        !object_type TYPE ztimem_object_type
+        !object_name TYPE sobj_name
       RETURNING
         VALUE(result)  TYPE REF TO zif_timem_object
       RAISING
@@ -41,12 +41,12 @@ CLASS ZCL_TIMEM_OBJECT_FACTORY IMPLEMENTATION.
 
   METHOD get_instance.
     result = SWITCH #(
-      i_object_type
-      WHEN gc_object_type-program THEN NEW zcl_timem_object_prog( i_object_name )
-      WHEN gc_object_type-program_includes THEN NEW zcl_timem_object_prog_includes( i_object_name )
-      WHEN gc_object_type-class THEN NEW zcl_timem_object_clas( CONV #( i_object_name ) )
-      WHEN gc_object_type-function_group THEN NEW zcl_timem_object_fugr( CONV #( i_object_name ) )
-      WHEN gc_object_type-function THEN NEW zcl_timem_object_func( CONV #( i_object_name ) ) ).
+      object_type
+      WHEN gc_object_type-program THEN NEW zcl_timem_object_prog( object_name )
+      WHEN gc_object_type-program_includes THEN NEW zcl_timem_object_prog_includes( object_name )
+      WHEN gc_object_type-class THEN NEW zcl_timem_object_clas( CONV #( object_name ) )
+      WHEN gc_object_type-function_group THEN NEW zcl_timem_object_fugr( CONV #( object_name ) )
+      WHEN gc_object_type-function THEN NEW zcl_timem_object_func( CONV #( object_name ) ) ).
     IF result IS NOT BOUND OR NOT result->check_exists( ).
       RAISE EXCEPTION TYPE zcx_timem
         EXPORTING

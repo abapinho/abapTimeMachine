@@ -13,12 +13,12 @@ CLASS zcl_timem_object_prog_includes DEFINITION
     "! @parameter i_name | Program/include name
     METHODS constructor
       IMPORTING
-        !i_name TYPE sobj_name .
+        !name TYPE sobj_name .
   PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES ty_t_rpy_repo TYPE STANDARD TABLE OF rpy_repo WITH KEY inclname.
 
-    DATA g_name TYPE sobj_name .
+    DATA name TYPE sobj_name .
 
     METHODS get_includes
       RETURNING VALUE(result) TYPE ty_t_rpy_repo.
@@ -30,14 +30,14 @@ CLASS ZCL_TIMEM_OBJECT_PROG_INCLUDES IMPLEMENTATION.
 
 
   METHOD constructor.
-    g_name = i_name.
+    me->name = name.
   ENDMETHOD.
 
 
   METHOD get_includes.
     CALL FUNCTION 'RPY_PROGRAM_READ'
       EXPORTING
-        program_name     = me->g_name
+        program_name     = name
         only_texts       = abap_true
       TABLES
         include_tab      = result
@@ -53,22 +53,22 @@ CLASS ZCL_TIMEM_OBJECT_PROG_INCLUDES IMPLEMENTATION.
 
 
   METHOD zif_timem_object~check_exists.
-    SELECT SINGLE name INTO g_name
+    SELECT SINGLE name INTO name
       FROM trdir
-      WHERE name   = g_name.
+      WHERE name   = name.
     result = boolc( sy-subrc = 0 ).
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_name.
-    result = g_name.
+    result = name.
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_part_list.
     result = VALUE #( (
-      name        = CONV #( me->g_name )
-      object_name = CONV #( me->g_name )
+      name        = CONV #( name )
+      object_name = CONV #( name )
       type        = 'REPS' ) ).
 
     DATA(includes) = get_includes( ).

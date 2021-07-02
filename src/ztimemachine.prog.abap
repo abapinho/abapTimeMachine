@@ -2,7 +2,6 @@
 "! code of all its parts and displays it as HTML.
 REPORT ztimemachine.
 
-
 SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-sel.
 PARAMETERS p_otype TYPE ztimem_object_type AS LISTBOX VISIBLE LENGTH 25 OBLIGATORY DEFAULT 'PROG'.
 PARAMETERS p_name TYPE sobj_name OBLIGATORY.
@@ -60,14 +59,14 @@ START-OF-SELECTION.
     ELSE zif_timem_consts=>mode-time_machine ).
 
   TRY.
-      zcl_timem_options=>get_instance( )->set( i_mode               = mode
-                                               i_ignore_case        = p_icase
-                                               i_ignore_indentation = p_iinde
-                                               i_timestamp = CONV #( |{ p_date }{ p_time }| )
-                                               i_ignore_unreleased  = p_iunre ).
+      zcl_timem_options=>get_instance( )->set( mode               = mode
+                                               ignore_case        = p_icase
+                                               ignore_indentation = p_iinde
+                                               timestamp = CONV #( |{ p_date }{ p_time }| )
+                                               ignore_unreleased  = p_iunre ).
 
-      NEW zcl_timem_run( )->go( i_object_type = p_otype
-                                i_object_name = p_name ).
+      NEW zcl_timem_run( )->go( object_type = p_otype
+                                object_name = p_name ).
 
       CALL SELECTION-SCREEN 1001.
       LEAVE SCREEN.
