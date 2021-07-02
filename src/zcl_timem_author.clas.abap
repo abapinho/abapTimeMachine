@@ -37,9 +37,12 @@ CLASS ZCL_TIMEM_AUTHOR IMPLEMENTATION.
     READ TABLE authors INTO author WITH KEY uname = uname.
     IF sy-subrc <> 0.
       author-uname = uname.
-      SELECT SINGLE name_textc INTO author-name
+      SELECT name_textc INTO author-name
+      UP TO 1 ROWS
       FROM user_addr
       WHERE bname = uname.
+        EXIT.
+      ENDSELECT.
       IF sy-subrc <> 0.
         author-name = uname.
       ENDIF.

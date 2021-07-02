@@ -18,9 +18,9 @@ CLASS zcl_timem_gui_viewer DEFINITION
     METHODS constructor
       IMPORTING
         !io_handler TYPE REF TO zcl_timem_gui_handler .
+
     "! Takes a deep structure with all the information of the object, renders
     "! the HTML and CSS assets and displays them.
-
     METHODS render
       IMPORTING
         !is_parts TYPE ztimem_parts
@@ -29,17 +29,17 @@ CLASS zcl_timem_gui_viewer DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA go_html_viewer TYPE REF TO cl_gui_html_viewer.
+    DATA html_viewer TYPE REF TO cl_gui_html_viewer.
 
     METHODS add_asset
       IMPORTING
-        !io_asset     TYPE REF TO zif_timem_asset
+        !asset        TYPE REF TO zif_timem_asset
       RETURNING
         VALUE(result) TYPE w3url .
 
     METHODS string_2_xstring
       IMPORTING
-        !input      TYPE string
+        !input        TYPE string
       RETURNING
         VALUE(result) TYPE xstring .
 
@@ -49,7 +49,7 @@ CLASS zcl_timem_gui_viewer DEFINITION
 
     CLASS-METHODS xstring_2_bintab
       IMPORTING
-        !xstr       TYPE xstring
+        !xstr         TYPE xstring
       RETURNING
         VALUE(result) TYPE lvc_t_mime .
 ENDCLASS.
@@ -60,11 +60,11 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
 
 
   METHOD add_asset.
-    DATA(content) = io_asset->get_content( ).
+    DATA(content) = asset->get_content( ).
 
     NEW zcl_timem_userexits( )->modify_asset_content(
       EXPORTING
-        subtype = io_asset->get_subtype( )
+        subtype = asset->get_subtype( )
       CHANGING
         content = content ).
 
@@ -72,11 +72,11 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
 
     DATA(t_bintab) = xstring_2_bintab( xstr ).
 
-    go_html_viewer->load_data(
+    html_viewer->load_data(
       EXPORTING
-        url                    =  io_asset->get_url( )
+        url                    =  asset->get_url( )
         type                   = 'text'
-        subtype                = io_asset->get_subtype( )
+        subtype                = asset->get_subtype( )
       CHANGING
         data_table             = t_bintab
       EXCEPTIONS
@@ -89,13 +89,13 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
       MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
                  WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
     ENDIF.
-    result = io_asset->get_url( ).
+    result = asset->get_url( ).
   ENDMETHOD.
 
 
   METHOD constructor.
-    go_html_viewer = NEW cl_gui_html_viewer( parent                   = cl_gui_container=>screen0
-                                             query_table_disabled     = abap_true ).
+    html_viewer = NEW cl_gui_html_viewer( parent                   = cl_gui_container=>screen0
+                                          query_table_disabled     = abap_true ).
     register_events( io_handler ).
   ENDMETHOD.
 
@@ -103,23 +103,23 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
   METHOD register_events.
     DATA t_event TYPE cntl_simple_events.
     t_event = VALUE #( ( appl_event = abap_true
-                         eventid    = go_html_viewer->m_id_sapevent ) ).
-    go_html_viewer->set_registered_events( t_event ).
-    SET HANDLER io_handler->on_sapevent FOR go_html_viewer.
+                         eventid    = html_viewer->m_id_sapevent ) ).
+    html_viewer->set_registered_events( t_event ).
+    SET HANDLER io_handler->on_sapevent FOR html_viewer.
   ENDMETHOD.
 
 
   METHOD render.
     SKIP. " Creates the screen0 container
     add_asset( NEW zcl_timem_asset_factory( )->create_instance(
-      i_asset_type = zif_timem_consts=>asset_type-css
+      asset_type = zif_timem_consts=>asset_type-css
       is_parts     = is_parts ) ).
 
     DATA(url) = add_asset( NEW zcl_timem_asset_factory( )->create_instance(
-      i_asset_type = zif_timem_consts=>asset_type-html
+      asset_type = zif_timem_consts=>asset_type-html
       is_parts     = is_parts ) ).
 
-    go_html_viewer->show_url(
+    html_viewer->show_url(
       EXPORTING
         url = url
       EXCEPTIONS
@@ -153,8 +153,8 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
   METHOD xstring_2_bintab.
     CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
       EXPORTING
-        buffer        = xstr
+        buffer     = xstr
       TABLES
-        binary_tab    = result.
+        binary_tab = result.
   ENDMETHOD.
 ENDCLASS.

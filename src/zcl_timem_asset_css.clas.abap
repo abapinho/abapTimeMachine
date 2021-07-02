@@ -19,7 +19,7 @@ public section.
       !theme type ZTIMEM_THEME .
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA g_theme_transformation TYPE char30.
+    DATA theme_transformation TYPE char30.
 ENDCLASS.
 
 
@@ -28,7 +28,7 @@ CLASS ZCL_TIMEM_ASSET_CSS IMPLEMENTATION.
 
 
   METHOD constructor.
-    g_theme_transformation = |ZTIMEM_CSS_THEME_{ theme }|.
+    theme_transformation = |ZTIMEM_CSS_THEME_{ theme }|.
   ENDMETHOD.
 
 
@@ -40,7 +40,7 @@ CLASS ZCL_TIMEM_ASSET_CSS IMPLEMENTATION.
     SOURCE XML css
     RESULT XML result.
 
-    CALL TRANSFORMATION (g_theme_transformation)
+    CALL TRANSFORMATION (theme_transformation)
     SOURCE XML css
     RESULT XML theme_css.
 

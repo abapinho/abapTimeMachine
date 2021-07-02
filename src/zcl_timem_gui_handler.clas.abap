@@ -10,7 +10,7 @@ CLASS zcl_timem_gui_handler DEFINITION
 
     METHODS constructor
       IMPORTING
-        !io_gui TYPE REF TO zcl_timem_gui .
+        !gui TYPE REF TO zcl_timem_gui .
 
     "! Handler method
     "! @parameter action | Action
@@ -23,21 +23,21 @@ CLASS zcl_timem_gui_handler DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA go_gui TYPE REF TO zcl_timem_gui.
-    data userexits type ref to zcl_timem_userexits.
+    DATA gui TYPE REF TO zcl_timem_gui.
+    DATA userexits TYPE REF TO zcl_timem_userexits.
 
     METHODS display_request
       IMPORTING
-        i_request TYPE trkorr.
+        request TYPE trkorr.
 
     METHODS display_user
       IMPORTING
-        i_user TYPE uname.
+        user TYPE uname.
 
     METHODS display_source
       IMPORTING
-        i_type        TYPE versobjtyp
-        i_object_name TYPE versobjnam.
+        type        TYPE versobjtyp
+        object_name TYPE versobjnam.
 
     METHODS display_version.
 
@@ -55,8 +55,8 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
 
 
   METHOD constructor.
-    go_gui = io_gui.
-    userexits = new #( ).
+    me->gui = gui.
+    userexits = NEW #( ).
   ENDMETHOD.
 
 
@@ -108,7 +108,7 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
   METHOD display_request.
     CALL FUNCTION 'TR_DISPLAY_REQUEST'
       EXPORTING
-        i_trkorr = i_request.
+        i_trkorr = request.
   ENDMETHOD.
 
 
@@ -116,8 +116,8 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
     CALL FUNCTION 'RS_TOOL_ACCESS'
       EXPORTING
         operation           = 'SHOW'
-        object_name         = i_object_name
-        object_type         = i_type
+        object_name         = object_name
+        object_type         = type
       EXCEPTIONS
         not_executed        = 1
         invalid_object_type = 2
@@ -132,7 +132,7 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
   METHOD display_user.
     CALL FUNCTION 'SUID_IDENTITY_MAINT'
       EXPORTING
-        i_username       = i_user
+        i_username       = user
         i_tcode_mode     = 6
       EXCEPTIONS
         no_authorisation = 1
@@ -146,7 +146,7 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
 
   METHOD display_version.
     TRY.
-        go_gui->display( ).
+        gui->display( ).
       CATCH zcx_timem.
         RETURN. " Ignore error
     ENDTRY.
@@ -170,13 +170,13 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
           IMPORTING
             e_type = DATA(type)
             e_object_name = DATA(object_name) ).
-        display_source( i_type = type
-                        i_object_name = object_name ).
+        display_source( type        = type
+                        object_name = object_name ).
 
       WHEN 'timestamp'.
         " Depending on the link, getdata may be just the timestamp xxx or be like timestamp=xxx
         DATA(ts) = COND timestamp( WHEN getdata(10) = 'timestamp=' THEN getdata+10 ELSE getdata ).
-        zcl_timem_options=>get_instance( )->set( i_timestamp = ts ).
+        zcl_timem_options=>get_instance( )->set( timestamp = ts ).
         display_version( ).
 
       WHEN OTHERS.

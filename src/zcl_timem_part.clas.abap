@@ -42,12 +42,12 @@ CLASS zcl_timem_part DEFINITION
     TYPES:
       ty_t_version TYPE STANDARD TABLE OF REF TO zcl_timem_version WITH KEY table_line .
 
-    DATA gt_version TYPE ty_t_version .
+    DATA versions TYPE ty_t_version .
 
     METHODS load_versions
       IMPORTING
-        !i_vrsd_type TYPE versobjtyp
-        !i_vrsd_name TYPE versobjnam
+        !vrsd_type TYPE versobjtyp
+        !vrsd_name TYPE versobjnam
       RAISING
         zcx_timem .
 
@@ -83,16 +83,16 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
     me->name = name.
     me->vrsd_type = vrsd_type.
     me->vrsd_name = vrsd_name.
-    load_versions( i_vrsd_type = vrsd_type
-                   i_vrsd_name = vrsd_name ).
+    load_versions( vrsd_type = vrsd_type
+                   vrsd_name = vrsd_name ).
   ENDMETHOD.
 
 
   METHOD get_diffed_source_with_blame.
-    DATA(o_diff) = NEW zcl_timem_diff( ).
-    LOOP AT get_versions_until_threshold( ) INTO DATA(o_version).
-      result = o_diff->compute( lines_old = result
-                                lines_new =  o_version->get_source( ) ).
+    DATA(diff) = NEW zcl_timem_diff( ).
+    LOOP AT get_versions_until_threshold( ) INTO DATA(version).
+      result = diff->compute( lines_old = result
+                              lines_new =  version->get_source( ) ).
     ENDLOOP.
   ENDMETHOD.
 
@@ -106,17 +106,17 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
 
 
   METHOD get_source_at_threshold.
-    DATA(o_version) = get_version_at_threshold( ).
-    IF o_version IS BOUND.
-      result = o_version->get_source( ).
+    DATA(version) = get_version_at_threshold( ).
+    IF version IS BOUND.
+      result = version->get_source( ).
     ENDIF.
   ENDMETHOD.
 
 
   METHOD get_timestamps.
     DATA ts LIKE LINE OF result.
-    LOOP AT gt_version INTO DATA(o_version).
-      ts = |{ o_version->date }{ o_version->time }|.
+    LOOP AT versions INTO DATA(version).
+      ts = |{ version->date }{ version->time }|.
       COLLECT ts INTO result.
     ENDLOOP.
   ENDMETHOD.
@@ -124,18 +124,18 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
 
   METHOD get_versions_until_threshold.
     result = VALUE #(
-      FOR o_version IN gt_version
+      FOR version IN versions
         WHERE (
           table_line->date < zcl_timem_options=>get_instance( )->date OR
           ( table_line->date = zcl_timem_options=>get_instance( )->date AND
             table_line->time <= zcl_timem_options=>get_instance( )->time ) )
-        ( o_version ) ).
+        ( version ) ).
   ENDMETHOD.
 
 
   METHOD get_version_at_threshold.
     " The last one should be the one we want
-    LOOP AT gt_version INTO result WHERE
+    LOOP AT versions INTO result WHERE
           table_line->date < zcl_timem_options=>get_instance( )->date OR
           ( table_line->date = zcl_timem_options=>get_instance( )->date AND
             table_line->time <= zcl_timem_options=>get_instance( )->time ).
@@ -144,10 +144,10 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
 
 
   METHOD load_versions.
-    DATA(o_vrsd) = NEW zcl_timem_vrsd( i_type = i_vrsd_type
-                                       i_name = i_vrsd_name ).
+    DATA(vrsd) = NEW zcl_timem_vrsd( type = vrsd_type
+                                     name = vrsd_name ).
 
-    me->gt_version = VALUE #( FOR s_vrsd IN o_vrsd->t_vrsd
-                              ( NEW zcl_timem_version( s_vrsd ) ) ).
+    versions = VALUE #( FOR s_vrsd IN vrsd->vrsd_list
+                        ( NEW zcl_timem_version( s_vrsd ) ) ).
   ENDMETHOD.
 ENDCLASS.

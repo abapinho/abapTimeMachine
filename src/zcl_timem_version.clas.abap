@@ -40,11 +40,11 @@ CLASS zcl_timem_version DEFINITION
     "! the source code already with blame information.
     METHODS constructor
       IMPORTING
-        !is_vrsd TYPE vrsd
+        !vrsd TYPE vrsd
       RAISING
         zcx_timem .
-    "! Returns the version source code including blame information.
 
+    "! Returns the version source code including blame information.
     METHODS get_source
       RETURNING
         VALUE(result) TYPE ztimem_line_t
@@ -53,7 +53,7 @@ CLASS zcl_timem_version DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA s_vrsd TYPE vrsd.
+    DATA vrsd TYPE vrsd.
     DATA gt_source TYPE abaptxt255_tab.
 
     METHODS load_attributes
@@ -77,7 +77,7 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->s_vrsd = is_vrsd.
+    me->vrsd = vrsd.
     load_attributes( ).
     load_latest_task( ).
   ENDMETHOD.
@@ -115,12 +115,12 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
 
 
   METHOD load_attributes.
-    me->version_number = s_vrsd-versno.
-    me->author = s_vrsd-author.
-    me->date = s_vrsd-datum.
-    me->time = s_vrsd-zeit.
-    me->author_name = NEW zcl_timem_author( )->get_name( s_vrsd-author ).
-    me->request = s_vrsd-korrnum.
+    me->version_number = vrsd-versno.
+    me->author = vrsd-author.
+    me->date = vrsd-datum.
+    me->time = vrsd-zeit.
+    me->author_name = NEW zcl_timem_author( )->get_name( vrsd-author ).
+    me->request = vrsd-korrnum.
   ENDMETHOD.
 
 
@@ -135,8 +135,8 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
       LEFT JOIN user_addr ON user_addr~bname = e070~as4user
       UP TO 1 ROWS
       WHERE strkorr = me->request
-        AND object = s_vrsd-objtype
-        AND obj_name = s_vrsd-objname
+        AND object = vrsd-objtype
+        AND obj_name = vrsd-objname
       ORDER BY as4date DESCENDING as4time DESCENDING.
       EXIT.
     ENDSELECT.
@@ -151,15 +151,15 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
 
     RAISE EVENT loading_source
       EXPORTING
-        type           = s_vrsd-objtype
-        name           = s_vrsd-objname
+        type           = vrsd-objtype
+        name           = vrsd-objname
         version_number = me->version_number.
 
     DATA t_trdir TYPE trdir_it.
     CALL FUNCTION 'SVRS_GET_REPS_FROM_OBJECT'
       EXPORTING
-        object_name = s_vrsd-objname
-        object_type = s_vrsd-objtype
+        object_name = vrsd-objname
+        object_type = vrsd-objtype
         versno      = get_real_version( )
       TABLES
         repos_tab   = gt_source

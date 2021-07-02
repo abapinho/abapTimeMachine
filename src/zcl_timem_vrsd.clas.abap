@@ -8,15 +8,15 @@ CLASS zcl_timem_vrsd DEFINITION
 
     "! List of relevant lines of VRSD table (plus artificial lines created
     "! for the active and modified versions).
-    DATA t_vrsd TYPE vrsd_tab READ-ONLY .
+    DATA vrsd_list TYPE vrsd_tab READ-ONLY .
 
     "! Constructor which takes an object type and name and loads all the VRSD
     "! data, as well as the eventual artificial lines for the active and modified
     "! versions.
     METHODS constructor
       IMPORTING
-        !i_type TYPE versobjtyp
-        !i_name TYPE versobjnam
+        !type TYPE versobjtyp
+        !name TYPE versobjnam
       RAISING
         zcx_timem .
 
@@ -30,7 +30,7 @@ CLASS zcl_timem_vrsd DEFINITION
 
     METHODS load_active_or_modified
       IMPORTING
-                i_versno TYPE versno
+                versno TYPE versno
       RAISING   zcx_timem.
 
     METHODS get_request_active_modif
@@ -44,12 +44,12 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->type = i_type.
-    me->name = i_name.
+    me->type = type.
+    me->name = name.
     load_from_table( ).
     load_active_or_modified( zcl_timem_version=>c_version-active ).
     load_active_or_modified( zcl_timem_version=>c_version-modified ).
-    SORT me->t_vrsd BY versno.
+    SORT me->vrsd_list BY versno.
   ENDMETHOD.
 
 
@@ -111,24 +111,27 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
 
 
   METHOD load_active_or_modified.
-    DATA(s_obj) = VALUE svrs2_versionable_object(
+    DATA(obj) = VALUE svrs2_versionable_object(
       objtype = me->type
       data_pointer = me->type
       objname = me->name
       header_only = abap_true ).
+
     CALL FUNCTION 'SVRS_INITIALIZE_DATAPOINTER'
       CHANGING
         objtype      = me->type
         data_pointer = me->type.
+
     DATA(mode) = SWITCH char1(
-      i_versno
+      versno
       WHEN zcl_timem_version=>c_version-active THEN 'A'
       WHEN zcl_timem_version=>c_version-modified THEN 'M' ).
+
     CALL FUNCTION 'SVRS_GET_VERSION_REPOSITORY'
       EXPORTING
         mode      = mode
       CHANGING
-        obj       = s_obj
+        obj       = obj
       EXCEPTIONS
         not_found = 1
         OTHERS    = 2.
@@ -136,32 +139,33 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA s_vrsd TYPE vrsd.
+    DATA vrsd TYPE vrsd.
     CALL FUNCTION 'SVRS_EXTRACT_INFO_FROM_OBJECT'
       EXPORTING
-        object    = s_obj
+        object    = obj
       CHANGING
-        vrsd_info = s_vrsd.
-    IF s_vrsd-author IS INITIAL.
+        vrsd_info = vrsd.
+    IF vrsd-author IS INITIAL.
       RAISE EXCEPTION TYPE zcx_timem. " TODO
     ENDIF.
 
-    s_vrsd-versno = i_versno.
-    s_vrsd-objtype = me->type.
-    s_vrsd-objname = me->name.
-    s_vrsd-korrnum = get_request_active_modif( ).
-    INSERT s_vrsd INTO TABLE me->t_vrsd.
+    vrsd-versno = versno.
+    vrsd-objtype = me->type.
+    vrsd-objname = me->name.
+    vrsd-korrnum = get_request_active_modif( ).
+    INSERT vrsd INTO TABLE me->vrsd_list.
   ENDMETHOD.
 
 
   METHOD load_from_table.
-    SELECT * INTO TABLE me->t_vrsd
+    SELECT * INTO TABLE me->vrsd_list
       FROM vrsd
       WHERE objtype = me->type
-        AND objname = me->name.
+        AND objname = me->name
+      ORDER BY PRIMARY KEY.
 
     " We consider the current version to be 99998 instead of 0
-    LOOP AT me->t_vrsd ASSIGNING FIELD-SYMBOL(<s_vrsd>)
+    LOOP AT me->vrsd_list ASSIGNING FIELD-SYMBOL(<s_vrsd>)
       WHERE versno = zcl_timem_version=>c_version-latest_db.
       <s_vrsd>-versno = zcl_timem_version=>c_version-latest.
     ENDLOOP.

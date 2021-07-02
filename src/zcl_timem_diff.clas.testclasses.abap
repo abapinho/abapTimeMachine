@@ -31,7 +31,7 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD ignore_case.
-    zcl_timem_options=>get_instance( )->set( i_ignore_case = abap_true ).
+    zcl_timem_options=>get_instance( )->set( ignore_case = abap_true ).
     DATA(t_blame) = o_diff->compute( lines_old   = VALUE #( ( source = 'AaA' author = 'A' ) )
                                      lines_new   = VALUE #( ( source = 'aAa' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author
@@ -40,7 +40,7 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD ignore_indentation.
-    zcl_timem_options=>get_instance( )->set( i_ignore_indentation = abap_true ).
+    zcl_timem_options=>get_instance( )->set( ignore_indentation = abap_true ).
     DATA(t_blame) = o_diff->compute( lines_old   = VALUE #( ( source = '  AaA' author = 'A' ) )
                                      lines_new   = VALUE #( ( source = '    AaA' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author

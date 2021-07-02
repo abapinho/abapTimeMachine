@@ -11,8 +11,8 @@ CLASS zcl_timem_parts DEFINITION
     "! @parameter i_object_name | Object name
     METHODS constructor
       IMPORTING
-        !i_object_type TYPE ztimem_object_type
-        !i_object_name TYPE sobj_name
+        !object_type TYPE ztimem_object_type
+        !object_name TYPE sobj_name
       RAISING
         zcx_timem .
 
@@ -26,9 +26,9 @@ CLASS zcl_timem_parts DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
 
-    DATA g_type TYPE ztimem_object_type .
-    DATA g_name TYPE sobj_name .
-    DATA gt_part TYPE zif_timem_object=>ty_t_part_ref .
+    DATA object_type TYPE ztimem_object_type .
+    DATA object_name TYPE sobj_name .
+    DATA parts TYPE zif_timem_object=>ty_t_part_ref .
     DATA userexits TYPE REF TO zcl_timem_userexits.
 
     "! Load all the data, creating the actual parts
@@ -40,21 +40,24 @@ CLASS zcl_timem_parts DEFINITION
 
     METHODS get_authors
       IMPORTING
-        !parts      TYPE zif_timem_object=>ty_t_part_ref
+        !parts        TYPE zif_timem_object=>ty_t_part_ref
       RETURNING
-        VALUE(result) TYPE ztimem_author_info_t .
+        VALUE(result) TYPE ztimem_author_info_t
+      RAISING   zcx_timem.
 
     METHODS get_requests
       IMPORTING
-        !parts      TYPE zif_timem_object=>ty_t_part_ref
+                !parts        TYPE zif_timem_object=>ty_t_part_ref
       RETURNING
-        VALUE(result) TYPE ztimem_request_info_t .
+                VALUE(result) TYPE ztimem_request_info_t
+      RAISING   zcx_timem.
 
     METHODS get_stats
       IMPORTING
-        !parts      TYPE zif_timem_object=>ty_t_part_ref
+        !parts        TYPE zif_timem_object=>ty_t_part_ref
       RETURNING
-        VALUE(result) TYPE ztimem_stats .
+        VALUE(result) TYPE ztimem_stats
+      RAISING   zcx_timem.
 
     METHODS get_timestamps
       RETURNING
@@ -67,8 +70,8 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->g_type = i_object_type.
-    me->g_name = i_object_name.
+    me->object_type = object_type.
+    me->object_name = object_name.
     me->userexits = NEW #( ).
     load( ).
   ENDMETHOD.
@@ -110,21 +113,21 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
   METHOD get_data.
     DATA(t_part) =
       VALUE ztimem_part_source_t(
-        FOR o_part IN gt_part
-        ( name = o_part->name
-        type = o_part->vrsd_type
-        object_name = o_part->vrsd_name
-        t_line = o_part->get_source( ) ) ).
+        FOR part IN parts
+        ( name = part->name
+        type = part->vrsd_type
+        object_name = part->vrsd_name
+        t_line = part->get_source( ) ) ).
     DELETE t_part WHERE t_line IS INITIAL.
 
-    result = VALUE #( name = g_name
-                       type = g_type
+    result = VALUE #( name = object_name
+                       type = object_type
                        version = zif_timem_consts=>version
-                       t_author = get_authors( gt_part )
-                       t_request = get_requests( gt_part )
+                       t_author = get_authors( parts )
+                       t_request = get_requests( parts )
                        t_part = t_part
                        t_timestamp = get_timestamps( )
-                       s_stats = get_stats( gt_part )
+                       s_stats = get_stats( parts )
                        timestamp = zcl_timem_options=>get_instance( )->timestamp
                        ignore_case = zcl_timem_options=>get_instance( )->ignore_case
                        ignore_indentation = zcl_timem_options=>get_instance( )->ignore_indentation ).
@@ -137,11 +140,11 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
     DATA requests TYPE ztimem_line_t.
     DATA(lines) = VALUE ztimem_line_t(
       FOR part IN parts
-      FOR s_line IN part->get_source( )
-      ( s_line ) ).
+      FOR line IN part->get_source( )
+      ( line ) ).
 
-    LOOP AT lines REFERENCE INTO DATA(os_line)
-      GROUP BY ( request = os_line->request )
+    LOOP AT lines REFERENCE INTO DATA(line_ref)
+      GROUP BY ( request = line_ref->request )
         ASCENDING
         ASSIGNING FIELD-SYMBOL(<t_group>).
 
@@ -171,8 +174,8 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
 
   METHOD get_timestamps.
     " Gather timestamps from all parts
-    LOOP AT gt_part INTO DATA(o_part).
-      DATA(t_timestamp_part) = o_part->get_timestamps( ).
+    LOOP AT parts INTO DATA(part).
+      DATA(t_timestamp_part) = part->get_timestamps( ).
       LOOP AT t_timestamp_part INTO DATA(ts).
         COLLECT ts INTO result.
       ENDLOOP.
@@ -185,8 +188,8 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
 
 
   METHOD load.
-    DATA(object) = NEW zcl_timem_object_factory( )->get_instance( i_object_type = me->g_type
-                                                                  i_object_name = me->g_name ).
+    DATA(object) = NEW zcl_timem_object_factory( )->get_instance( object_type = object_type
+                                                                  object_name = object_name ).
     DATA(part_list) = object->get_part_list( ).
 
     userexits->modify_part_list( CHANGING part_list = part_list ).
@@ -195,7 +198,7 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
       TRY.
           INSERT NEW #( name = s_part->name
                         vrsd_name = s_part->object_name
-                        vrsd_type = s_part->type ) INTO TABLE me->gt_part.
+                        vrsd_type = s_part->type ) INTO TABLE parts.
         CATCH zcx_timem.
           ASSERT 1 = 1. " Doesn't exist? Carry on
       ENDTRY.

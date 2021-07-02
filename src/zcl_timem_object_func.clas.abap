@@ -1,23 +1,23 @@
 "! Representation of a function module object. It will be able to create and
 "! return a list of all the parts the function module is made of.
-class ZCL_TIMEM_OBJECT_FUNC definition
-  public
-  final
-  create public .
+CLASS zcl_timem_object_func DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces ZIF_TIMEM_OBJECT .
+    INTERFACES zif_timem_object .
 
     "! Constructor for the function module object.
     "! @parameter i_name | Function module name
-  methods CONSTRUCTOR
-    importing
-      !I_NAME type RS38L_FNAM .
-protected section.
-private section.
+    METHODS constructor
+      IMPORTING
+        !name TYPE rs38l_fnam .
+  PROTECTED SECTION.
+  PRIVATE SECTION.
 
-  data G_NAME type RS38L_FNAM .
+    DATA name TYPE rs38l_fnam .
 ENDCLASS.
 
 
@@ -26,14 +26,14 @@ CLASS ZCL_TIMEM_OBJECT_FUNC IMPLEMENTATION.
 
 
   METHOD constructor.
-    g_name = i_name.
+    me->name = name.
   ENDMETHOD.
 
 
   METHOD zif_timem_object~check_exists.
     CALL FUNCTION 'FUNCTION_EXISTS'
       EXPORTING
-        funcname           = me->g_name
+        funcname           = name
       EXCEPTIONS
         function_not_exist = 1
         OTHERS             = 2.
@@ -42,14 +42,14 @@ CLASS ZCL_TIMEM_OBJECT_FUNC IMPLEMENTATION.
 
 
   METHOD zif_timem_object~get_name.
-    result = g_name.
+    result = name.
   ENDMETHOD.
 
 
   METHOD zif_timem_object~get_part_list.
     result = VALUE #( (
-      name        = CONV #( me->g_name )
-      object_name = CONV #( me->g_name )
+      name        = CONV #( name )
+      object_name = CONV #( name )
       type        = 'FUNC' ) ).
   ENDMETHOD.
 ENDCLASS.
