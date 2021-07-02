@@ -53,9 +53,9 @@ CLASS ZCL_TIMEM_OBJECT_PROG_INCLUDES IMPLEMENTATION.
 
 
   METHOD zif_timem_object~check_exists.
-    SELECT SINGLE name INTO @DATA(name)
+    SELECT SINGLE name INTO g_name
       FROM trdir
-      WHERE name   = @g_name.
+      WHERE name   = g_name.
     result = boolc( sy-subrc = 0 ).
   ENDMETHOD.
 

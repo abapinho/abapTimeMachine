@@ -40,19 +40,19 @@ CLASS zcl_timem_parts DEFINITION
 
     METHODS get_authors
       IMPORTING
-        !it_part      TYPE zif_timem_object=>ty_t_part_ref
+        !parts      TYPE zif_timem_object=>ty_t_part_ref
       RETURNING
         VALUE(result) TYPE ztimem_author_info_t .
 
     METHODS get_requests
       IMPORTING
-        !it_part      TYPE zif_timem_object=>ty_t_part_ref
+        !parts      TYPE zif_timem_object=>ty_t_part_ref
       RETURNING
         VALUE(result) TYPE ztimem_request_info_t .
 
     METHODS get_stats
       IMPORTING
-        !it_part      TYPE zif_timem_object=>ty_t_part_ref
+        !parts      TYPE zif_timem_object=>ty_t_part_ref
       RETURNING
         VALUE(result) TYPE ztimem_stats .
 
@@ -75,33 +75,33 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
 
 
   METHOD get_authors.
-    DATA t_author TYPE ztimem_line_t.
+    DATA authors TYPE ztimem_line_t.
 
-    DATA(t_line) = VALUE ztimem_line_t(
-      FOR part IN it_part
+    DATA(lines) = VALUE ztimem_line_t(
+      FOR part IN parts
       FOR s_line IN part->get_source( )
       ( s_line ) ).
 
-    LOOP AT t_line ASSIGNING FIELD-SYMBOL(<s_line>)
+    LOOP AT lines ASSIGNING FIELD-SYMBOL(<s_line>)
      GROUP BY ( author = <s_line>-author name = <s_line>-author_name )
               ASSIGNING FIELD-SYMBOL(<t_group>).
 
-      REFRESH t_author.
+      REFRESH authors.
       LOOP AT GROUP <t_group> ASSIGNING <s_line> WHERE author = <s_line>-author.
-        t_author = VALUE #( BASE t_author ( <s_line> ) ).
+        authors = VALUE #( BASE authors ( <s_line> ) ).
       ENDLOOP.
 
       DATA(request_count) = REDUCE int2( INIT x = 0
-                                         FOR GROUPS request OF s_author IN t_author
-                                         GROUP BY s_author-request
+                                         FOR GROUPS request OF author IN authors
+                                         GROUP BY author-request
                                          NEXT x = x + 1 ).
 
       result = VALUE #(
         BASE result
         ( author = <t_group>-author
           name = <t_group>-name
-          line_count = lines( t_author )
-          percentage = lines( t_author ) / lines( t_line )
+          line_count = lines( authors )
+          percentage = lines( authors ) / lines( lines )
           request_count = request_count ) ).
     ENDLOOP.
   ENDMETHOD.
@@ -134,44 +134,38 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
 
 
   METHOD get_requests.
-    DATA t_request TYPE ztimem_line_t.
-    DATA(t_line) = VALUE ztimem_line_t(
-      FOR part IN it_part
+    DATA requests TYPE ztimem_line_t.
+    DATA(lines) = VALUE ztimem_line_t(
+      FOR part IN parts
       FOR s_line IN part->get_source( )
       ( s_line ) ).
 
-    LOOP AT t_line REFERENCE INTO DATA(os_line)
-      WHERE request IS NOT INITIAL
+    LOOP AT lines REFERENCE INTO DATA(os_line)
       GROUP BY ( request = os_line->request )
         ASCENDING
         ASSIGNING FIELD-SYMBOL(<t_group>).
 
-      REFRESH t_request.
+      REFRESH requests.
       LOOP AT GROUP <t_group> ASSIGNING FIELD-SYMBOL(<s_group>) WHERE request = <t_group>-request.
-        t_request = VALUE #( BASE t_request ( <s_group> ) ).
+        requests = VALUE #( BASE requests ( <s_group> ) ).
       ENDLOOP.
-
-      DATA(request_count) = REDUCE int2( INIT x = 0
-                                         FOR GROUPS request OF s_author IN t_request
-                                         GROUP BY s_author-request
-                                         NEXT x = x + 1 ).
 
       result = VALUE #(
         BASE result
         ( request = <t_group>-request
           description = NEW zcl_timem_request( <t_group>-request )->description
-          line_count = lines( t_request )
-          percentage = lines( t_request ) / lines( t_line ) ) ).
+          line_count = lines( requests )
+          percentage = lines( requests ) / lines( lines ) ) ).
     ENDLOOP.
   ENDMETHOD.
 
 
   METHOD get_stats.
-    DATA(t_line) = VALUE ztimem_line_t(
-      FOR part IN it_part
-      FOR s_line IN part->get_source( )
-      ( s_line ) ).
-    result = NEW zcl_timem_stats( t_line )->stats.
+    DATA(lines) = VALUE ztimem_line_t(
+      FOR part IN parts
+      FOR line IN part->get_source( )
+      ( line ) ).
+    result = NEW zcl_timem_stats( lines )->stats.
   ENDMETHOD.
 
 

@@ -1,38 +1,41 @@
-class ZCL_TIMEM_OPTIONS definition
-  public
-  final
-  create private .
+CLASS zcl_timem_options DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PRIVATE .
 
-public section.
+  PUBLIC SECTION.
 
-  types TY_MODE type CHAR1 .
+    TYPES ty_mode TYPE char1 .
 
     "! Mode (Blame or Time Machine)
-  data MODE type TY_MODE read-only .
+    DATA mode TYPE ty_mode READ-ONLY .
     "! Diff operation should ignore case
-  data IGNORE_CASE type BOOLEAN read-only .
+    DATA ignore_case TYPE boolean READ-ONLY .
     "! Diff operation should ignore indentation
-  data IGNORE_INDENTATION type BOOLEAN read-only .
+    DATA ignore_indentation TYPE boolean READ-ONLY .
     "! CSS theme name
-  data THEME type ZTIMEM_THEME read-only .
+    DATA theme TYPE ztimem_theme READ-ONLY .
     "! Timestamp
-  data TIMESTAMP type TIMESTAMP read-only .
+    DATA timestamp TYPE timestamp READ-ONLY .
     "! Date
-  data DATE type DATUM read-only .
+    DATA date TYPE datum READ-ONLY .
     "! Time
-  data TIME type UZEIT read-only .
+    DATA time TYPE uzeit READ-ONLY .
+    " Ignore unreleased requests
+    DATA ignore_unreleased TYPE boolean READ-ONLY.
 
-  class-methods CLASS_CONSTRUCTOR .
-  class-methods GET_INSTANCE
-    returning
-      value(RO_INSTANCE) type ref to ZCL_TIMEM_OPTIONS .
-  methods SET
-    importing
-      !I_MODE type TY_MODE optional
-      !I_IGNORE_CASE type BOOLEAN optional
-      !I_IGNORE_INDENTATION type BOOLEAN optional
-      !I_TIMESTAMP type TIMESTAMP optional
-      !I_THEME type ZTIMEM_THEME optional .
+    CLASS-METHODS class_constructor .
+    CLASS-METHODS get_instance
+      RETURNING
+        VALUE(ro_instance) TYPE REF TO zcl_timem_options .
+    METHODS set
+      IMPORTING
+        !i_mode               TYPE ty_mode OPTIONAL
+        !i_ignore_case        TYPE boolean OPTIONAL
+        !i_ignore_indentation TYPE boolean OPTIONAL
+        !i_timestamp          TYPE timestamp OPTIONAL
+        !i_theme              TYPE ztimem_theme OPTIONAL
+        !i_ignore_unreleased  TYPE boolean OPTIONAL.
   PROTECTED SECTION.
   PRIVATE SECTION.
     CLASS-DATA: go_instance TYPE REF TO zcl_timem_options.
@@ -70,6 +73,10 @@ CLASS ZCL_TIMEM_OPTIONS IMPLEMENTATION.
 
     IF i_ignore_indentation IS SUPPLIED.
       me->ignore_indentation = i_ignore_indentation.
+    ENDIF.
+
+    IF i_ignore_unreleased IS SUPPLIED.
+      me->ignore_unreleased = i_ignore_unreleased.
     ENDIF.
 
     IF i_theme IS SUPPLIED.

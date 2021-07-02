@@ -91,8 +91,8 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
   METHOD get_diffed_source_with_blame.
     DATA(o_diff) = NEW zcl_timem_diff( ).
     LOOP AT get_versions_until_threshold( ) INTO DATA(o_version).
-      result = o_diff->compute( it_old = result
-                                it_new =  o_version->get_source( ) ).
+      result = o_diff->compute( lines_old = result
+                                lines_new =  o_version->get_source( ) ).
     ENDLOOP.
   ENDMETHOD.
 

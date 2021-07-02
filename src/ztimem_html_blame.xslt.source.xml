@@ -166,18 +166,7 @@
                   </xsl:choose>
                 </TD>
                 <TD>
-                  <a>
-                    <xsl:attribute name="title">
-                      <xsl:value-of select="AUTHOR_NAME"/>
-                    </xsl:attribute>
-                    <xsl:if test="AUTHOR != ''">
-                      <xsl:attribute name="href">SAPEVENT:author?
-
-                        <xsl:value-of select="AUTHOR"/>
-                      </xsl:attribute>
-                    </xsl:if>
-                    <xsl:value-of select="AUTHOR"/>
-                  </a>
+                  <xsl:value-of select="AUTHOR"/>
                 </TD>
                 <TD>
                   <xsl:if test="TIME != '00:00:00'">

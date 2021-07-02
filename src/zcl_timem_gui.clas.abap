@@ -7,26 +7,26 @@ CLASS zcl_timem_gui DEFINITION
 
     METHODS constructor
       IMPORTING
-        !io_parts TYPE REF TO zcl_timem_parts .
+        !parts TYPE REF TO zcl_timem_parts .
 
     METHODS display
       RAISING
         zcx_timem .
 
   PROTECTED SECTION.
-private section.
+  PRIVATE SECTION.
 
-  data GO_PARTS type ref to ZCL_TIMEM_PARTS .
-  data GO_VIEWER type ref to ZCL_TIMEM_GUI_VIEWER .
-  data GO_HANDLER type ref to ZCL_TIMEM_GUI_HANDLER .
+    DATA parts TYPE REF TO zcl_timem_parts .
+    DATA viewer TYPE REF TO zcl_timem_gui_viewer .
+    DATA handler TYPE REF TO zcl_timem_gui_handler .
 
-  methods HIGHLIGHT_SOURCE
-    changing
-      !PARTS type ZTIMEM_PARTS .
+    METHODS highlight_source
+      CHANGING
+        !parts TYPE ztimem_parts .
 
-  methods DEDUPLICATE_HEADER_FIELDS
-    changing
-      !PARTS type ZTIMEM_PARTS .
+    METHODS deduplicate_header_fields
+      CHANGING
+        !parts TYPE ztimem_parts .
 ENDCLASS.
 
 
@@ -35,9 +35,9 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->go_parts = io_parts.
-    me->go_handler = NEW #( me ).
-    me->go_viewer = NEW #( go_handler ).
+    me->parts = parts.
+    me->handler = NEW #( me ).
+    me->viewer = NEW #( handler ).
   ENDMETHOD.
 
 
@@ -63,14 +63,14 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
 
 
   METHOD display.
-    data(parts) = me->go_parts->get_data( ).
-    highlight_source( CHANGING parts = parts ).
-    deduplicate_header_fields( changing parts = parts ).
-    go_viewer->render( parts ).
+    DATA(data) = me->parts->get_data( ).
+    highlight_source( CHANGING parts = data ).
+    deduplicate_header_fields( CHANGING parts = data ).
+    viewer->render( data ).
   ENDMETHOD.
 
 
-  method HIGHLIGHT_SOURCE.
+  METHOD highlight_source.
     DATA(highlighter) = NEW zcl_timem_syntax_abap( ).
 
     LOOP AT parts-t_part REFERENCE INTO DATA(part).
@@ -78,5 +78,5 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
         line->source = highlighter->process_line(  CONV #( line->source ) ).
       ENDLOOP.
     ENDLOOP.
-  endmethod.
+  ENDMETHOD.
 ENDCLASS.
