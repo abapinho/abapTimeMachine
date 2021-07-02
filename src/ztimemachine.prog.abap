@@ -2,7 +2,6 @@
 "! code of all its parts and displays it as HTML.
 REPORT ztimemachine.
 
-TABLES vrsd.
 
 SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-sel.
 PARAMETERS p_otype TYPE ztimem_object_type AS LISTBOX VISIBLE LENGTH 25 OBLIGATORY DEFAULT 'PROG'.
