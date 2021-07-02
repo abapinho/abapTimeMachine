@@ -39,7 +39,7 @@ CLASS zcl_timem_gui_viewer DEFINITION
 
     METHODS string_2_xstring
       IMPORTING
-        !i_input      TYPE string
+        !input      TYPE string
       RETURNING
         VALUE(result) TYPE xstring .
 
@@ -49,10 +49,9 @@ CLASS zcl_timem_gui_viewer DEFINITION
 
     CLASS-METHODS xstring_2_bintab
       IMPORTING
-        !i_xstr    TYPE xstring
-      EXPORTING
-        !e_size    TYPE i
-        !et_bintab TYPE lvc_t_mime .
+        !xstr       TYPE xstring
+      RETURNING
+        VALUE(result) TYPE lvc_t_mime .
 ENDCLASS.
 
 
@@ -71,12 +70,7 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
 
     DATA(xstr) = string_2_xstring( content ).
 
-    xstring_2_bintab(
-      EXPORTING
-        i_xstr    = xstr
-      IMPORTING
-        e_size    = DATA(size)
-        et_bintab = DATA(t_bintab) ).
+    DATA(t_bintab) = xstring_2_bintab( xstr ).
 
     go_html_viewer->load_data(
       EXPORTING
@@ -144,7 +138,7 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
   METHOD string_2_xstring.
     CALL FUNCTION 'SCMS_STRING_TO_XSTRING'
       EXPORTING
-        text   = i_input
+        text   = input
       IMPORTING
         buffer = result
       EXCEPTIONS
@@ -159,10 +153,8 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
   METHOD xstring_2_bintab.
     CALL FUNCTION 'SCMS_XSTRING_TO_BINARY'
       EXPORTING
-        buffer        = i_xstr
-      IMPORTING
-        output_length = e_size
+        buffer        = xstr
       TABLES
-        binary_tab    = et_bintab.
+        binary_tab    = result.
   ENDMETHOD.
 ENDCLASS.

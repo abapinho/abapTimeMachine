@@ -4,6 +4,7 @@ CLASS zcl_timem_userexits DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    METHODS constructor.
 
     METHODS before_rendering
       CHANGING
@@ -27,6 +28,7 @@ CLASS zcl_timem_userexits DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES ty_userexits TYPE STANDARD TABLE OF REF TO zif_timem_userexit WITH KEY table_line.
+    DATA options TYPE REF TO zcl_timem_options.
 
     METHODS get_instances
       RETURNING VALUE(result) TYPE ty_userexits.
@@ -41,11 +43,20 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
     DATA(userexits) = get_instances( ).
     LOOP AT userexits INTO DATA(userexit).
       TRY.
-          userexit->before_rendering( CHANGING parts = parts ).
+          userexit->before_rendering(
+            EXPORTING
+              options = options
+            CHANGING
+              parts = parts ).
         CATCH cx_sy_dyn_call_illegal_method.
           ASSERT 1 = 1. " Not implemented? Carry on.
       ENDTRY.
     ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD constructor.
+    options = zcl_timem_options=>get_instance( ).
   ENDMETHOD.
 
 
@@ -80,6 +91,7 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
       TRY.
           userexit->modify_asset_content(
             EXPORTING
+              options = options
               subtype = subtype
             CHANGING
               content = content ).
@@ -94,7 +106,11 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
     DATA(userexits) = get_instances( ).
     LOOP AT userexits INTO DATA(userexit).
       TRY.
-          userexit->modify_part_list( CHANGING part_list = part_list ).
+          userexit->modify_part_list(
+            EXPORTING
+              options = options
+            CHANGING
+              part_list = part_list ).
         CATCH cx_sy_dyn_call_illegal_method.
           ASSERT 1 = 1. " Not implemented? Carry on.
       ENDTRY.
@@ -107,8 +123,9 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
     LOOP AT userexits INTO DATA(userexit).
       TRY.
           userexit->on_sapevent(
-            action  = action
-            getdata = getdata ).
+            options  = options
+             action  = action
+             getdata = getdata ).
         CATCH cx_sy_dyn_call_illegal_method.
           ASSERT 1 = 1. " Not implemented? Carry on.
       ENDTRY.

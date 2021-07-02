@@ -128,6 +128,12 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>P_IUNRE</KEY>
+     <ENTRY>Ignore unreleased requests</ENTRY>
+     <LENGTH>34</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>P_MBLAME</KEY>
      <ENTRY>Blame</ENTRY>
      <LENGTH>13</LENGTH>

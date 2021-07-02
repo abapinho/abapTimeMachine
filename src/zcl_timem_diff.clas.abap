@@ -8,12 +8,12 @@ CLASS zcl_timem_diff DEFINITION
     "! Takes two source lists - old and new - and returns a new source list
     "! which merges both, adding for each line an indicator of how it changed
     "! between both versions: (I)nsert/(D)elete/(U)pdate.
-    "! @parameter it_old | Old source list
-    "! @parameter it_new | New source list
+    "! @parameter lines_old | Old source list
+    "! @parameter lines_new | New source list
     METHODS compute
       IMPORTING
-        !it_old       TYPE ztimem_line_t
-        !it_new       TYPE ztimem_line_t
+        !lines_old       TYPE ztimem_line_t
+        !lines_new       TYPE ztimem_line_t
       RETURNING
         VALUE(result) TYPE ztimem_line_t .
   PROTECTED SECTION.
@@ -27,8 +27,8 @@ CLASS zcl_timem_diff DEFINITION
 
     METHODS compute_delta
       IMPORTING
-        !it_old       TYPE ztimem_line_t
-        !it_new       TYPE ztimem_line_t
+        !lines_old       TYPE ztimem_line_t
+        !lines_new       TYPE ztimem_line_t
       RETURNING
         VALUE(result) TYPE vxabapt255_tab .
 
@@ -53,12 +53,12 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
           new_index TYPE i VALUE 1,
           s_line    LIKE LINE OF result.
 
-    IF it_old IS INITIAL.
-      result = it_new.
+    IF lines_old IS INITIAL.
+      result = lines_new.
       RETURN.
     ENDIF.
 
-    DATA(t_delta) = compute_delta( it_old = it_old it_new = it_new ).
+    DATA(t_delta) = compute_delta( lines_old = lines_old lines_new = lines_new ).
 
     DO.
       READ TABLE t_delta INTO DATA(s_delta) WITH KEY number = old_index.
@@ -70,14 +70,14 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
             old_index = old_index + 1.
 
           WHEN c_diff-insert.
-            READ TABLE it_new INTO s_line INDEX new_index.
+            READ TABLE lines_new INTO s_line INDEX new_index.
             ASSERT sy-subrc = 0.
             s_line-source = s_delta-line.
             INSERT s_line INTO TABLE result.
             new_index = new_index + 1.
 
           WHEN c_diff-update.
-            READ TABLE it_new INTO s_line INDEX new_index.
+            READ TABLE lines_new INTO s_line INDEX new_index.
             ASSERT sy-subrc = 0.
             INSERT s_line INTO TABLE result.
             new_index = new_index + 1.
@@ -88,7 +88,7 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
 
         ENDCASE.
       ELSE.
-        READ TABLE it_old INTO s_line INDEX old_index.
+        READ TABLE lines_old INTO s_line INDEX old_index.
         ASSERT sy-subrc = 0.
         INSERT s_line INTO TABLE result.
         new_index = new_index + 1.
@@ -96,7 +96,7 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
 
       ENDIF.
 
-      IF new_index > lines( it_new ) AND old_index > lines( it_old ).
+      IF new_index > lines( lines_new ) AND old_index > lines( lines_old ).
         EXIT. " current loop
       ENDIF.
     ENDDO.
@@ -108,8 +108,8 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
           t_trdirtab_new TYPE TABLE OF trdir,
           t_trdir_delta  TYPE TABLE OF xtrdir.
 
-    DATA(t_source_old) = get_source( it_old ).
-    DATA(t_source_new) = get_source( it_new ).
+    DATA(t_source_old) = get_source( lines_old ).
+    DATA(t_source_new) = get_source( lines_new ).
 
     CALL FUNCTION 'SVRS_COMPUTE_DELTA_REPS'
       TABLES

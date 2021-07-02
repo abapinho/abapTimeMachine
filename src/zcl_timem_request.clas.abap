@@ -1,27 +1,28 @@
 "! Represents an SAP transport request
-class ZCL_TIMEM_REQUEST definition
-  public
-  final
-  create public .
+CLASS zcl_timem_request DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
     "! Transport request ID
-  data ID type TRKORR read-only .
+    DATA id TYPE trkorr READ-ONLY .
     "! Transport request description
-  data DESCRIPTION type AS4TEXT read-only .
+    DATA description TYPE as4text READ-ONLY .
+    "! Transport request status
+    DATA status TYPE trstatus READ-ONLY.
 
     "! Constructs an instance for the given request ID
-  methods CONSTRUCTOR
-    importing
-      !I_REQUEST type TRKORR .
+    METHODS constructor
+      IMPORTING
+        !i_request TYPE trkorr .
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    METHODS get_description
+    METHODS populate_details
       IMPORTING
-                !i_request           TYPE trkorr
-      RETURNING VALUE(result) TYPE as4text.
+        !i_request TYPE trkorr.
 ENDCLASS.
 
 
@@ -31,14 +32,15 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
 
   METHOD constructor.
     me->id = i_request.
-    me->description = get_description( i_request ).
+    populate_details( i_request ).
   ENDMETHOD.
 
 
-  METHOD get_description.
-    SELECT SINGLE as4text INTO result
-    FROM e07t
-    WHERE trkorr = i_request
+  METHOD populate_details.
+    SELECT SINGLE as4text trstatus INTO (description, status)
+    FROM e070
+    INNER JOIN e07t ON e07t~trkorr = e070~trkorr
+    WHERE e070~trkorr = i_request
       AND langu  = 'E'.
   ENDMETHOD.
 ENDCLASS.

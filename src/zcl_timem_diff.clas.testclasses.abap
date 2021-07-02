@@ -23,8 +23,8 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD changed_line.
-    DATA(t_blame) = o_diff->compute( it_old   = VALUE #( ( source = 'AaA' author = 'A' ) )
-                                     it_new   = VALUE #( ( source = 'aAa' author = 'B' ) ) ).
+    DATA(t_blame) = o_diff->compute( lines_old   = VALUE #( ( source = 'AaA' author = 'A' ) )
+                                     lines_new   = VALUE #( ( source = 'aAa' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author
                                         exp = 'B' ).
   ENDMETHOD.
@@ -32,8 +32,8 @@ CLASS ltcl_diff IMPLEMENTATION.
 
   METHOD ignore_case.
     zcl_timem_options=>get_instance( )->set( i_ignore_case = abap_true ).
-    DATA(t_blame) = o_diff->compute( it_old   = VALUE #( ( source = 'AaA' author = 'A' ) )
-                                     it_new   = VALUE #( ( source = 'aAa' author = 'B' ) ) ).
+    DATA(t_blame) = o_diff->compute( lines_old   = VALUE #( ( source = 'AaA' author = 'A' ) )
+                                     lines_new   = VALUE #( ( source = 'aAa' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author
                                         exp = 'A' ).
   ENDMETHOD.
@@ -41,16 +41,16 @@ CLASS ltcl_diff IMPLEMENTATION.
 
   METHOD ignore_indentation.
     zcl_timem_options=>get_instance( )->set( i_ignore_indentation = abap_true ).
-    DATA(t_blame) = o_diff->compute( it_old   = VALUE #( ( source = '  AaA' author = 'A' ) )
-                                     it_new   = VALUE #( ( source = '    AaA' author = 'B' ) ) ).
+    DATA(t_blame) = o_diff->compute( lines_old   = VALUE #( ( source = '  AaA' author = 'A' ) )
+                                     lines_new   = VALUE #( ( source = '    AaA' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author
                                         exp = 'A' ).
   ENDMETHOD.
 
 
   METHOD empty_old.
-    DATA(t_blame) = o_diff->compute( it_old   = VALUE #( )
-                                     it_new   = VALUE #( ( source = 'bbb' author = 'B' )
+    DATA(t_blame) = o_diff->compute( lines_old   = VALUE #( )
+                                     lines_new   = VALUE #( ( source = 'bbb' author = 'B' )
                                                          ( source = 'bbb' author = 'B' ) ) ).
     cl_abap_unit_assert=>assert_equals( act = t_blame[ 1 ]-author
                                         exp = 'B' ).
@@ -60,17 +60,17 @@ CLASS ltcl_diff IMPLEMENTATION.
 
 
   METHOD empty_new.
-    DATA(t_blame) = o_diff->compute( it_old   = VALUE #( ( source = 'bbb' author = 'B' )
+    DATA(t_blame) = o_diff->compute( lines_old   = VALUE #( ( source = 'bbb' author = 'B' )
                                                          ( source = 'bbb' author = 'B' ) )
-                                     it_new   = VALUE #( ) ).
+                                     lines_new   = VALUE #( ) ).
     cl_abap_unit_assert=>assert_equals( act = lines( t_blame )
                                         exp = 0 ).
   ENDMETHOD.
 
 
   METHOD empty_both.
-    DATA(t_blame) = o_diff->compute( it_old   = VALUE #( )
-                                     it_new   = VALUE #( ) ).
+    DATA(t_blame) = o_diff->compute( lines_old   = VALUE #( )
+                                     lines_new   = VALUE #( ) ).
     cl_abap_unit_assert=>assert_equals( act = lines( t_blame )
                                         exp = 0 ).
   ENDMETHOD.

@@ -12,11 +12,11 @@ public section.
   interfaces ZIF_TIMEM_ASSET .
 
     "! Constructor for a CSS asset
-    "! @parameter i_theme | Theme name which will determine which transformation to use
+    "! @parameter theme | Theme name which will determine which transformation to use
     "! to generate the CSS asset
   methods CONSTRUCTOR
     importing
-      !I_THEME type ZTIMEM_THEME .
+      !theme type ZTIMEM_THEME .
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA g_theme_transformation TYPE char30.
@@ -28,7 +28,7 @@ CLASS ZCL_TIMEM_ASSET_CSS IMPLEMENTATION.
 
 
   METHOD constructor.
-    g_theme_transformation = |ZTIMEM_CSS_THEME_{ i_theme }|.
+    g_theme_transformation = |ZTIMEM_CSS_THEME_{ theme }|.
   ENDMETHOD.
 
 

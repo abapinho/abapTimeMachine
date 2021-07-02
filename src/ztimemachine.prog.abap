@@ -2,7 +2,7 @@
 "! code of all its parts and displays it as HTML.
 REPORT ztimemachine.
 
-DATA: vrsd TYPE vrsd.
+TABLES vrsd.
 
 SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-sel.
 PARAMETERS p_otype TYPE ztimem_object_type AS LISTBOX VISIBLE LENGTH 25 OBLIGATORY DEFAULT 'PROG'.
@@ -20,6 +20,7 @@ PARAMETERS p_mblame RADIOBUTTON GROUP mode.
 SELECTION-SCREEN BEGIN OF BLOCK options WITH FRAME TITLE TEXT-opt.
 PARAMETERS p_icase AS CHECKBOX MODIF ID bla.
 PARAMETERS p_iinde AS CHECKBOX MODIF ID bla.
+PARAMETERS p_iunre AS CHECKBOX MODIF ID bla.
 SELECTION-SCREEN END OF BLOCK options.
 SELECTION-SCREEN END OF BLOCK mode.
 
@@ -63,7 +64,8 @@ START-OF-SELECTION.
       zcl_timem_options=>get_instance( )->set( i_mode               = mode
                                                i_ignore_case        = p_icase
                                                i_ignore_indentation = p_iinde
-                                               i_timestamp = CONV #( |{ p_date }{ p_time }| ) ).
+                                               i_timestamp = CONV #( |{ p_date }{ p_time }| )
+                                               i_ignore_unreleased  = p_iunre ).
 
       NEW zcl_timem_run( )->go( i_object_type = p_otype
                                 i_object_name = p_name ).
