@@ -71,6 +71,7 @@ START-OF-SELECTION.
       CALL SELECTION-SCREEN 1001.
       LEAVE SCREEN.
 
-    CATCH zcx_timem INTO DATA(o_exp).
-      MESSAGE o_exp TYPE 'I' DISPLAY LIKE 'E'.
+    CATCH zcx_timem INTO DATA(exc).
+      DATA(text) = exc->get_text( ).
+      MESSAGE text TYPE 'I' DISPLAY LIKE 'E'.
   ENDTRY.

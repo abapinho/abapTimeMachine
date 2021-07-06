@@ -97,9 +97,7 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
         empty_key   = 1
         OTHERS      = 2.
     IF sy-subrc <> 0.
-      RAISE EXCEPTION TYPE zcx_timem
-        MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
-        WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      zcx_timem=>raise_from_syst( ).
     ENDIF.
 
     IF locked IS INITIAL.

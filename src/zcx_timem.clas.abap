@@ -23,6 +23,14 @@ public section.
     importing
       !TEXTID like IF_T100_MESSAGE=>T100KEY optional
       !PREVIOUS like PREVIOUS optional .
+  class-methods RAISE_FROM_SYST
+    raising
+      ZCX_TIMEM .
+
+  methods IF_MESSAGE~GET_TEXT
+    redefinition .
+  methods IF_MESSAGE~GET_LONGTEXT
+    redefinition .
 protected section.
 private section.
 ENDCLASS.
@@ -44,4 +52,35 @@ else.
   IF_T100_MESSAGE~T100KEY = TEXTID.
 endif.
   endmethod.
+
+
+  METHOD if_message~get_longtext.
+    " Get deepest long text from an exception chain
+    IF me->previous IS BOUND.
+      result = me->previous->get_longtext( preserve_newlines ).
+    ELSE.
+      result = super->if_message~get_longtext( preserve_newlines ).
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD if_message~get_text.
+    " Get deepest text from an exception chain
+    IF me->previous IS BOUND.
+      result = me->previous->get_text( ).
+    ELSE.
+      result = super->if_message~get_text( ).
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD raise_from_syst.
+    TRY.
+        cx_proxy_t100=>raise_from_sy_msg( ).
+      CATCH cx_proxy_t100 INTO DATA(exc_t100).
+        RAISE EXCEPTION TYPE zcx_timem
+          EXPORTING
+            previous = exc_t100.
+    ENDTRY.
+  ENDMETHOD.
 ENDCLASS.
