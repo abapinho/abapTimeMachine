@@ -1,32 +1,30 @@
 "! Takes a deep structure with all the information of the requested object,
 "! renders the HTML and CSS assets based on the requested theme and displays it.
-CLASS zcl_timem_gui_viewer DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+class ZCL_TIMEM_GUI_VIEWER definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
-    CONSTANTS:
-      BEGIN OF c_theme,
+  constants:
+    BEGIN OF c_theme,
         light TYPE ztimem_theme VALUE 'LIGHT',
         dark  TYPE ztimem_theme VALUE 'DARK',
       END OF c_theme .
 
     "! Constructor which takes a theme as input
     "! @parameter i_theme | Theme name
-    METHODS constructor
-      IMPORTING
-        !io_handler TYPE REF TO zcl_timem_gui_handler .
-
+  methods CONSTRUCTOR
+    importing
+      !IO_HANDLER type ref to ZCL_TIMEM_GUI_HANDLER .
     "! Takes a deep structure with all the information of the object, renders
     "! the HTML and CSS assets and displays them.
-    METHODS render
-      IMPORTING
-        !is_parts TYPE ztimem_parts
-      RAISING
-        zcx_timem .
-
+  methods RENDER
+    importing
+      !DATA type ZTIMEM_DATA
+    raising
+      ZCX_TIMEM .
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA html_viewer TYPE REF TO cl_gui_html_viewer.
@@ -113,11 +111,11 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
     SKIP. " Creates the screen0 container
     add_asset( NEW zcl_timem_asset_factory( )->create_instance(
       asset_type = zif_timem_consts=>asset_type-css
-      is_parts     = is_parts ) ).
+      data       = data ) ).
 
     DATA(url) = add_asset( NEW zcl_timem_asset_factory( )->create_instance(
       asset_type = zif_timem_consts=>asset_type-html
-      is_parts     = is_parts ) ).
+      data       = data ) ).
 
     html_viewer->show_url(
       EXPORTING

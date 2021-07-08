@@ -1,30 +1,26 @@
-CLASS zcl_timem_userexits DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+class ZCL_TIMEM_USEREXITS definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
-    METHODS constructor.
+public section.
 
-    METHODS before_rendering
-      CHANGING
-        !parts TYPE ztimem_parts .
-
-    METHODS on_sapevent
-      IMPORTING
-        !action  TYPE c
-        !getdata TYPE c .
-
-    METHODS modify_part_list
-      CHANGING
-        !part_list TYPE ztimem_part_t .
-
-    METHODS modify_asset_content
-      IMPORTING
-        subtype TYPE c
-      CHANGING
-        content TYPE string.
-
+  methods CONSTRUCTOR .
+  methods BEFORE_RENDERING
+    changing
+      !DATA type ZTIMEM_DATA .
+  methods ON_SAPEVENT
+    importing
+      !ACTION type C
+      !GETDATA type C .
+  methods MODIFY_PART_LIST
+    changing
+      !PART_LIST type ZTIMEM_PART_T .
+  methods MODIFY_ASSET_CONTENT
+    importing
+      !SUBTYPE type C
+    changing
+      !CONTENT type STRING .
   PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES ty_userexits TYPE STANDARD TABLE OF REF TO zif_timem_userexit WITH KEY table_line.
@@ -47,7 +43,7 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
             EXPORTING
               options = options
             CHANGING
-              parts = parts ).
+              data = data ).
         CATCH cx_sy_dyn_call_illegal_method.
           ASSERT 1 = 1. " Not implemented? Carry on.
       ENDTRY.

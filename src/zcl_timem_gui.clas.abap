@@ -14,19 +14,18 @@ CLASS zcl_timem_gui DEFINITION
         zcx_timem .
 
   PROTECTED SECTION.
-  PRIVATE SECTION.
+private section.
 
-    DATA parts TYPE REF TO zcl_timem_parts .
-    DATA viewer TYPE REF TO zcl_timem_gui_viewer .
-    DATA handler TYPE REF TO zcl_timem_gui_handler .
+  data PARTS type ref to ZCL_TIMEM_PARTS .
+  data VIEWER type ref to ZCL_TIMEM_GUI_VIEWER .
+  data HANDLER type ref to ZCL_TIMEM_GUI_HANDLER .
 
-    METHODS highlight_source
-      CHANGING
-        !parts TYPE ztimem_parts .
-
-    METHODS deduplicate_header_fields
-      CHANGING
-        !parts TYPE ztimem_parts .
+  methods HIGHLIGHT_SOURCE
+    changing
+      !DATA type ZTIMEM_DATA .
+  methods DEDUPLICATE_HEADER_FIELDS
+    changing
+      !DATA type ZTIMEM_DATA .
 ENDCLASS.
 
 
@@ -44,8 +43,8 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
   METHOD deduplicate_header_fields.
     DATA previous TYPE ztimem_line.
 
-    LOOP AT parts-t_part REFERENCE INTO DATA(part).
-      LOOP AT part->t_line REFERENCE INTO DATA(line).
+    LOOP AT data-parts REFERENCE INTO DATA(part).
+      LOOP AT part->lines REFERENCE INTO DATA(line).
         IF line->line_num <> 1 AND line->version_number = previous-version_number.
           CLEAR line->author.
           CLEAR line->author_name.
@@ -64,8 +63,8 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
 
   METHOD display.
     DATA(data) = me->parts->get_data( ).
-    highlight_source( CHANGING parts = data ).
-    deduplicate_header_fields( CHANGING parts = data ).
+    highlight_source( CHANGING data = data ).
+    deduplicate_header_fields( CHANGING data = data ).
     viewer->render( data ).
   ENDMETHOD.
 
@@ -73,8 +72,8 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
   METHOD highlight_source.
     DATA(highlighter) = NEW zcl_timem_syntax_abap( ).
 
-    LOOP AT parts-t_part REFERENCE INTO DATA(part).
-      LOOP AT part->t_line REFERENCE INTO DATA(line).
+    LOOP AT data-parts REFERENCE INTO DATA(part).
+      LOOP AT part->lines REFERENCE INTO DATA(line).
         line->source = highlighter->process_line(  CONV #( line->source ) ).
       ENDLOOP.
     ENDLOOP.

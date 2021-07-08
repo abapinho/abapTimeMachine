@@ -1,28 +1,26 @@
 "! List of parts of an object.
-CLASS zcl_timem_parts DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+class ZCL_TIMEM_PARTS definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
     "! Constructor for an object parts
     "! @parameter i_object_type | Object type
     "! @parameter i_object_name | Object name
-    METHODS constructor
-      IMPORTING
-        !object_type TYPE ztimem_object_type
-        !object_name TYPE sobj_name
-      RAISING
-        zcx_timem .
-
+  methods CONSTRUCTOR
+    importing
+      !OBJECT_TYPE type ZTIMEM_OBJECT_TYPE
+      !OBJECT_NAME type SOBJ_NAME
+    raising
+      ZCX_TIMEM .
     "! Returns a deep structure containing all the details for all the parts.
-    METHODS get_data
-      RETURNING
-        VALUE(result) TYPE ztimem_parts
-      RAISING
-        zcx_timem .
-
+  methods GET_DATA
+    returning
+      value(RESULT) type ZTIMEM_DATA
+    raising
+      ZCX_TIMEM .
   PROTECTED SECTION.
   PRIVATE SECTION.
 
@@ -117,22 +115,22 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
         ( name = part->name
         type = part->vrsd_type
         object_name = part->vrsd_name
-        t_line = part->get_source( ) ) ).
-    DELETE t_part WHERE t_line IS INITIAL.
+        lines = part->get_source( ) ) ).
+    DELETE t_part WHERE lines IS INITIAL.
 
     result = VALUE #( name = object_name
                        type = object_type
                        version = zif_timem_consts=>version
-                       t_author = get_authors( parts )
-                       t_request = get_requests( parts )
-                       t_part = t_part
-                       t_timestamp = get_timestamps( )
-                       s_stats = get_stats( parts )
+                       authors = get_authors( parts )
+                       requests = get_requests( parts )
+                       parts = t_part
+                       timestamps = get_timestamps( )
+                       stats = get_stats( parts )
                        timestamp = zcl_timem_options=>get_instance( )->timestamp
                        ignore_case = zcl_timem_options=>get_instance( )->ignore_case
                        ignore_indentation = zcl_timem_options=>get_instance( )->ignore_indentation ).
 
-    userexits->before_rendering( CHANGING parts = result ).
+    userexits->before_rendering( CHANGING data = result ).
   ENDMETHOD.
 
 

@@ -1,6 +1,6 @@
 <xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
   <xsl:output method="text"/>
-  <xsl:template match="/">
+  <xsl:template match="DATA">
     <html>
       <head>
         <title>ABAP Time Machine</title>
@@ -10,23 +10,25 @@
         <div class="header">
           <h1>
             <xsl:choose>
-              <xsl:when test="//PARTS/TYPE = 'CLAS'">Class</xsl:when>
-              <xsl:when test="//PARTS/TYPE = 'PROG'">Program</xsl:when>
-              <xsl:when test="//PARTS/TYPE = 'FUGR'">Function group</xsl:when>
-              <xsl:when test="//PARTS/TYPE = 'FUNC'">Function module</xsl:when>
+              <xsl:when test="TYPE = 'CLAS'">Class</xsl:when>
+              <xsl:when test="TYPE = 'PROG'">Program</xsl:when>
+              <xsl:when test="TYPE = 'FUGR'">Function group</xsl:when>
+              <xsl:when test="TYPE = 'FUNC'">Function module</xsl:when>
             </xsl:choose>
             <xsl:text> </xsl:text>
-            <xsl:value-of select="//PARTS/NAME"/>
+            <xsl:value-of select="NAME"/>
           </h1>
         </div>
         <div class="metadata">
           <form method="get" action="SAPEVENT:timestamp">
           <label for="timestamps">Moment: </label>
           <select id="timestamp" name="timestamp" onchange='this.form.submit();'>
-            <xsl:for-each select="//PARTS/T_TIMESTAMP/TIMESTAMP">
+            <xsl:for-each select="TIMESTAMPS/TIMESTAMP">
               <option>
-                <xsl:attribute name="value"><xsl:value-of select="."/></xsl:attribute>
-                <xsl:if test=". = //PARTS/TIMESTAMP">
+                <xsl:attribute name="value">
+                  <xsl:value-of select="."/>
+                </xsl:attribute>
+                <xsl:if test=". = ../../TIMESTAMP">
                   <xsl:attribute name="selected">selected</xsl:attribute>
                 </xsl:if>
                 <xsl:value-of select="substring(.,1,4)"/>-<xsl:value-of select="substring(.,5,2)"/>-<xsl:value-of select="substring(.,7,2)"/>
@@ -41,7 +43,7 @@
         <div class="toc">
           <div class="toc-child">
             <ul>
-              <xsl:for-each select="//PARTS/T_PART/ZTIMEM_PART_SOURCE">
+              <xsl:for-each select="PARTS/ZTIMEM_PART_SOURCE">
                 <li>
                   <a>
                     <xsl:attribute name="href"><xsl:text>#</xsl:text><xsl:value-of select="NAME"/></xsl:attribute>
@@ -62,7 +64,7 @@
             </ul>
           </div>
         </div>
-        <xsl:for-each select="//PARTS/T_PART/ZTIMEM_PART_SOURCE">
+        <xsl:for-each select="PARTS/ZTIMEM_PART_SOURCE">
           <h2 class="blame">
             <a>
               <xsl:attribute name="name"><xsl:value-of select="NAME"/></xsl:attribute>
@@ -81,7 +83,7 @@
                 </TH>
               </TR>
             </THEAD>
-            <xsl:for-each select="T_LINE/ZTIMEM_LINE">
+            <xsl:for-each select="LINES/ZTIMEM_LINE">
               <TR>
                 <xsl:attribute name="class">versionfirstrow</xsl:attribute>
                 <TD class="num"><xsl:value-of select="number(LINE_NUM)"/></TD>
@@ -96,7 +98,7 @@
             Statistics
           </a>
         </h2>
-        <xsl:for-each select="//PARTS/S_STATS">
+        <xsl:for-each select="STATS">
           <table>
             <tr>
               <td>Total lines:</td>
@@ -149,7 +151,7 @@
           <P/>
           Version
           <xsl:text> </xsl:text>
-          <xsl:value-of select="//PARTS/VERSION"/>
+          <xsl:value-of select="VERSION"/>
         </div>
       </body>
     </html>

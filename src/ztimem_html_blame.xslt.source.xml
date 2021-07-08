@@ -1,6 +1,6 @@
 <xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
   <xsl:output method="text"/>
-  <xsl:template match="PARTS">
+  <xsl:template match="DATA">
     <html>
       <head>
         <title>ABAP Blame</title>
@@ -23,7 +23,7 @@
           <form method="get" action="SAPEVENT:timestamp">
           <label for="timestamps">Moment: </label>
           <select id="timestamp" name="timestamp" onchange='this.form.submit();'>
-            <xsl:for-each select="T_TIMESTAMP/TIMESTAMP">
+            <xsl:for-each select="TIMESTAMPS/TIMESTAMP">
               <option>
                 <xsl:attribute name="value">
                   <xsl:value-of select="."/>
@@ -56,7 +56,7 @@
         <div class="toc">
           <div class="toc-child">
             <ul>
-              <xsl:for-each select="T_PART/ZTIMEM_PART_SOURCE">
+              <xsl:for-each select="PARTS/ZTIMEM_PART_SOURCE">
                 <li>
                   <a>
                     <xsl:attribute name="href">
@@ -98,7 +98,7 @@
             </ul>
           </div>
         </div>
-        <xsl:for-each select="T_PART/ZTIMEM_PART_SOURCE">
+        <xsl:for-each select="PARTS/ZTIMEM_PART_SOURCE">
           <h2 class="blame">
             <a>
               <xsl:attribute name="name">
@@ -151,7 +151,7 @@
                 </TH>
               </TR>
             </THEAD>
-            <xsl:for-each select="T_LINE/ZTIMEM_LINE">
+            <xsl:for-each select="LINES/ZTIMEM_LINE">
               <TR>
                 <xsl:if test="REQUEST != ''">
                   <xsl:attribute name="class">versionfirstrow</xsl:attribute>
@@ -242,7 +242,7 @@
               <th class="num">Requests</th>
             </tr>
           </THEAD>
-          <xsl:for-each select="T_AUTHOR/ZTIMEM_AUTHOR_INFO">
+          <xsl:for-each select="AUTHORS/ZTIMEM_AUTHOR_INFO">
             <tr>
               <td>
                 <a>
@@ -277,7 +277,7 @@
               <th class="num">Percentage</th>
             </tr>
           </THEAD>
-          <xsl:for-each select="T_REQUEST/ZTIMEM_REQUEST_INFO">
+          <xsl:for-each select="REQUESTS/ZTIMEM_REQUEST_INFO">
             <tr>
               <td>
                 <a>
@@ -304,7 +304,7 @@
             Statistics
           </a>
         </h2>
-        <xsl:for-each select="S_STATS">
+        <xsl:for-each select="STATS">
           <table>
             <tr>
               <td>Total lines:</td>

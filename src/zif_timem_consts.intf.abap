@@ -2,7 +2,7 @@ interface ZIF_TIMEM_CONSTS
   public .
 
 
-  constants VERSION type CHAR10 value '0.26b' ##NO_TEXT.
+  constants VERSION type CHAR10 value '0.27b' ##NO_TEXT.
   constants:
     BEGIN OF mode,
                time_machine TYPE zcl_timem_options=>ty_mode VALUE 'T',

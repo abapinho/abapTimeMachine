@@ -16,11 +16,11 @@ public section.
     "! is to be rendered as HTML.
   methods CONSTRUCTOR
     importing
-      !IS_PARTS type ZTIMEM_PARTS .
+      !DATA type ZTIMEM_DATA .
   PROTECTED SECTION.
 private section.
 
-  data GS_PARTS type ZTIMEM_PARTS .
+  data DATA type ZTIMEM_DATA .
 ENDCLASS.
 
 
@@ -29,13 +29,13 @@ CLASS ZCL_TIMEM_ASSET_HTML_TMACHINE IMPLEMENTATION.
 
 
   METHOD constructor.
-    gs_parts = is_parts.
+    me->data = data.
   ENDMETHOD.
 
 
   METHOD zif_timem_asset~get_content.
     CALL TRANSFORMATION ztimem_html_timemachine
-    SOURCE parts = gs_parts
+    SOURCE data = data
     RESULT XML result
     OPTIONS xml_header = 'NO'.
   ENDMETHOD.

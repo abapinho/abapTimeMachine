@@ -1,16 +1,16 @@
-CLASS zcl_timem_asset_factory DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+class ZCL_TIMEM_ASSET_FACTORY definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
-    METHODS create_instance
-      IMPORTING
-        !asset_type TYPE string
-        !is_parts     TYPE ztimem_parts
-      RETURNING
-        VALUE(result) TYPE REF TO zif_timem_asset .
+  methods CREATE_INSTANCE
+    importing
+      !ASSET_TYPE type STRING
+      !DATA type ZTIMEM_DATA
+    returning
+      value(RESULT) type ref to ZIF_TIMEM_ASSET .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -28,7 +28,7 @@ CLASS ZCL_TIMEM_ASSET_FACTORY IMPLEMENTATION.
       WHEN 'HTML' THEN
         SWITCH #(
           options->mode
-          WHEN zif_timem_consts=>mode-blame THEN NEW zcl_timem_asset_html_blame( is_parts )
-          WHEN zif_timem_consts=>mode-time_machine THEN NEW zcl_timem_asset_html_tmachine( is_parts ) ) ).
+          WHEN zif_timem_consts=>mode-blame THEN NEW zcl_timem_asset_html_blame( data )
+          WHEN zif_timem_consts=>mode-time_machine THEN NEW zcl_timem_asset_html_tmachine( data ) ) ).
   ENDMETHOD.
 ENDCLASS.

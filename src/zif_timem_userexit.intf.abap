@@ -1,28 +1,26 @@
-INTERFACE zif_timem_userexit
-  PUBLIC .
+interface ZIF_TIMEM_USEREXIT
+  public .
 
-  METHODS before_rendering
-    IMPORTING
-      options TYPE REF TO zcl_timem_options
-    CHANGING
-      !parts  TYPE ztimem_parts .
 
-  METHODS on_sapevent
-    IMPORTING
-      options  TYPE REF TO zcl_timem_options
-      !action  TYPE c
-      !getdata TYPE c .
-
-  METHODS modify_part_list
-    IMPORTING
-      options    TYPE REF TO zcl_timem_options
-    CHANGING
-      !part_list TYPE ztimem_part_t .
-
-  METHODS modify_asset_content
-    IMPORTING
-      options TYPE REF TO zcl_timem_options
-      subtype TYPE c
-    CHANGING
-      content TYPE string.
-ENDINTERFACE.
+  methods BEFORE_RENDERING
+    importing
+      !OPTIONS type ref to ZCL_TIMEM_OPTIONS
+    changing
+      !DATA type ZTIMEM_DATA .
+  methods ON_SAPEVENT
+    importing
+      !OPTIONS type ref to ZCL_TIMEM_OPTIONS
+      !ACTION type C
+      !GETDATA type C .
+  methods MODIFY_PART_LIST
+    importing
+      !OPTIONS type ref to ZCL_TIMEM_OPTIONS
+    changing
+      !PART_LIST type ZTIMEM_PART_T .
+  methods MODIFY_ASSET_CONTENT
+    importing
+      !OPTIONS type ref to ZCL_TIMEM_OPTIONS
+      !SUBTYPE type C
+    changing
+      !CONTENT type STRING .
+endinterface.
