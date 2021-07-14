@@ -15,17 +15,18 @@ SELECTION-SCREEN END OF BLOCK filters.
 SELECTION-SCREEN BEGIN OF BLOCK mode WITH FRAME TITLE TEXT-mde.
 PARAMETERS p_mtimem RADIOBUTTON GROUP mode USER-COMMAND mode.
 PARAMETERS p_mblame RADIOBUTTON GROUP mode.
+SELECTION-SCREEN SKIP.
 SELECTION-SCREEN BEGIN OF BLOCK options WITH FRAME TITLE TEXT-opt.
+*PARAMETERS p_iunre AS CHECKBOX.
 PARAMETERS p_icase AS CHECKBOX MODIF ID bla.
 PARAMETERS p_iinde AS CHECKBOX MODIF ID bla.
-PARAMETERS p_iunre AS CHECKBOX MODIF ID bla.
 SELECTION-SCREEN END OF BLOCK options.
 SELECTION-SCREEN END OF BLOCK mode.
 
 SELECTION-SCREEN COMMENT /1(83) link.
 
 SELECTION-SCREEN BEGIN OF SCREEN 1001.
-* dummy for triggering screen on Java SAP GUI
+" dummy for triggering screen on Java SAP GUI
 SELECTION-SCREEN END OF SCREEN 1001.
 
 *SELECTION-SCREEN BEGIN OF BLOCK output WITH FRAME TITLE TEXT-out.
@@ -63,7 +64,7 @@ START-OF-SELECTION.
                                                ignore_case        = p_icase
                                                ignore_indentation = p_iinde
                                                timestamp = CONV #( |{ p_date }{ p_time }| )
-                                               ignore_unreleased  = p_iunre ).
+                                               ignore_unreleased  = abap_false ). " p_iunre (not yet implemented)
 
       NEW zcl_timem_run( )->go( object_type = p_otype
                                 object_name = p_name ).

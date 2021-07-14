@@ -18,6 +18,9 @@
             <xsl:text> </xsl:text>
             <xsl:value-of select="NAME"/>
           </h1>
+          <div>&amp;nbsp;</div>
+          <div class="header_text"><xsl:value-of select="HEADER_TEXT"/></div>
+          <div>&amp;nbsp;</div>
         </div>
         <div class="metadata">
           <form method="get" action="SAPEVENT:timestamp">
@@ -148,7 +151,9 @@
           </table>
         </xsl:for-each>
         <div id="footer">
-          <P/>
+          <div>&amp;nbsp;</div>
+          <div class="footer_text"><xsl:value-of select="FOOTER_TEXT"/></div>
+          <div>&amp;nbsp;</div>
           Version
           <xsl:text> </xsl:text>
           <xsl:value-of select="VERSION"/>

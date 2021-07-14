@@ -9,6 +9,8 @@ body {
 div, table, h1, h2, h3 {font-family: Consolas, Courier, monospace;}
 table { border-collapse: collapse; }
 div, table { font-size: 10pt; }
+div.header_text { font-style: italic; }
+div.footer_text { font-style: italic; }
 pre { display: inline; }
 table th { text-align: left; }
 table .num { text-align: right; }
