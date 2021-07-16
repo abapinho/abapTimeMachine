@@ -60,7 +60,7 @@ CLASS zcl_timem_aggregated_field DEFINITION
 
     METHODS get_request_count_for_value
       IMPORTING
-                value          TYPE any
+                value          TYPE string
                 value_requests TYPE ty_t_value_request
       RETURNING VALUE(result)  TYPE i.
 ENDCLASS.
@@ -71,7 +71,7 @@ CLASS ZCL_TIMEM_AGGREGATED_FIELD IMPLEMENTATION.
 
 
   METHOD build.
-    
+    DATA aggregated_line LIKE LINE OF result.
     DATA value_requests TYPE ty_t_value_request.
 
     LOOP AT lines INTO DATA(line).
@@ -112,7 +112,7 @@ CLASS ZCL_TIMEM_AGGREGATED_FIELD IMPLEMENTATION.
       <aggregated_line>-description = get_description( value = <aggregated_line>-value lines = lines ).
       <aggregated_line>-percentage = <aggregated_line>-line_count / total_lines.
       <aggregated_line>-request_count = get_request_count_for_value(
-        value = <aggregated_line>-value
+        value = CONV #( <aggregated_line>-value )
         value_requests = value_requests ).
     ENDLOOP.
   ENDMETHOD.
