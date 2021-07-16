@@ -19,36 +19,50 @@
             <xsl:value-of select="NAME"/>
           </h1>
           <div>&amp;nbsp;</div>
-          <div class="header_text"><xsl:value-of select="HEADER_TEXT"/></div>
+          <div class="header_text">
+            <xsl:value-of select="HEADER_TEXT"/>
+          </div>
           <div>&amp;nbsp;</div>
         </div>
         <div class="metadata">
-          <form method="get" action="SAPEVENT:timestamp">
-          <label for="timestamps">Moment: </label>
-          <select id="timestamp" name="timestamp" onchange='this.form.submit();'>
-            <xsl:for-each select="TIMESTAMPS/TIMESTAMP">
-              <option>
-                <xsl:attribute name="value">
-                  <xsl:value-of select="."/>
-                </xsl:attribute>
-                <xsl:if test=". = ../../TIMESTAMP">
-                  <xsl:attribute name="selected">selected</xsl:attribute>
-                </xsl:if>
-                <xsl:value-of select="substring(.,1,4)"/>-<xsl:value-of select="substring(.,5,2)"/>-<xsl:value-of select="substring(.,7,2)"/>
+          <form action="SAPEVENT:timestamp" method="get">
+            <label for="timestamps">Moment: </label>
+            <select id="timestamp" name="timestamp" onchange="this.form.submit();">
+              <xsl:for-each select="TIMESTAMPS/TIMESTAMP">
+                <option>
+                  <xsl:attribute name="value">
+                    <xsl:value-of select="."/>
+                  </xsl:attribute>
+                  <xsl:if test=". = ../../TIMESTAMP">
+                    <xsl:attribute name="selected">selected</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="substring(.,1,4)"/>
+                  -
+                  <xsl:value-of select="substring(.,5,2)"/>
+                  -
+                  <xsl:value-of select="substring(.,7,2)"/>
+
                 &amp;nbsp;
-                <xsl:value-of select="substring(.,9,2)"/>:<xsl:value-of select="substring(.,11,2)"/>:<xsl:value-of select="substring(.,13,2)"/>
-              </option>
-            </xsl:for-each>
-          </select>
+
+                  <xsl:value-of select="substring(.,9,2)"/>
+                  :
+                  <xsl:value-of select="substring(.,11,2)"/>
+                  :
+                  <xsl:value-of select="substring(.,13,2)"/>
+                </option>
+              </xsl:for-each>
+            </select>
           </form>
           <br/>
           <div>Ignore case:
+
             <xsl:choose>
               <xsl:when test="IGNORE_CASE = 'X'">Yes</xsl:when>
               <xsl:otherwise>No</xsl:otherwise>
             </xsl:choose>
           </div>
           <div>Ignore indentation:
+
             <xsl:choose>
               <xsl:when test="IGNORE_INDENTATION = 'X'">Yes</xsl:when>
               <xsl:otherwise>No</xsl:otherwise>
@@ -77,25 +91,27 @@
               <li>
                 <a>
                   <xsl:attribute name="href">#contributors</xsl:attribute>
-
                   Contributors
-
                 </a>
               </li>
               <li>
                 <a>
                   <xsl:attribute name="href">#requests</xsl:attribute>
-
                   Requests
-
                 </a>
               </li>
+              <xsl:for-each select="AGGREGATED_FIELDS/ZTIMEM_AGGREGATED_FIELD[starts-with(FIELDNAME, 'CUSTOM') and count(LINES/ZTIMEM_AGGREGATED_LINE)&gt;0]">
+                <li>
+                  <a>
+                    <xsl:attribute name="href">#aggregated_<xsl:value-of select="FIELDNAME"/></xsl:attribute>
+                    <xsl:value-of select="TITLE"/> list
+                  </a>
+                </li>
+              </xsl:for-each>
               <li>
                 <a>
                   <xsl:attribute name="href">#stats</xsl:attribute>
-
                   Statistics
-
                 </a>
               </li>
             </ul>
@@ -141,14 +157,19 @@
                   <a>
                     <xsl:attribute name="href">SAPEVENT:source?
 
+
                       <xsl:value-of select="TYPE"/>
 
+
                       |
+
 
                       <xsl:value-of select="OBJECT_NAME"/>
                     </xsl:attribute>
 
+
                     Source
+
 
                   </a>
                 </TH>
@@ -174,10 +195,18 @@
                 <TD>
                   <xsl:if test="TIME != '00:00:00'">
                     <a>
-                      <xsl:attribute name="title">Show versions only until <xsl:value-of select="DATE"/>&amp;nbsp;<xsl:value-of select="TIME"/></xsl:attribute>
-                      <xsl:attribute name="href">SAPEVENT:timestamp?<xsl:value-of select="TIMESTAMP"/></xsl:attribute>
+                      <xsl:attribute name="title">Show versions only until
+                        <xsl:value-of select="DATE"/>
+                        &amp;nbsp;
+                        <xsl:value-of select="TIME"/>
+                      </xsl:attribute>
+                      <xsl:attribute name="href">SAPEVENT:timestamp?
+                        <xsl:value-of select="TIMESTAMP"/>
+                      </xsl:attribute>
                       <xsl:value-of select="DATE"/>
+
                       &amp;nbsp;
+
                       <xsl:value-of select="TIME"/>
                     </a>
                   </xsl:if>
@@ -186,8 +215,12 @@
                   <xsl:choose>
                     <xsl:when test="REQUEST != ''">
                       <a>
-                        <xsl:attribute name="title">Jump to request&amp;nbsp;<xsl:value-of select="REQUEST"/></xsl:attribute>
-                        <xsl:attribute name="href">SAPEVENT:request?<xsl:value-of select="REQUEST"/></xsl:attribute>
+                        <xsl:attribute name="title">Jump to request&amp;nbsp;
+                          <xsl:value-of select="REQUEST"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="href">SAPEVENT:request?
+                          <xsl:value-of select="REQUEST"/>
+                        </xsl:attribute>
                         <xsl:value-of select="REQUEST"/>
                       </a>
                     </xsl:when>
@@ -229,13 +262,16 @@
             </xsl:for-each>
           </table>
         </xsl:for-each>
-        <h2 class="contributors">
+
+        <h2 class="aggregated">
           <a>
             <xsl:attribute name="name">contributors</xsl:attribute>
+
             Contributors
+
           </a>
         </h2>
-        <table class="contributors">
+        <table class="aggregated">
           <THEAD class="header">
             <tr>
               <th>Username</th>
@@ -245,16 +281,19 @@
               <th class="num">Requests</th>
             </tr>
           </THEAD>
-          <xsl:for-each select="AUTHORS/ZTIMEM_AUTHOR_INFO">
+          <xsl:for-each select="AGGREGATED_FIELDS/ZTIMEM_AGGREGATED_FIELD[FIELDNAME='AUTHOR']/LINES/ZTIMEM_AGGREGATED_LINE">
+            <xsl:sort order="descending" select="PERCENTAGE"/>
             <tr>
               <td>
                 <a>
-                  <xsl:attribute name="href">SAPEVENT:author?<xsl:value-of select="AUTHOR"/></xsl:attribute>
-                  <xsl:value-of select="AUTHOR"/>
+                  <xsl:attribute name="href">SAPEVENT:author?
+                    <xsl:value-of select="VALUE"/>
+                  </xsl:attribute>
+                  <xsl:value-of select="VALUE"/>
                 </a>
               </td>
               <td>
-                <xsl:value-of select="NAME"/>
+                <xsl:value-of select="DESCRIPTION"/>
               </td>
               <td class="num">
                 <xsl:value-of select="number(LINE_COUNT)"/>
@@ -268,10 +307,14 @@
             </tr>
           </xsl:for-each>
         </table>
-        <h2 class="requests">
-          <a><xsl:attribute name="name">requests</xsl:attribute>Requests</a>
+
+        <h2 class="aggregated">
+          <a>
+            <xsl:attribute name="name">requests</xsl:attribute>
+            Requests
+          </a>
         </h2>
-        <table class="requests">
+        <table class="aggregated">
           <THEAD class="header">
             <tr>
               <th>Request</th>
@@ -280,13 +323,18 @@
               <th class="num">Percentage</th>
             </tr>
           </THEAD>
-          <xsl:for-each select="REQUESTS/ZTIMEM_REQUEST_INFO">
+          <xsl:for-each select="AGGREGATED_FIELDS/ZTIMEM_AGGREGATED_FIELD[FIELDNAME='REQUEST']/LINES/ZTIMEM_AGGREGATED_LINE">
+            <xsl:sort order="descending" select="PERCENTAGE"/>
             <tr>
               <td>
                 <a>
-                  <xsl:attribute name="title">Jump to request&amp;nbsp;<xsl:value-of select="REQUEST"/></xsl:attribute>
-                  <xsl:attribute name="href">SAPEVENT:request?<xsl:value-of select="REQUEST"/></xsl:attribute>
-                  <xsl:value-of select="REQUEST"/>
+                  <xsl:attribute name="title">Jump to request&amp;nbsp;
+                    <xsl:value-of select="VALUE"/>
+                  </xsl:attribute>
+                  <xsl:attribute name="href">SAPEVENT:request?
+                    <xsl:value-of select="VALUE"/>
+                  </xsl:attribute>
+                  <xsl:value-of select="VALUE"/>
                 </a>
               </td>
               <td>
@@ -301,10 +349,51 @@
             </tr>
           </xsl:for-each>
         </table>
+
+        <xsl:for-each select="AGGREGATED_FIELDS/ZTIMEM_AGGREGATED_FIELD[starts-with(FIELDNAME, 'CUSTOM') and count(LINES/ZTIMEM_AGGREGATED_LINE)&gt;0]">
+          <h2 class="aggregated">
+            <a>
+              <xsl:attribute name="name">aggregated_<xsl:value-of select="FIELDNAME"/></xsl:attribute>
+              <xsl:value-of select="TITLE"/> list
+            </a>
+          </h2>
+          <table class="aggregated">
+            <THEAD class="header">
+              <tr>
+                <th>
+                  <xsl:value-of select="TITLE"/>
+                </th>
+                <th class="num">Lines</th>
+                <th class="num">Percentage</th>
+                <th class="num">Requests</th>
+              </tr>
+            </THEAD>
+            <xsl:for-each select="LINES/ZTIMEM_AGGREGATED_LINE">
+              <xsl:sort order="descending" select="PERCENTAGE"/>
+              <tr>
+                <td>
+                  <xsl:value-of select="VALUE"/>
+                </td>
+                <td class="num">
+                  <xsl:value-of select="number(LINE_COUNT)"/>
+                </td>
+                <td class="num">
+                  <xsl:value-of select="format-number(PERCENTAGE, '#%')"/>
+                </td>
+                <td class="num">
+                  <xsl:value-of select="number(REQUEST_COUNT)"/>
+                </td>
+              </tr>
+            </xsl:for-each>
+          </table>
+        </xsl:for-each>
+
         <h2 class="stats">
           <a>
             <xsl:attribute name="name">stats</xsl:attribute>
+
             Statistics
+
           </a>
         </h2>
         <xsl:for-each select="STATS">
@@ -358,9 +447,13 @@
 
         <div id="footer">
           <div>&amp;nbsp;</div>
-          <div class="footer_text"><xsl:value-of select="FOOTER_TEXT"/></div>
+          <div class="footer_text">
+            <xsl:value-of select="FOOTER_TEXT"/>
+          </div>
           <div>&amp;nbsp;</div>
+
           Version
+
           <xsl:text> </xsl:text>
           <xsl:value-of select="VERSION"/>
         </div>

@@ -1,26 +1,32 @@
-class ZCL_TIMEM_USEREXITS definition
-  public
-  final
-  create public .
+CLASS zcl_timem_userexits DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods CONSTRUCTOR .
-  methods BEFORE_RENDERING
-    changing
-      !DATA type ZTIMEM_DATA .
-  methods ON_SAPEVENT
-    importing
-      !ACTION type C
-      !GETDATA type C .
-  methods MODIFY_PART_LIST
-    changing
-      !PART_LIST type ZTIMEM_PART_T .
-  methods MODIFY_ASSET_CONTENT
-    importing
-      !SUBTYPE type C
-    changing
-      !CONTENT type STRING .
+    METHODS constructor .
+
+    METHODS modify_results
+      CHANGING
+        !parts         TYPE ztimem_part_source_t
+        !custom_fields TYPE ztimem_data_custom_fields .
+
+    METHODS on_sapevent
+      IMPORTING
+        !action  TYPE c
+        !getdata TYPE c .
+
+    METHODS modify_part_list
+      CHANGING
+        !part_list TYPE ztimem_part_t .
+
+    METHODS modify_asset_content
+      IMPORTING
+        !subtype TYPE c
+      CHANGING
+        !content TYPE string .
+
   PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES ty_userexits TYPE STANDARD TABLE OF REF TO zif_timem_userexit WITH KEY table_line.
@@ -33,22 +39,6 @@ ENDCLASS.
 
 
 CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
-
-
-  METHOD before_rendering.
-    DATA(userexits) = get_instances( ).
-    LOOP AT userexits INTO DATA(userexit).
-      TRY.
-          userexit->before_rendering(
-            EXPORTING
-              options = options
-            CHANGING
-              data = data ).
-        CATCH cx_sy_dyn_call_illegal_method.
-          ASSERT 1 = 1. " Not implemented? Carry on.
-      ENDTRY.
-    ENDLOOP.
-  ENDMETHOD.
 
 
   METHOD constructor.
@@ -107,6 +97,23 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
               options = options
             CHANGING
               part_list = part_list ).
+        CATCH cx_sy_dyn_call_illegal_method.
+          ASSERT 1 = 1. " Not implemented? Carry on.
+      ENDTRY.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD modify_results.
+    DATA(userexits) = get_instances( ).
+    LOOP AT userexits INTO DATA(userexit).
+      TRY.
+          userexit->modify_results(
+            EXPORTING
+              options       = options
+            CHANGING
+              parts         = parts
+              custom_fields = custom_fields ).
         CATCH cx_sy_dyn_call_illegal_method.
           ASSERT 1 = 1. " Not implemented? Carry on.
       ENDTRY.

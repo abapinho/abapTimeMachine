@@ -1,16 +1,18 @@
-interface ZIF_TIMEM_CONSTS
-  public .
+INTERFACE zif_timem_consts
+  PUBLIC .
 
+  CONSTANTS version TYPE char10 VALUE '0.30b' ##NO_TEXT.
 
-  constants VERSION type CHAR10 value '0.28b' ##NO_TEXT.
-  constants:
+  CONSTANTS:
     BEGIN OF mode,
-               time_machine TYPE zcl_timem_options=>ty_mode VALUE 'T',
-               blame        TYPE zcl_timem_options=>ty_mode VALUE 'B',
-             END OF mode .
-  constants:
+      time_machine TYPE zcl_timem_options=>ty_mode VALUE 'T',
+      blame        TYPE zcl_timem_options=>ty_mode VALUE 'B',
+    END OF mode .
+
+  CONSTANTS:
     BEGIN OF asset_type,
-               css  TYPE string VALUE 'CSS',
-               html TYPE string VALUE 'HTML',
-             END OF asset_type .
-endinterface.
+      css  TYPE string VALUE 'CSS',
+      html TYPE string VALUE 'HTML',
+    END OF asset_type .
+
+ENDINTERFACE.

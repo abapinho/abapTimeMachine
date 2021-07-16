@@ -14,18 +14,18 @@ CLASS zcl_timem_gui DEFINITION
         zcx_timem .
 
   PROTECTED SECTION.
-private section.
+  PRIVATE SECTION.
 
-  data PARTS type ref to ZCL_TIMEM_PARTS .
-  data VIEWER type ref to ZCL_TIMEM_GUI_VIEWER .
-  data HANDLER type ref to ZCL_TIMEM_GUI_HANDLER .
+    DATA parts TYPE REF TO zcl_timem_parts .
+    DATA viewer TYPE REF TO zcl_timem_gui_viewer .
+    DATA handler TYPE REF TO zcl_timem_gui_handler .
 
-  methods HIGHLIGHT_SOURCE
-    changing
-      !DATA type ZTIMEM_DATA .
-  methods DEDUPLICATE_HEADER_FIELDS
-    changing
-      !DATA type ZTIMEM_DATA .
+    METHODS highlight_source
+      CHANGING
+        !data TYPE ztimem_data .
+    METHODS deduplicate_header_fields
+      CHANGING
+        !data TYPE ztimem_data .
 ENDCLASS.
 
 
@@ -53,6 +53,9 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
           CLEAR line->task.
           CLEAR line->date.
           CLEAR line->time.
+          CLEAR line->custom1.
+          CLEAR line->custom2.
+          CLEAR line->custom3.
         ELSE.
           previous = line->*.
         ENDIF.
