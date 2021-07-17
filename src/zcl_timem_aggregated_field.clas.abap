@@ -71,7 +71,6 @@ CLASS ZCL_TIMEM_AGGREGATED_FIELD IMPLEMENTATION.
 
 
   METHOD build.
-    DATA aggregated_line LIKE LINE OF result.
     DATA value_requests TYPE ty_t_value_request.
 
     LOOP AT lines INTO DATA(line).
