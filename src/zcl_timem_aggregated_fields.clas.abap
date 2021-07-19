@@ -17,8 +17,8 @@ CLASS zcl_timem_aggregated_fields DEFINITION
   PRIVATE SECTION.
     METHODS build_aggregated_field
       IMPORTING
-                lines        TYPE ztimem_line_t
-                fieldname     TYPE feldname
+                lines         TYPE ztimem_line_t
+                fieldname     TYPE name_feld
                 title         TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE ztimem_aggregated_field.
 ENDCLASS.

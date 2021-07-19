@@ -7,7 +7,7 @@ CLASS zcl_timem_aggregated_field DEFINITION
 
     METHODS constructor
       IMPORTING
-        !fieldname TYPE feldname.
+        !fieldname TYPE name_feld.
 
     METHODS build
       IMPORTING
@@ -24,7 +24,7 @@ CLASS zcl_timem_aggregated_field DEFINITION
       END OF ty_s_value_request,
       ty_t_value_request TYPE SORTED TABLE OF ty_s_value_request WITH UNIQUE KEY value request.
 
-    DATA fieldname TYPE feldname.
+    DATA fieldname TYPE name_feld.
 
     METHODS get_description
       IMPORTING
@@ -71,7 +71,6 @@ CLASS ZCL_TIMEM_AGGREGATED_FIELD IMPLEMENTATION.
 
 
   METHOD build.
-    DATA aggregated_line LIKE LINE OF result.
     DATA value_requests TYPE ty_t_value_request.
 
     LOOP AT lines INTO DATA(line).
