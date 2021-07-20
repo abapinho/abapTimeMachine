@@ -53,6 +53,16 @@
               </xsl:for-each>
             </select>
           </form>
+          <!--
+          <form action="SAPEVENT:revert" method="get">
+            <button name="revert">
+              <xsl:attribute name="value">
+                <xsl:value-of select="TIMESTAMP"/>
+              </xsl:attribute>
+              Revert code
+            </button>
+          </form>
+          -->
           <br/>
           <div>Ignore case:
 

@@ -1,33 +1,34 @@
 "! Takes a deep structure with all the information of the requested object,
 "! renders the HTML and CSS assets based on the requested theme and displays it.
-class ZCL_TIMEM_GUI_VIEWER definition
-  public
-  final
-  create public .
+CLASS zcl_timem_gui_viewer DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  constants:
-    BEGIN OF c_theme,
+    CONSTANTS:
+      BEGIN OF c_theme,
         light TYPE ztimem_theme VALUE 'LIGHT',
         dark  TYPE ztimem_theme VALUE 'DARK',
       END OF c_theme .
 
     "! Constructor which takes a theme as input
     "! @parameter i_theme | Theme name
-  methods CONSTRUCTOR
-    importing
-      !IO_HANDLER type ref to ZCL_TIMEM_GUI_HANDLER .
+    METHODS constructor
+      IMPORTING
+        !io_handler TYPE REF TO zcl_timem_gui_handler .
     "! Takes a deep structure with all the information of the object, renders
     "! the HTML and CSS assets and displays them.
-  methods RENDER
-    importing
-      !DATA type ZTIMEM_DATA
-    raising
-      ZCX_TIMEM .
+    METHODS render
+      IMPORTING
+        !data TYPE ztimem_data
+      RAISING
+        zcx_timem .
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA html_viewer TYPE REF TO cl_gui_html_viewer.
+    DATA userexits TYPE REF TO zcl_timem_userexits.
 
     METHODS add_asset
       IMPORTING
@@ -60,7 +61,7 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
   METHOD add_asset.
     DATA(content) = asset->get_content( ).
 
-    NEW zcl_timem_userexits( )->modify_asset_content(
+   userexits->modify_asset_content(
       EXPORTING
         subtype = asset->get_subtype( )
       CHANGING
@@ -92,6 +93,7 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
 
 
   METHOD constructor.
+    userexits = NEW #( ).
     html_viewer = NEW cl_gui_html_viewer( parent                   = cl_gui_container=>screen0
                                           query_table_disabled     = abap_true ).
     register_events( io_handler ).

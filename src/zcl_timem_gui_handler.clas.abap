@@ -154,6 +154,8 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
 
 
   METHOD on_sapevent.
+    DATA ts TYPE timestamp.
+
     action = condense( action ).
     getdata = condense( getdata ).
     CASE action.
@@ -162,6 +164,15 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
 
       WHEN 'request'.
         display_request( CONV #( getdata ) ).
+
+      WHEN 'revert'.
+        " Revert to the requested timestmap
+        ts = CONV #( getdata+7 ).
+        gui->revert( ts ).
+        " And then display the new present time
+        get time stamp field ts.
+        zcl_timem_options=>get_instance( )->set( timestamp = ts ).
+        display_version( ).
 
       WHEN 'source'.
         decode_source_type_and_name(
@@ -175,7 +186,7 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
 
       WHEN 'timestamp'.
         " Depending on the link, getdata may be just the timestamp xxx or be like timestamp=xxx
-        DATA(ts) = COND timestamp( WHEN getdata(10) = 'timestamp=' THEN getdata+10 ELSE getdata ).
+        ts = COND #( WHEN getdata(10) = 'timestamp=' THEN getdata+10 ELSE getdata ).
         zcl_timem_options=>get_instance( )->set( timestamp = ts ).
         display_version( ).
 

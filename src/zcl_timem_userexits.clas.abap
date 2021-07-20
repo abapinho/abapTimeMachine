@@ -30,6 +30,7 @@ CLASS zcl_timem_userexits DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES ty_userexits TYPE STANDARD TABLE OF REF TO zif_timem_userexit WITH KEY table_line.
+    data instances type ty_userexits.
     DATA options TYPE REF TO zcl_timem_options.
 
     METHODS get_instances
@@ -43,6 +44,7 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
 
   METHOD constructor.
     options = zcl_timem_options=>get_instance( ).
+    instances = get_instances( ).
   ENDMETHOD.
 
 
@@ -72,10 +74,9 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
 
 
   METHOD modify_asset_content.
-    DATA(userexits) = get_instances( ).
-    LOOP AT userexits INTO DATA(userexit).
+    LOOP AT instances INTO DATA(instance).
       TRY.
-          userexit->modify_asset_content(
+          instance->modify_asset_content(
             EXPORTING
               options = options
               subtype = subtype
@@ -89,10 +90,9 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
 
 
   METHOD modify_part_list.
-    DATA(userexits) = get_instances( ).
-    LOOP AT userexits INTO DATA(userexit).
+    LOOP AT instances INTO DATA(instance).
       TRY.
-          userexit->modify_part_list(
+          instance->modify_part_list(
             EXPORTING
               options = options
             CHANGING
@@ -105,10 +105,9 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
 
 
   METHOD modify_results.
-    DATA(userexits) = get_instances( ).
-    LOOP AT userexits INTO DATA(userexit).
+    LOOP AT instances INTO DATA(instance).
       TRY.
-          userexit->modify_results(
+          instance->modify_results(
             EXPORTING
               options       = options
             CHANGING
@@ -122,10 +121,9 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
 
 
   METHOD on_sapevent.
-    DATA(userexits) = get_instances( ).
-    LOOP AT userexits INTO DATA(userexit).
+    LOOP AT instances INTO DATA(instance).
       TRY.
-          userexit->on_sapevent(
+          instance->on_sapevent(
             options  = options
              action  = action
              getdata = getdata ).

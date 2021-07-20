@@ -14,18 +14,25 @@ CLASS zcl_timem_version DEFINITION
         active    TYPE versno VALUE 99998,
         modified  TYPE versno VALUE 99999,
       END OF c_version .
+
     "! Version number from the VRSD table
     DATA version_number TYPE versno READ-ONLY .
+
     "! Transport request ID
     DATA request TYPE verskorrno READ-ONLY .
+
     "! Task ID (if exists)
     DATA task TYPE verskorrno READ-ONLY .
+
     " Username
     DATA author TYPE versuser READ-ONLY .
+
     " Name of the user (or username if no longer exists)
     DATA author_name TYPE ad_namtext READ-ONLY .
+
     " Date of version
     DATA date TYPE versdate READ-ONLY .
+
     " Time of version
     DATA time TYPE verstime READ-ONLY .
 
@@ -50,6 +57,10 @@ CLASS zcl_timem_version DEFINITION
         VALUE(result) TYPE ztimem_line_t
       RAISING
         zcx_timem .
+
+    METHODS retrieve
+      RAISING
+        zcx_timem.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -170,5 +181,22 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
     IF sy-subrc <> 0.
       RETURN.
     ENDIF.
+  ENDMETHOD.
+
+
+  METHOD retrieve.
+    DATA(infolna) = VALUE vrsinfolna( objname = vrsd-objname ).
+    DATA(infolnb) = VALUE vrsinfolnb(
+      korrnum = vrsd-korrnum
+      datum = | vrsd-date date = user |
+      author = vrsd-author ).
+    DATA(real_version) = get_real_version( ).
+
+    SUBMIT rsedtve1 AND RETURN
+             WITH objtype = vrsd-objtype
+             WITH objname = vrsd-objname
+             WITH versno  = real_version
+             WITH infolna = infolna
+             WITH infolnb = infolnb.
   ENDMETHOD.
 ENDCLASS.

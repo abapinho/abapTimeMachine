@@ -7,25 +7,36 @@ CLASS zcl_timem_gui DEFINITION
 
     METHODS constructor
       IMPORTING
-        !parts TYPE REF TO zcl_timem_parts .
+        !object_type TYPE ztimem_object_type
+        !object_name TYPE sobj_name
+      RAISING
+        zcx_timem .
 
     METHODS display
       RAISING
         zcx_timem .
 
+    METHODS revert
+      IMPORTING
+        ts TYPE timestamp.
+
   PROTECTED SECTION.
   PRIVATE SECTION.
-
+    DATA object_type TYPE ztimem_object_type.
+    DATA object_name TYPE sobj_name.
     DATA parts TYPE REF TO zcl_timem_parts .
     DATA viewer TYPE REF TO zcl_timem_gui_viewer .
     DATA handler TYPE REF TO zcl_timem_gui_handler .
 
     METHODS highlight_source
       CHANGING
-        !data TYPE ztimem_data .
+        !data TYPE ztimem_data.
+
     METHODS deduplicate_header_fields
       CHANGING
         !data TYPE ztimem_data .
+
+    METHODS load_parts.
 ENDCLASS.
 
 
@@ -34,7 +45,9 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
 
 
   METHOD constructor.
-    me->parts = parts.
+    me->object_type = object_type.
+    me->object_name = object_name.
+    load_parts( ).
     me->handler = NEW #( me ).
     me->viewer = NEW #( handler ).
   ENDMETHOD.
@@ -65,7 +78,7 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
 
 
   METHOD display.
-    DATA(data) = me->parts->get_data( ).
+    DATA(data) = parts->get_data( ).
     highlight_source( CHANGING data = data ).
     deduplicate_header_fields( CHANGING data = data ).
     viewer->render( data ).
@@ -80,5 +93,17 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
         line->source = highlighter->process_line(  CONV #( line->source ) ).
       ENDLOOP.
     ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_parts.
+    me->parts = NEW zcl_timem_parts( object_type = object_type
+                                     object_name = object_name ).
+  ENDMETHOD.
+
+
+  METHOD revert.
+    parts->revert( ts ).
+    load_parts( ).
   ENDMETHOD.
 ENDCLASS.

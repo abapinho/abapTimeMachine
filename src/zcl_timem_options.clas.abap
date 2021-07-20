@@ -95,7 +95,7 @@ CLASS ZCL_TIMEM_OPTIONS IMPLEMENTATION.
 
     IF timestamp IS SUPPLIED.
       me->timestamp = timestamp.
-      CONVERT TIME STAMP timestamp TIME ZONE sy-zonlo INTO DATE me->date TIME me->time.
+      CONVERT TIME STAMP timestamp TIME ZONE space INTO DATE me->date TIME me->time.
     ENDIF.
   ENDMETHOD.
 ENDCLASS.

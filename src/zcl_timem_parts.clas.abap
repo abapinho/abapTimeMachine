@@ -23,6 +23,10 @@ CLASS zcl_timem_parts DEFINITION
       RAISING
         zcx_timem .
 
+    METHODS revert
+      IMPORTING
+        ts TYPE timestamp.
+
   PROTECTED SECTION.
   PRIVATE SECTION.
 
@@ -30,6 +34,7 @@ CLASS zcl_timem_parts DEFINITION
     DATA object_name TYPE sobj_name .
     DATA parts TYPE zif_timem_object=>ty_t_part_ref .
     DATA userexits TYPE REF TO zcl_timem_userexits.
+    DATA options TYPE REF TO zcl_timem_options.
 
     "! Load all the data, creating the actual parts
     "! which will load all the versions
@@ -65,6 +70,7 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
     me->object_type = object_type.
     me->object_name = object_name.
     me->userexits = NEW #( ).
+    me->options = zcl_timem_options=>get_instance( ).
     load( ).
   ENDMETHOD.
 
@@ -92,14 +98,14 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
                        parts = t_part
                        timestamps = get_timestamps( )
                        stats = get_stats( t_part )
-                       timestamp = zcl_timem_options=>get_instance( )->timestamp
+                       timestamp = options->timestamp
                        aggregated_fields = NEW zcl_timem_aggregated_fields( )->build(
                          lines         = get_lines( t_part )
                          custom1_title = CONV #( custom_fields-custom1_title )
                          custom2_title = CONV #( custom_fields-custom2_title )
                          custom3_title = CONV #( custom_fields-custom3_title ) )
-                       ignore_case = zcl_timem_options=>get_instance( )->ignore_case
-                       ignore_indentation = zcl_timem_options=>get_instance( )->ignore_indentation ).
+                       ignore_case = options->ignore_case
+                       ignore_indentation = options->ignore_indentation ).
 
     result = CORRESPONDING #( BASE ( result ) custom_fields ).
   ENDMETHOD.
@@ -127,7 +133,7 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
       ENDLOOP.
     ENDLOOP.
     " We also need the user selected timestamp
-    DATA(options_timestamp) = zcl_timem_options=>get_instance( )->timestamp.
+    DATA(options_timestamp) = options->timestamp.
     COLLECT options_timestamp INTO result.
     SORT result BY table_line DESCENDING.
   ENDMETHOD.
@@ -149,6 +155,13 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
         CATCH zcx_timem.
           ASSERT 1 = 1. " Doesn't exist? Carry on
       ENDTRY.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD revert.
+    LOOP AT parts INTO DATA(part).
+      part->revert( ts ).
     ENDLOOP.
   ENDMETHOD.
 ENDCLASS.

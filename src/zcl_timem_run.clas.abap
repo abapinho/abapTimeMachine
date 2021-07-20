@@ -32,9 +32,8 @@ CLASS ZCL_TIMEM_RUN IMPLEMENTATION.
 
   METHOD go.
     SET HANDLER me->on_loading_version_source FOR ALL INSTANCES.
-    DATA(o_parts) = NEW zcl_timem_parts( object_type = object_type
-                                         object_name = object_name ).
-    NEW zcl_timem_gui( o_parts )->display( ).
+    NEW zcl_timem_gui( object_type = object_type
+                       object_name = object_name )->display( ).
   ENDMETHOD.
 
 
