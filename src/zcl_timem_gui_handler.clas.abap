@@ -47,6 +47,10 @@ CLASS zcl_timem_gui_handler DEFINITION
       EXPORTING
         e_type        TYPE versobjtyp
         e_object_name TYPE versobjnam.
+
+    METHODS revert
+      IMPORTING
+        ts TYPE timestamp.
 ENDCLASS.
 
 
@@ -168,9 +172,9 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
       WHEN 'revert'.
         " Revert to the requested timestmap
         ts = CONV #( getdata+7 ).
-        gui->revert( ts ).
+        revert( ts ).
         " And then display the new present time
-        get time stamp field ts.
+        GET TIME STAMP FIELD ts.
         zcl_timem_options=>get_instance( )->set( timestamp = ts ).
         display_version( ).
 
@@ -195,5 +199,15 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
           action  = action
           getdata = getdata ).
     ENDCASE.
+  ENDMETHOD.
+
+
+  METHOD revert.
+    TRY.
+        gui->revert( ts ).
+      CATCH zcx_timem INTO DATA(exc).
+        DATA(text) = exc->get_text( ).
+        MESSAGE text TYPE 'E'.
+    ENDTRY.
   ENDMETHOD.
 ENDCLASS.
