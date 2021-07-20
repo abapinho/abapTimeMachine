@@ -61,11 +61,11 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
   METHOD add_asset.
     DATA(content) = asset->get_content( ).
 
-   userexits->modify_asset_content(
-      EXPORTING
-        subtype = asset->get_subtype( )
-      CHANGING
-        content = content ).
+    userexits->modify_asset_content(
+       EXPORTING
+         subtype = asset->get_subtype( )
+       CHANGING
+         content = content ).
 
     DATA(xstr) = string_2_xstring( content ).
 
