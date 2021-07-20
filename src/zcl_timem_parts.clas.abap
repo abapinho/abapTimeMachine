@@ -25,7 +25,9 @@ CLASS zcl_timem_parts DEFINITION
 
     METHODS revert
       IMPORTING
-        ts TYPE timestamp.
+        ts TYPE timestamp
+      RAISING
+        zcx_timem.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -132,9 +134,6 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
         COLLECT ts INTO result.
       ENDLOOP.
     ENDLOOP.
-    " We also need the user selected timestamp
-    DATA(options_timestamp) = options->timestamp.
-    COLLECT options_timestamp INTO result.
     SORT result BY table_line DESCENDING.
   ENDMETHOD.
 

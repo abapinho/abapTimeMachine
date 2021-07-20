@@ -18,7 +18,9 @@ CLASS zcl_timem_gui DEFINITION
 
     METHODS revert
       IMPORTING
-        ts TYPE timestamp.
+        ts TYPE timestamp
+      RAISING
+        zcx_timem.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
