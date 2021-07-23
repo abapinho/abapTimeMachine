@@ -14,6 +14,7 @@
               <xsl:when test="TYPE = 'PROG'">Program</xsl:when>
               <xsl:when test="TYPE = 'FUGR'">Function group</xsl:when>
               <xsl:when test="TYPE = 'FUNC'">Function module</xsl:when>
+              <xsl:when test="TYPE = 'TR'">Transport request</xsl:when>
             </xsl:choose>
             <xsl:text> </xsl:text>
             <xsl:value-of select="NAME"/>

@@ -25,6 +25,7 @@ CLASS zcl_timem_vrsd DEFINITION
     DATA type TYPE versobjtyp.
     DATA name TYPE versobjnam.
     DATA request_active_modif TYPE trkorr.
+    DATA options TYPE REF TO zcl_timem_options.
 
     METHODS load_from_table.
 
@@ -46,9 +47,12 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
   METHOD constructor.
     me->type = type.
     me->name = name.
+    me->options = zcl_timem_options=>get_instance( ).
     load_from_table( ).
-    load_active_or_modified( zcl_timem_version=>c_version-active ).
-    load_active_or_modified( zcl_timem_version=>c_version-modified ).
+    IF options->ignore_unreleased = abap_false.
+      load_active_or_modified( zcl_timem_version=>c_version-active ).
+      load_active_or_modified( zcl_timem_version=>c_version-modified ).
+    ENDIF.
     SORT me->vrsd_list BY versno.
   ENDMETHOD.
 
@@ -156,10 +160,20 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
 
 
   METHOD load_from_table.
+    DATA: versno_range TYPE RANGE OF versno.
+
+    IF options->ignore_unreleased = abap_true.
+      versno_range = VALUE #(
+        option = 'NE'
+        sign = 'I'
+        ( low = '00000' ) ).
+    ENDIF.
+
     SELECT * INTO TABLE me->vrsd_list
       FROM vrsd
       WHERE objtype = me->type
         AND objname = me->name
+        AND versno IN versno_range
       ORDER BY PRIMARY KEY.
 
     " We consider the current version to be 99998 instead of 0

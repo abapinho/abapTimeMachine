@@ -16,13 +16,16 @@ CLASS zcl_timem_request DEFINITION
     "! Constructs an instance for the given request ID
     METHODS constructor
       IMPORTING
-        !id TYPE trkorr .
+                !id TYPE trkorr
+      RAISING   zcx_timem.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
     METHODS populate_details
       IMPORTING
-        !id TYPE trkorr.
+        !id TYPE trkorr
+      RAISING
+        zcx_timem.
 ENDCLASS.
 
 
@@ -46,5 +49,8 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
     ORDER BY as4text trstatus.
       EXIT.
     ENDSELECT.
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION TYPE zcx_timem.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.

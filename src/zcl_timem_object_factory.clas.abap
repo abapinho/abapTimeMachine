@@ -12,11 +12,12 @@ CLASS zcl_timem_object_factory DEFINITION
 
     CONSTANTS:
       BEGIN OF gc_object_type,
-        program               TYPE ztimem_object_type VALUE 'PROG',
-        program_includes TYPE ztimem_object_type VALUE 'PRGI',
-        class                 TYPE ztimem_object_type VALUE 'CLAS',
-        function_group        TYPE ztimem_object_type VALUE 'FUGR',
-        function              TYPE ztimem_object_type VALUE 'FUNC',
+        program           TYPE ztimem_object_type VALUE 'PROG',
+        program_includes  TYPE ztimem_object_type VALUE 'PRGI',
+        class             TYPE ztimem_object_type VALUE 'CLAS',
+        function_group    TYPE ztimem_object_type VALUE 'FUGR',
+        function          TYPE ztimem_object_type VALUE 'FUNC',
+        transport_request TYPE ztimem_object_type VALUE 'TR',
       END OF gc_object_type .
 
     "! Creates and returns an instance to the requested object
@@ -24,10 +25,10 @@ CLASS zcl_timem_object_factory DEFINITION
     "! @parameter i_object_name | Object name
     METHODS get_instance
       IMPORTING
-        !object_type TYPE ztimem_object_type
-        !object_name TYPE sobj_name
+        !object_type  TYPE ztimem_object_type
+        !object_name  TYPE sobj_name
       RETURNING
-        VALUE(result)  TYPE REF TO zif_timem_object
+        VALUE(result) TYPE REF TO zif_timem_object
       RAISING
         zcx_timem .
   PROTECTED SECTION.
@@ -46,7 +47,8 @@ CLASS ZCL_TIMEM_OBJECT_FACTORY IMPLEMENTATION.
       WHEN gc_object_type-program_includes THEN NEW zcl_timem_object_prog_includes( object_name )
       WHEN gc_object_type-class THEN NEW zcl_timem_object_clas( CONV #( object_name ) )
       WHEN gc_object_type-function_group THEN NEW zcl_timem_object_fugr( CONV #( object_name ) )
-      WHEN gc_object_type-function THEN NEW zcl_timem_object_func( CONV #( object_name ) ) ).
+      WHEN gc_object_type-function THEN NEW zcl_timem_object_func( CONV #( object_name ) )
+      WHEN gc_object_type-transport_request THEN NEW zcl_timem_object_tr( CONV #( object_name ) ) ).
     IF result IS NOT BOUND OR NOT result->check_exists( ).
       RAISE EXCEPTION TYPE zcx_timem
         EXPORTING

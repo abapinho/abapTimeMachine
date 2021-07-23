@@ -47,6 +47,13 @@
      <DOMVALUE_L>PRGI</DOMVALUE_L>
      <DDTEXT>Program with includes</DDTEXT>
     </DD07V>
+    <DD07V>
+     <DOMNAME>ZTIMEM_OBJECT_TYPE</DOMNAME>
+     <VALPOS>0006</VALPOS>
+     <DDLANGUAGE>E</DDLANGUAGE>
+     <DOMVALUE_L>TR</DOMVALUE_L>
+     <DDTEXT>Transport request</DDTEXT>
+    </DD07V>
    </DD07V_TAB>
   </asx:values>
  </asx:abap>

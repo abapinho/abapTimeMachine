@@ -13,7 +13,9 @@ CLASS zcl_timem_aggregated_field DEFINITION
       IMPORTING
         !lines        TYPE ztimem_line_t
       RETURNING
-        VALUE(result) TYPE ztimem_aggregated_line_t.
+        VALUE(result) TYPE ztimem_aggregated_line_t
+      RAISING
+        zcx_timem.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -30,7 +32,9 @@ CLASS zcl_timem_aggregated_field DEFINITION
       IMPORTING
                 value         TYPE any
                 !lines        TYPE ztimem_line_t
-      RETURNING VALUE(result) TYPE string.
+      RETURNING VALUE(result) TYPE string
+      RAISING
+                zcx_timem.
 
     METHODS get_description_author
       IMPORTING
@@ -56,7 +60,9 @@ CLASS zcl_timem_aggregated_field DEFINITION
         lines            TYPE ztimem_line_t
         value_requests   TYPE ty_t_value_request
       CHANGING
-        aggregated_lines TYPE ztimem_aggregated_line_t.
+        aggregated_lines TYPE ztimem_aggregated_line_t
+      RAISING
+        zcx_timem.
 
     METHODS get_request_count_for_value
       IMPORTING
