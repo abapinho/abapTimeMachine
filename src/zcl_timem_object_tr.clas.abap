@@ -40,7 +40,7 @@ CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
   METHOD get_object.
     result = COND #(
       WHEN object_key-pgmid = 'R3TR' AND ( object_key-object = 'CLAS' OR object_key-object = 'FUGR' )
-        OR object_key-pgmid = 'LIMU' AND ( object_key-object = 'FUNC' )
+        OR object_key-pgmid = 'LIMU' AND object_key-object = 'FUNC'
       THEN NEW zcl_timem_object_factory( )->get_instance(
         object_type = object_key-object
         object_name = CONV #( object_key-obj_name ) )
