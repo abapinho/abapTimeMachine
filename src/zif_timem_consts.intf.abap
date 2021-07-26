@@ -1,7 +1,7 @@
 INTERFACE zif_timem_consts
   PUBLIC .
 
-  CONSTANTS version TYPE char10 VALUE '0.30b' ##NO_TEXT.
+  CONSTANTS version TYPE char10 VALUE '0.31b' ##NO_TEXT.
 
   CONSTANTS:
     BEGIN OF mode,
