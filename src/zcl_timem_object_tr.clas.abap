@@ -24,7 +24,9 @@ CLASS zcl_timem_object_tr DEFINITION
       IMPORTING
         object_key    TYPE trwbo_s_e071
       RETURNING
-        VALUE(result) TYPE REF TO zif_timem_object.
+        VALUE(result) TYPE REF TO zif_timem_object
+      RAISING
+        zcx_timem.
 ENDCLASS.
 
 
@@ -45,7 +47,7 @@ CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
         object_type = object_key-object
         object_name = CONV #( object_key-obj_name ) )
 
-      WHEN object_key-pgmid = 'LIMU' AND ( object_key-object = 'REPS' )
+      WHEN object_key-pgmid = 'LIMU' AND object_key-object = 'REPS'
       THEN NEW zcl_timem_object_factory( )->get_instance(
         object_type = 'PROG'
         object_name = CONV #( object_key-obj_name ) ) ).
