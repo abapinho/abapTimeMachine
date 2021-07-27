@@ -17,7 +17,7 @@ PARAMETERS p_mtimem RADIOBUTTON GROUP mode USER-COMMAND mode.
 PARAMETERS p_mblame RADIOBUTTON GROUP mode.
 SELECTION-SCREEN SKIP.
 SELECTION-SCREEN BEGIN OF BLOCK options WITH FRAME TITLE TEXT-opt.
-*PARAMETERS p_iunre AS CHECKBOX.
+PARAMETERS p_iunre AS CHECKBOX.
 PARAMETERS p_icase AS CHECKBOX MODIF ID bla.
 PARAMETERS p_iinde AS CHECKBOX MODIF ID bla.
 SELECTION-SCREEN END OF BLOCK options.
@@ -64,7 +64,7 @@ START-OF-SELECTION.
                                                ignore_case        = p_icase
                                                ignore_indentation = p_iinde
                                                timestamp = CONV #( |{ p_date }{ p_time }| )
-                                               ignore_unreleased  = abap_false ). " p_iunre (not yet implemented)
+                                               ignore_unreleased  = p_iunre ).
 
       NEW zcl_timem_run( )->go( object_type = p_otype
                                 object_name = p_name ).

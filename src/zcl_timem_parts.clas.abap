@@ -28,7 +28,6 @@ CLASS zcl_timem_parts DEFINITION
         ts TYPE timestamp
       RAISING
         zcx_timem.
-
   PROTECTED SECTION.
   PRIVATE SECTION.
 
@@ -141,13 +140,14 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
   METHOD load.
     DATA(object) = NEW zcl_timem_object_factory( )->get_instance( object_type = object_type
                                                                   object_name = object_name ).
+
     DATA(part_list) = object->get_part_list( ).
 
     userexits->modify_part_list( CHANGING part_list = part_list ).
 
     LOOP AT part_list REFERENCE INTO DATA(s_part).
       TRY.
-          DATA(part) = NEW zcl_timem_part( name = s_part->name
+          DATA(part) = NEW zcl_timem_part( name      = s_part->name
                                            vrsd_name = s_part->object_name
                                            vrsd_type = s_part->type ).
           INSERT part INTO TABLE parts.
