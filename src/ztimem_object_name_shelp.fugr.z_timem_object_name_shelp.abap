@@ -9,9 +9,9 @@ FUNCTION z_timem_object_name_shelp.
 *"     REFERENCE(CALLCONTROL) TYPE  DDSHF4CTRL
 *"----------------------------------------------------------------------
 
-  " TODO Under construction
-  IF callcontrol-step <> 'DISP'.
-    RETURN.
-  ENDIF.
+*  TODO Under construction
+*  IF callcontrol-step <> 'DISP'.
+*    RETURN.
+*  ENDIF.
 
 ENDFUNCTION.
