@@ -5,6 +5,12 @@ CLASS zcl_timem_request DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    TYPES:
+      BEGIN OF ty_s_system,
+        sysid TYPE sysid,
+        subrc TYPE sysubrc,
+      END OF ty_s_system,
+      ty_t_system TYPE STANDARD TABLE OF ty_s_system WITH KEY sysid.
 
     "! Transport request ID
     DATA id TYPE trkorr READ-ONLY .
@@ -18,6 +24,10 @@ CLASS zcl_timem_request DEFINITION
       IMPORTING
                 !id TYPE trkorr
       RAISING   zcx_timem.
+
+    METHODS get_imported_systems
+      RETURNING
+        VALUE(result) TYPE ty_t_system.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -36,6 +46,22 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
   METHOD constructor.
     me->id = id.
     populate_details( id ).
+  ENDMETHOD.
+
+
+  METHOD get_imported_systems.
+    DATA cofile                 TYPE ctslg_cofile.
+
+    CALL FUNCTION 'TR_READ_GLOBAL_INFO_OF_REQUEST'
+      EXPORTING
+        iv_trkorr = id
+      IMPORTING
+        es_cofile = cofile.
+
+    result = VALUE #(
+      FOR wa IN cofile-systems
+      ( sysid = wa-systemid
+        subrc = wa-rc ) ).
   ENDMETHOD.
 
 

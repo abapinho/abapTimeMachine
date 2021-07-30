@@ -5,12 +5,21 @@ CLASS zcl_timem_userexits DEFINITION
 
   PUBLIC SECTION.
 
+    CLASS-METHODS class_constructor .
+
     METHODS constructor .
 
-    METHODS modify_results
+    METHODS before_rendering
       CHANGING
-        !parts         TYPE ztimem_part_source_t
-        !custom_fields TYPE ztimem_data_custom_fields .
+        !data TYPE ztimem_data .
+
+    METHODS modify_parts
+      CHANGING
+        !parts TYPE ztimem_part_source_t .
+
+    METHODS modify_summary
+      CHANGING
+        !summary TYPE ztimem_summary .
 
     METHODS on_sapevent
       IMPORTING
@@ -30,11 +39,10 @@ CLASS zcl_timem_userexits DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
     TYPES ty_userexits TYPE STANDARD TABLE OF REF TO zif_timem_userexit WITH KEY table_line.
-    data instances type ty_userexits.
+    CLASS-DATA instances TYPE ty_userexits.
     DATA options TYPE REF TO zcl_timem_options.
 
-    METHODS get_instances
-      RETURNING VALUE(result) TYPE ty_userexits.
+    CLASS-METHODS load_instances.
 ENDCLASS.
 
 
@@ -42,13 +50,32 @@ ENDCLASS.
 CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
 
 
-  METHOD constructor.
-    options = zcl_timem_options=>get_instance( ).
-    instances = get_instances( ).
+  METHOD before_rendering.
+    LOOP AT instances INTO DATA(instance).
+      TRY.
+          instance->before_rendering(
+            EXPORTING
+              options = options
+            CHANGING
+              data = data ).
+        CATCH cx_sy_dyn_call_illegal_method.
+          ASSERT 1 = 1. " Not implemented? Carry on.
+      ENDTRY.
+    ENDLOOP.
   ENDMETHOD.
 
 
-  METHOD get_instances.
+  METHOD class_constructor.
+    load_instances( ).
+  ENDMETHOD.
+
+
+  METHOD constructor.
+    options = zcl_timem_options=>get_instance( ).
+  ENDMETHOD.
+
+
+  METHOD load_instances.
     DATA impkey TYPE  seoclskey.
     DATA impkeys TYPE seor_implementing_keys.
 
@@ -68,7 +95,7 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
     DATA o TYPE REF TO zif_timem_userexit.
     LOOP AT impkeys INTO DATA(classdata).
       CREATE OBJECT o TYPE (classdata-clsname).
-      INSERT o INTO TABLE result.
+      INSERT o INTO TABLE instances.
     ENDLOOP.
   ENDMETHOD.
 
@@ -82,6 +109,21 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
               subtype = subtype
             CHANGING
               content = content ).
+        CATCH cx_sy_dyn_call_illegal_method.
+          ASSERT 1 = 1. " Not implemented? Carry on.
+      ENDTRY.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD modify_parts.
+    LOOP AT instances INTO DATA(instance).
+      TRY.
+          instance->modify_parts(
+            EXPORTING
+              options       = options
+            CHANGING
+              parts         = parts ).
         CATCH cx_sy_dyn_call_illegal_method.
           ASSERT 1 = 1. " Not implemented? Carry on.
       ENDTRY.
@@ -104,15 +146,14 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD modify_results.
+  METHOD modify_summary.
     LOOP AT instances INTO DATA(instance).
       TRY.
-          instance->modify_results(
+          instance->modify_summary(
             EXPORTING
-              options       = options
+              options = options
             CHANGING
-              parts         = parts
-              custom_fields = custom_fields ).
+              summary = summary ).
         CATCH cx_sy_dyn_call_illegal_method.
           ASSERT 1 = 1. " Not implemented? Carry on.
       ENDTRY.

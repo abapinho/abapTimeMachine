@@ -81,6 +81,7 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
 
   METHOD display.
     DATA(data) = parts->get_data( ).
+    NEW zcl_timem_userexits( )->before_rendering( CHANGING data = data ).
     highlight_source( CHANGING data = data ).
     deduplicate_header_fields( CHANGING data = data ).
     viewer->render( data ).
