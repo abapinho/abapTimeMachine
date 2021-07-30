@@ -41,9 +41,9 @@ CLASS ZCL_TIMEM_USEREXIT_DEFAULT IMPLEMENTATION.
 
 
   METHOD modify_summary_author.
-    summary-title = 'Contributors'.
-    summary-value_title = 'Username'.
-    summary-text1_title = 'Name'.
+    summary-title = 'Contributors'.   ##NO_TEXT
+    summary-value_title = 'Username'. ##NO_TEXT
+    summary-text1_title = 'Name'.     ##NO_TEXT
     LOOP AT summary-lines REFERENCE INTO DATA(line).
       line->text1 = NEW zcl_timem_author( )->get_name( CONV #( line->value ) ).
       line->value = |<a href="SAPEVENT:author?{ line->value }">{ line->value }</a>|.
@@ -52,16 +52,36 @@ CLASS ZCL_TIMEM_USEREXIT_DEFAULT IMPLEMENTATION.
 
 
   METHOD modify_summary_request.
-    summary-title = 'Requests'.
-    summary-value_title = 'Request'.
-    summary-text1_title = 'Description'.
-    summary-text2_title = 'Systems'.
+    summary-title = 'Requests'.          ##NO_TEXT
+    summary-value_title = 'Request'.     ##NO_TEXT
+    summary-text1_title = 'Description'. ##NO_TEXT
+    summary-text2_title = 'Systems'.     ##NO_TEXT
     LOOP AT summary-lines REFERENCE INTO DATA(line).
       DATA(request) = NEW zcl_timem_request( CONV #( line->value ) ).
       line->text1 = request->description.
       line->text2 = build_request_imported_systems( request ).
       line->value = |<a href="SAPEVENT:request?{ line->value }">{ line->value }</a>|.
     ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD zif_timem_userexit~before_rendering.
+    RETURN.
+  ENDMETHOD.
+
+
+  METHOD zif_timem_userexit~modify_asset_content.
+    RETURN.
+  ENDMETHOD.
+
+
+  METHOD zif_timem_userexit~modify_parts.
+    RETURN.
+  ENDMETHOD.
+
+
+  METHOD zif_timem_userexit~modify_part_list.
+    RETURN.
   ENDMETHOD.
 
 
@@ -72,5 +92,10 @@ CLASS ZCL_TIMEM_USEREXIT_DEFAULT IMPLEMENTATION.
       WHEN zif_timem_consts=>fieldname-request.
         modify_summary_request( CHANGING summary = summary ).
     ENDCASE.
+  ENDMETHOD.
+
+
+  METHOD zif_timem_userexit~on_sapevent.
+    RETURN.
   ENDMETHOD.
 ENDCLASS.

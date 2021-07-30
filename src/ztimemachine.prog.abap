@@ -38,7 +38,7 @@ INITIALIZATION.
     p_mtimem = abap_false.
     p_mblame = abap_true.
   ENDIF.
-  link = 'More details at https://github.com/abapinho/abapTimeMachine'.
+  link = 'More details at https://github.com/abapinho/abapTimeMachine'.  ##NO_TEXT
   NEW zcl_timem_dynpro( '1001' )->remove_toolbar( ).
 
 AT SELECTION-SCREEN OUTPUT.

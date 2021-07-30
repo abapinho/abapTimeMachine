@@ -18,7 +18,10 @@ CLASS zcl_timem_object_tr DEFINITION
     DATA id TYPE trkorr.
 
     METHODS get_object_keys
-      RETURNING VALUE(result) TYPE trwbo_t_e071.
+      RETURNING
+        VALUE(result) TYPE trwbo_t_e071
+      RAISING
+        zcx_timem.
 
     METHODS get_object
       IMPORTING
@@ -66,6 +69,9 @@ CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
       EXCEPTIONS
         error_occured = 1
         OTHERS        = 2.
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION TYPE zcx_timem.
+    ENDIF.
     result = request_data-objects.
     SORT result BY pgmid object obj_name.
     DELETE ADJACENT DUPLICATES FROM result COMPARING pgmid object obj_name.

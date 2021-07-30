@@ -192,7 +192,8 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
       author = vrsd-author ).
     DATA(real_version) = get_real_version( ).
 
-    SUBMIT rsedtve1 AND RETURN
+*   TODO SUBMIT parameter does not exist???
+    SUBMIT rsedtve1 AND RETURN                           "#EC CI_SUBMIT
              WITH objtype = vrsd-objtype
              WITH objname = vrsd-objname
              WITH versno  = real_version

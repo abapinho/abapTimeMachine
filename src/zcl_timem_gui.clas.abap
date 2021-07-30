@@ -38,7 +38,9 @@ CLASS zcl_timem_gui DEFINITION
       CHANGING
         !data TYPE ztimem_data .
 
-    METHODS load_parts.
+    METHODS load_parts
+      RAISING
+        zcx_timem.
 ENDCLASS.
 
 

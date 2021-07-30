@@ -53,15 +53,15 @@ CLASS ZCL_TIMEM_OBJECT_CLAS IMPLEMENTATION.
   METHOD zif_timem_object~get_part_list.
     " All sort of includes
     result = VALUE #(
-      ( name = 'Class pool'                  object_name = CONV #( name )                                  type = 'CLSD' )
-      ( name = 'Public section'              object_name = CONV #( name )                                  type = 'CPUB' )
-      ( name = 'Protected section'           object_name = CONV #( name )                                  type = 'CPRO' )
-      ( name = 'Private section'             object_name = CONV #( name )                                  type = 'CPRI' )
-      ( name = 'Local class definition'      object_name = cl_oo_classname_service=>get_ccdef_name( name ) type = 'CDEF' )
-      ( name = 'Local class implementation'  object_name = cl_oo_classname_service=>get_ccimp_name( name ) type = 'CINC' )
-      ( name = 'Local macros'                object_name = cl_oo_classname_service=>get_ccmac_name( name ) type = 'CINC' )
-      ( name = 'Local types'                 object_name = cl_oo_classname_service=>get_cl_name( name )    type = 'REPS' )
-      ( name = 'Local test classes'          object_name = cl_oo_classname_service=>get_ccau_name( name )  type = 'CINC' )
+      ( name = 'Class pool'                  object_name = CONV #( name )                                  type = 'CLSD' )  ##NO_TEXT
+      ( name = 'Public section'              object_name = CONV #( name )                                  type = 'CPUB' )  ##NO_TEXT
+      ( name = 'Protected section'           object_name = CONV #( name )                                  type = 'CPRO' )  ##NO_TEXT
+      ( name = 'Private section'             object_name = CONV #( name )                                  type = 'CPRI' )  ##NO_TEXT
+      ( name = 'Local class definition'      object_name = cl_oo_classname_service=>get_ccdef_name( name ) type = 'CDEF' )  ##NO_TEXT
+      ( name = 'Local class implementation'  object_name = cl_oo_classname_service=>get_ccimp_name( name ) type = 'CINC' )  ##NO_TEXT
+      ( name = 'Local macros'                object_name = cl_oo_classname_service=>get_ccmac_name( name ) type = 'CINC' )  ##NO_TEXT
+      ( name = 'Local types'                 object_name = cl_oo_classname_service=>get_cl_name( name )    type = 'REPS' )  ##NO_TEXT
+      ( name = 'Local test classes'          object_name = cl_oo_classname_service=>get_ccau_name( name )  type = 'CINC' )  ##NO_TEXT
     ).
 
     " Class methods

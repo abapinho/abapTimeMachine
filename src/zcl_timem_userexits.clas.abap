@@ -19,7 +19,9 @@ CLASS zcl_timem_userexits DEFINITION
 
     METHODS modify_summary
       CHANGING
-        !summary TYPE ztimem_summary .
+        !summary TYPE ztimem_summary
+      RAISING
+        zcx_timem.
 
     METHODS on_sapevent
       IMPORTING
@@ -28,7 +30,9 @@ CLASS zcl_timem_userexits DEFINITION
 
     METHODS modify_part_list
       CHANGING
-        !part_list TYPE ztimem_part_t .
+        !part_list TYPE ztimem_part_t
+      RAISING
+        zcx_timem.
 
     METHODS modify_asset_content
       IMPORTING
