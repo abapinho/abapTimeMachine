@@ -53,6 +53,7 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
 
   METHOD get_imported_systems.
     DATA cofile                 TYPE ctslg_cofile.
+    DATA datetime TYPE n LENGTH 14.
 
     CALL FUNCTION 'TR_READ_GLOBAL_INFO_OF_REQUEST'
       EXPORTING
@@ -61,11 +62,13 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
         es_cofile = cofile.
 
     LOOP AT cofile-systems INTO DATA(system).
-      DATA(datetime) = REDUCE #(
+      datetime = REDUCE #(
         INIT: dt = '00000000000000'
         FOR step IN system-steps
         FOR action IN step-actions
-        NEXT dt = COND #( WHEN action-date > dt(8) AND action-time > dt+8 THEN |{ action-date DATE = RAW }{ action-time TIME = RAW }| ELSE dt ) ).
+        NEXT dt = COND #(
+        WHEN action-date > dt(8) AND action-time > dt+8
+        THEN |{ action-date DATE = RAW }{ action-time TIME = RAW }| ELSE dt ) ).
       result = VALUE #(
         BASE result
         ( sysid = system-systemid
