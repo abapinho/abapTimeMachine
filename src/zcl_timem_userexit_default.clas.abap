@@ -35,7 +35,11 @@ CLASS ZCL_TIMEM_USEREXIT_DEFAULT IMPLEMENTATION.
 
   METHOD build_request_imported_systems.
     LOOP AT request->get_imported_systems( ) INTO DATA(system) WHERE sysid <> sy-sysid.
-      result = |{ result } { system-sysid }({ system-subrc })|.
+      DATA(one_system) = |<a style="text-decoration:none" href="" title="Return code { system-subrc } @ { system-date DATE = USER } { system-time TIME = USER }">{ system-sysid }</a>|.
+      IF system-subrc > 4.
+        one_system = |<strike>{ one_system }</strike>|.
+      ENDIF.
+      result = |{ result } { one_system }|.
     ENDLOOP.
   ENDMETHOD.
 

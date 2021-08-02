@@ -9,6 +9,8 @@ CLASS zcl_timem_request DEFINITION
       BEGIN OF ty_s_system,
         sysid TYPE sysid,
         subrc TYPE sysubrc,
+        date  TYPE as4date,
+        time  TYPE as4time,
       END OF ty_s_system,
       ty_t_system TYPE STANDARD TABLE OF ty_s_system WITH KEY sysid.
 
@@ -58,10 +60,19 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
       IMPORTING
         es_cofile = cofile.
 
-    result = VALUE #(
-      FOR wa IN cofile-systems
-      ( sysid = wa-systemid
-        subrc = wa-rc ) ).
+    LOOP AT cofile-systems INTO DATA(system).
+      DATA(datetime) = REDUCE #(
+        INIT: dt = '00000000000000'
+        FOR step IN system-steps
+        FOR action IN step-actions
+        NEXT dt = COND #( WHEN action-date > dt(8) AND action-time > dt+8 THEN |{ action-date DATE = RAW }{ action-time TIME = RAW }| ELSE dt ) ).
+      result = VALUE #(
+        BASE result
+        ( sysid = system-systemid
+          subrc = system-rc
+          date = datetime(8)
+          time = datetime+8(6) ) ).
+    ENDLOOP.
   ENDMETHOD.
 
 
