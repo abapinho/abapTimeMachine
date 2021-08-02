@@ -60,6 +60,14 @@ CLASS zcl_timem_parts DEFINITION
         !parts        TYPE ztimem_part_source_t
       RETURNING
         VALUE(result) TYPE ztimem_line_t.
+
+    METHODS get_summaries
+      IMPORTING
+        lines         TYPE ztimem_line_t
+      RETURNING
+        VALUE(result) TYPE ztimem_summary_t
+      RAISING
+        zcx_timem.
 ENDCLASS.
 
 
@@ -77,8 +85,6 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
 
 
   METHOD get_data.
-    DATA custom_fields TYPE ztimem_data_custom_fields.
-
     DATA(t_part) =
       VALUE ztimem_part_source_t(
         FOR part IN parts
@@ -88,10 +94,9 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
         lines = part->get_source( ) ) ).
     DELETE t_part WHERE lines IS INITIAL.
 
-    userexits->modify_results(
-      CHANGING
-        parts         = t_part
-        custom_fields = custom_fields ).
+    " The custom fields and anything else related to the parts must be edited at this point
+    " because it can affect the aggregated results (timestamps, stats and summaries)
+    userexits->modify_parts( CHANGING parts = t_part ).
 
     result = VALUE #( name = object_name
                        type = object_type
@@ -100,15 +105,9 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
                        timestamps = get_timestamps( )
                        stats = get_stats( t_part )
                        timestamp = options->timestamp
-                       aggregated_fields = NEW zcl_timem_aggregated_fields( )->build(
-                         lines         = get_lines( t_part )
-                         custom1_title = CONV #( custom_fields-custom1_title )
-                         custom2_title = CONV #( custom_fields-custom2_title )
-                         custom3_title = CONV #( custom_fields-custom3_title ) )
+                       summaries = get_summaries( get_lines( t_part ) )
                        ignore_case = options->ignore_case
                        ignore_indentation = options->ignore_indentation ).
-
-    result = CORRESPONDING #( BASE ( result ) custom_fields ).
   ENDMETHOD.
 
 
@@ -122,6 +121,16 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
 
   METHOD get_stats.
     result = NEW zcl_timem_stats( get_lines( parts ) )->stats.
+  ENDMETHOD.
+
+
+  METHOD get_summaries.
+    result = VALUE #(
+      ( NEW zcl_timem_summary( 'AUTHOR' )->build( lines ) )
+      ( NEW zcl_timem_summary( 'REQUEST' )->build( lines ) )
+      ( NEW zcl_timem_summary( 'CUSTOM1' )->build( lines ) )
+      ( NEW zcl_timem_summary( 'CUSTOM2' )->build( lines ) )
+      ( NEW zcl_timem_summary( 'CUSTOM3' )->build( lines ) ) ).
   ENDMETHOD.
 
 

@@ -38,7 +38,9 @@ CLASS zcl_timem_gui DEFINITION
       CHANGING
         !data TYPE ztimem_data .
 
-    METHODS load_parts.
+    METHODS load_parts
+      RAISING
+        zcx_timem.
 ENDCLASS.
 
 
@@ -81,6 +83,7 @@ CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
 
   METHOD display.
     DATA(data) = parts->get_data( ).
+    NEW zcl_timem_userexits( )->before_rendering( CHANGING data = data ).
     highlight_source( CHANGING data = data ).
     deduplicate_header_fields( CHANGING data = data ).
     viewer->render( data ).

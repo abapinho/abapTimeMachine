@@ -137,14 +137,7 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
     CALL FUNCTION 'SUID_IDENTITY_MAINT'
       EXPORTING
         i_username       = user
-        i_tcode_mode     = 6
-      EXCEPTIONS
-        no_authorisation = 1
-        OTHERS           = 2.
-    IF sy-subrc <> 0.
-      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
-                 WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
-    ENDIF.
+        i_tcode_mode     = 6.
   ENDMETHOD.
 
 

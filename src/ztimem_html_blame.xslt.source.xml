@@ -99,23 +99,11 @@
           </div>
           <div class="toc-child">
             <ul>
-              <li>
-                <a>
-                  <xsl:attribute name="href">#contributors</xsl:attribute>
-                  Contributors
-                </a>
-              </li>
-              <li>
-                <a>
-                  <xsl:attribute name="href">#requests</xsl:attribute>
-                  Requests
-                </a>
-              </li>
-              <xsl:for-each select="AGGREGATED_FIELDS/ZTIMEM_AGGREGATED_FIELD[starts-with(FIELDNAME, 'CUSTOM') and count(LINES/ZTIMEM_AGGREGATED_LINE)&gt;0]">
+              <xsl:for-each select="SUMMARIES/ZTIMEM_SUMMARY[count(LINES/ZTIMEM_SUMMARY_LINE)&gt;0]">
                 <li>
                   <a>
-                    <xsl:attribute name="href">#aggregated_<xsl:value-of select="FIELDNAME"/></xsl:attribute>
-                    <xsl:value-of select="TITLE"/> list
+                    <xsl:attribute name="href">#summary_<xsl:value-of select="FIELDNAME"/></xsl:attribute>
+                    <xsl:value-of select="TITLE"/>
                   </a>
                 </li>
               </xsl:for-each>
@@ -167,21 +155,11 @@
                 <TH>
                   <a>
                     <xsl:attribute name="href">SAPEVENT:source?
-
-
                       <xsl:value-of select="TYPE"/>
-
-
                       |
-
-
                       <xsl:value-of select="OBJECT_NAME"/>
                     </xsl:attribute>
-
-
                     Source
-
-
                   </a>
                 </TH>
               </TR>
@@ -274,116 +252,70 @@
           </table>
         </xsl:for-each>
 
-        <h2 class="aggregated">
-          <a>
-            <xsl:attribute name="name">contributors</xsl:attribute>
-
-            Contributors
-
-          </a>
-        </h2>
-        <table class="aggregated">
-          <THEAD class="header">
-            <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th class="num">Lines</th>
-              <th class="num">Percentage</th>
-              <th class="num">Requests</th>
-            </tr>
-          </THEAD>
-          <xsl:for-each select="AGGREGATED_FIELDS/ZTIMEM_AGGREGATED_FIELD[FIELDNAME='AUTHOR']/LINES/ZTIMEM_AGGREGATED_LINE">
-            <xsl:sort order="descending" select="PERCENTAGE"/>
-            <tr>
-              <td>
-                <a>
-                  <xsl:attribute name="href">SAPEVENT:author?
-                    <xsl:value-of select="VALUE"/>
-                  </xsl:attribute>
-                  <xsl:value-of select="VALUE"/>
-                </a>
-              </td>
-              <td>
-                <xsl:value-of select="DESCRIPTION"/>
-              </td>
-              <td class="num">
-                <xsl:value-of select="number(LINE_COUNT)"/>
-              </td>
-              <td class="num">
-                <xsl:value-of select="format-number(PERCENTAGE, '#%')"/>
-              </td>
-              <td class="num">
-                <xsl:value-of select="number(REQUEST_COUNT)"/>
-              </td>
-            </tr>
-          </xsl:for-each>
-        </table>
-
-        <h2 class="aggregated">
-          <a>
-            <xsl:attribute name="name">requests</xsl:attribute>
-            Requests
-          </a>
-        </h2>
-        <table class="aggregated">
-          <THEAD class="header">
-            <tr>
-              <th>Request</th>
-              <th>Description</th>
-              <th class="num">Lines</th>
-              <th class="num">Percentage</th>
-            </tr>
-          </THEAD>
-          <xsl:for-each select="AGGREGATED_FIELDS/ZTIMEM_AGGREGATED_FIELD[FIELDNAME='REQUEST']/LINES/ZTIMEM_AGGREGATED_LINE">
-            <xsl:sort order="descending" select="PERCENTAGE"/>
-            <tr>
-              <td>
-                <a>
-                  <xsl:attribute name="title">Jump to request&amp;nbsp;
-                    <xsl:value-of select="VALUE"/>
-                  </xsl:attribute>
-                  <xsl:attribute name="href">SAPEVENT:request?
-                    <xsl:value-of select="VALUE"/>
-                  </xsl:attribute>
-                  <xsl:value-of select="VALUE"/>
-                </a>
-              </td>
-              <td>
-                <xsl:value-of select="DESCRIPTION"/>
-              </td>
-              <td class="num">
-                <xsl:value-of select="number(LINE_COUNT)"/>
-              </td>
-              <td class="num">
-                <xsl:value-of select="format-number(PERCENTAGE, '#%')"/>
-              </td>
-            </tr>
-          </xsl:for-each>
-        </table>
-
-        <xsl:for-each select="AGGREGATED_FIELDS/ZTIMEM_AGGREGATED_FIELD[starts-with(FIELDNAME, 'CUSTOM') and count(LINES/ZTIMEM_AGGREGATED_LINE)&gt;0]">
-          <h2 class="aggregated">
+        <xsl:for-each select="SUMMARIES/ZTIMEM_SUMMARY[count(LINES/ZTIMEM_SUMMARY_LINE)&gt;0]">
+          <h2 class="summary">
             <a>
-              <xsl:attribute name="name">aggregated_<xsl:value-of select="FIELDNAME"/></xsl:attribute>
-              <xsl:value-of select="TITLE"/> list
+              <xsl:attribute name="name">summary_<xsl:value-of select="FIELDNAME"/></xsl:attribute>
+              <xsl:value-of select="TITLE"/>
             </a>
           </h2>
           <table class="aggregated">
             <THEAD class="header">
               <tr>
                 <th>
-                  <xsl:value-of select="TITLE"/>
+                  <xsl:value-of select="VALUE_TITLE"/>
+                </th>
+                <th>
+                  <xsl:if test="TEXT1_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="TEXT1_TITLE"/>
+                </th>
+                <th>
+                  <xsl:if test="TEXT2_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="TEXT2_TITLE"/>
+                </th>
+                <th>
+                  <xsl:if test="TEXT3_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="TEXT3_TITLE"/>
                 </th>
                 <th class="num">Lines</th>
                 <th class="num">Percentage</th>
-                <th class="num">Requests</th>
+                <th class="num">
+                  <xsl:if test="FIELDNAME = 'REQUEST'">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  Requests
+                </th>
               </tr>
             </THEAD>
-            <xsl:for-each select="LINES/ZTIMEM_AGGREGATED_LINE">
+            <xsl:for-each select="LINES/ZTIMEM_SUMMARY_LINE">
               <xsl:sort order="descending" select="PERCENTAGE"/>
               <tr>
                 <td>
                   <xsl:value-of select="VALUE"/>
+                </td>
+                <td>
+                  <xsl:if test="../../TEXT1_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="TEXT1"/>
+                </td>
+                <td>
+                  <xsl:if test="../../TEXT2_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="TEXT2"/>
+                </td>
+                <td>
+                  <xsl:if test="../../TEXT3_TITLE = ''">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
+                  <xsl:value-of select="TEXT3"/>
                 </td>
                 <td class="num">
                   <xsl:value-of select="number(LINE_COUNT)"/>
@@ -392,6 +324,9 @@
                   <xsl:value-of select="format-number(PERCENTAGE, '#%')"/>
                 </td>
                 <td class="num">
+                  <xsl:if test="../../FIELDNAME = 'REQUEST'">
+                    <xsl:attribute name="class">hide</xsl:attribute>
+                  </xsl:if>
                   <xsl:value-of select="number(REQUEST_COUNT)"/>
                 </td>
               </tr>

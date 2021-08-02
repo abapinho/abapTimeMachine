@@ -3,8 +3,8 @@
 REPORT ztimemachine.
 
 SELECTION-SCREEN BEGIN OF BLOCK sel WITH FRAME TITLE TEXT-sel.
-PARAMETERS p_otype TYPE ztimem_object_type AS LISTBOX VISIBLE LENGTH 25 OBLIGATORY DEFAULT 'PROG'.
-PARAMETERS p_name TYPE sobj_name OBLIGATORY.
+PARAMETERS p_otype TYPE ztimem_object_type OBLIGATORY DEFAULT 'PROG' AS LISTBOX VISIBLE LENGTH 25.
+PARAMETERS p_name TYPE sobj_name OBLIGATORY. " TODO MATCHCODE OBJECT ztimem_object_name.
 SELECTION-SCREEN END OF BLOCK sel.
 
 SELECTION-SCREEN BEGIN OF BLOCK filters WITH FRAME TITLE TEXT-flt.
@@ -38,7 +38,7 @@ INITIALIZATION.
     p_mtimem = abap_false.
     p_mblame = abap_true.
   ENDIF.
-  link = 'More details at https://github.com/abapinho/abapTimeMachine'.
+  link = 'More details at https://github.com/abapinho/abapTimeMachine'.  ##NO_TEXT
   NEW zcl_timem_dynpro( '1001' )->remove_toolbar( ).
 
 AT SELECTION-SCREEN OUTPUT.

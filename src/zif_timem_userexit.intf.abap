@@ -8,12 +8,19 @@ INTERFACE zif_timem_userexit
     CHANGING
       !data    TYPE ztimem_data .
 
-  METHODS modify_results
+  METHODS modify_parts
     IMPORTING
       !options TYPE REF TO zcl_timem_options
     CHANGING
-      !parts    TYPE ztimem_part_source_t
-      !custom_fields TYPE ztimem_data_custom_fields.
+      !parts   TYPE ztimem_part_source_t.
+
+  METHODS modify_summary
+    IMPORTING
+      options TYPE REF TO zcl_timem_options
+    CHANGING
+      summary TYPE ztimem_summary
+    RAISING
+      zcx_timem.
 
   METHODS on_sapevent
     IMPORTING
@@ -25,7 +32,9 @@ INTERFACE zif_timem_userexit
     IMPORTING
       !options   TYPE REF TO zcl_timem_options
     CHANGING
-      !part_list TYPE ztimem_part_t .
+      !part_list TYPE ztimem_part_t
+    RAISING
+      zcx_timem.
 
   METHODS modify_asset_content
     IMPORTING
