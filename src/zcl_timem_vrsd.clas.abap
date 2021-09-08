@@ -37,6 +37,10 @@ CLASS zcl_timem_vrsd DEFINITION
     METHODS get_request_active_modif
       RETURNING VALUE(result) TYPE trkorr
       RAISING   zcx_timem.
+
+    METHODS determine_request_active_modif
+      RETURNING VALUE(result) TYPE trkorr
+      RAISING   zcx_timem.
 ENDCLASS.
 
 
@@ -53,16 +57,16 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
       load_active_or_modified( zcl_timem_version=>c_version-active ).
       load_active_or_modified( zcl_timem_version=>c_version-modified ).
     ENDIF.
-    SORT me->vrsd_list BY versno.
+    SORT me->vrsd_list BY versno ASCENDING.
   ENDMETHOD.
 
 
-  METHOD get_request_active_modif.
-    IF request_active_modif IS NOT INITIAL.
-      result = request_active_modif.
-    ENDIF.
-
+  METHOD determine_request_active_modif.
     DATA s_ko100 TYPE ko100.
+    DATA locked TYPE trparflag.
+    DATA s_tlock_key TYPE tlock_int.
+    DATA s_tlock TYPE tlock.
+
     CALL FUNCTION 'TR_GET_PGMID_FOR_OBJECT'
       EXPORTING
         iv_object      = me->type
@@ -72,14 +76,12 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
         illegal_object = 1
         OTHERS         = 2.
     IF sy-subrc <> 0.
-      RAISE EXCEPTION TYPE zcx_timem. " TODO
+      RAISE EXCEPTION TYPE zcx_timem.
     ENDIF.
 
     DATA(s_e071) = VALUE e071( pgmid = s_ko100-pgmid
                                object = me->type
                                obj_name = me->name ).
-    DATA locked TYPE trparflag.
-    DATA s_tlock_key TYPE tlock_int.
     CALL FUNCTION 'TR_CHECK_TYPE'
       EXPORTING
         wi_e071     = s_e071
@@ -90,7 +92,6 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA s_tlock TYPE tlock.
     CALL FUNCTION 'TRINT_CHECK_LOCKS'
       EXPORTING
         wi_lock_key = s_tlock_key
@@ -108,11 +109,21 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    result = request_active_modif = s_tlock-trkorr.
+    result = s_tlock-trkorr.
+  ENDMETHOD.
+
+
+  METHOD get_request_active_modif.
+    IF request_active_modif IS INITIAL.
+      request_active_modif = determine_request_active_modif( ).
+    ENDIF.
+    result = request_active_modif.
   ENDMETHOD.
 
 
   METHOD load_active_or_modified.
+    DATA vrsd TYPE vrsd.
+
     DATA(obj) = VALUE svrs2_versionable_object(
       objtype = me->type
       data_pointer = me->type
@@ -141,20 +152,20 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA vrsd TYPE vrsd.
     CALL FUNCTION 'SVRS_EXTRACT_INFO_FROM_OBJECT'
       EXPORTING
         object    = obj
       CHANGING
         vrsd_info = vrsd.
     IF vrsd-author IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_timem. " TODO
+      RAISE EXCEPTION TYPE zcx_timem.
     ENDIF.
 
     vrsd-versno = versno.
     vrsd-objtype = me->type.
     vrsd-objname = me->name.
     vrsd-korrnum = get_request_active_modif( ).
+
     INSERT vrsd INTO TABLE me->vrsd_list.
   ENDMETHOD.
 

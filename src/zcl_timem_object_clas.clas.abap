@@ -61,8 +61,7 @@ CLASS ZCL_TIMEM_OBJECT_CLAS IMPLEMENTATION.
       ( name = 'Local class implementation'  object_name = cl_oo_classname_service=>get_ccimp_name( name ) type = 'CINC' )
       ( name = 'Local macros'                object_name = cl_oo_classname_service=>get_ccmac_name( name ) type = 'CINC' )
       ( name = 'Local types'                 object_name = cl_oo_classname_service=>get_cl_name( name )    type = 'REPS' )
-      ( name = 'Local test classes'          object_name = cl_oo_classname_service=>get_ccau_name( name )  type = 'CINC' )
-    ).
+      ( name = 'Local test classes'          object_name = cl_oo_classname_service=>get_ccau_name( name )  type = 'CINC' ) ).
 
     " Class methods
     result = VALUE #( BASE result

@@ -78,8 +78,8 @@ CLASS ZCL_TIMEM_SYNTAX_ABAP IMPLEMENTATION.
 
   METHOD init_keywords.
 
-    DATA: lv_keywords TYPE string,
-          lt_keywords TYPE STANDARD TABLE OF string.
+    DATA lv_keywords TYPE string.
+    DATA lt_keywords TYPE STANDARD TABLE OF string.
 
     lv_keywords =
       '&&|?TO|ABAP-SOURCE|ABBREVIATED|ABS|ABSTRACT|ACCEPT|ACCEPTING|ACCESSPOLICY' &&
@@ -179,7 +179,8 @@ CLASS ZCL_TIMEM_SYNTAX_ABAP IMPLEMENTATION.
       '|WRITE|WRITER|X|XML|XOR|XSD|XSTRLEN|YELLOW|YES|YYMMDD|Z|ZERO|ZONE'.
 
     SPLIT lv_keywords AT '|' INTO TABLE lt_keywords.
-    gt_keywords = lt_keywords. " Hash table
+    " Hash table
+    gt_keywords = lt_keywords.
 
   ENDMETHOD.
 
@@ -197,20 +198,17 @@ CLASS ZCL_TIMEM_SYNTAX_ABAP IMPLEMENTATION.
 
   METHOD order_matches.
 
-    DATA:
-      lv_index      TYPE sy-tabix,
-      lv_line_len   TYPE i,
-      lv_prev_token TYPE c.
+    DATA lv_index      TYPE sy-tabix.
+    DATA lv_line_len   TYPE i.
+    DATA lv_prev_token TYPE c.
 
-    FIELD-SYMBOLS:
-      <ls_prev>  TYPE ty_match,
-      <ls_match> TYPE ty_match.
+    FIELD-SYMBOLS <ls_prev>  TYPE ty_match.
 
-    SORT ct_matches BY offset.
+    SORT ct_matches BY offset ASCENDING.
 
     lv_line_len = strlen( iv_line ).
 
-    LOOP AT ct_matches ASSIGNING <ls_match>.
+    LOOP AT ct_matches ASSIGNING FIELD-SYMBOL(<ls_match>).
       lv_index = sy-tabix.
 
       " Delete matches after open text match
@@ -242,15 +240,18 @@ CLASS ZCL_TIMEM_SYNTAX_ABAP IMPLEMENTATION.
               <ls_prev>-length = <ls_match>-offset + <ls_match>-length - <ls_prev>-offset.
               CLEAR lv_prev_token.
             ELSEIF <ls_prev>-text_tag = '}' AND <ls_match>-text_tag = '{'.
-              <ls_prev>-length = <ls_match>-offset - <ls_prev>-offset - 1.  " Shift } out of scope
-              <ls_prev>-offset = <ls_prev>-offset + 1.                   " Shift { out of scope
+              " Shift } out of scope
+              <ls_prev>-length = <ls_match>-offset - <ls_prev>-offset - 1.
+              " Shift { out of scope
+              <ls_prev>-offset = <ls_prev>-offset + 1.
               CLEAR lv_prev_token.
             ELSEIF <ls_match>-text_tag = '{'.
               <ls_prev>-length = <ls_match>-offset - <ls_prev>-offset.
               CLEAR lv_prev_token.
             ELSEIF <ls_prev>-text_tag = '}'.
               <ls_prev>-length = <ls_match>-offset - <ls_prev>-offset.
-              <ls_prev>-offset = <ls_prev>-offset + 1.                   " Shift } out of scope
+              " Shift } out of scope
+              <ls_prev>-offset = <ls_prev>-offset + 1.
               CLEAR lv_prev_token.
             ENDIF.
             DELETE ct_matches INDEX lv_index.
@@ -267,20 +268,15 @@ CLASS ZCL_TIMEM_SYNTAX_ABAP IMPLEMENTATION.
 
 
   METHOD parse_line. "REDEFINITION
-
-    DATA lv_index TYPE i.
-
-    FIELD-SYMBOLS <ls_match> LIKE LINE OF rt_matches.
-
-    rt_matches = super->parse_line( iv_line ).
+    result = super->parse_line( iv_line ).
 
     " Remove non-keywords
-    LOOP AT rt_matches ASSIGNING <ls_match> WHERE token = c_token-keyword.
-      lv_index = sy-tabix.
+    LOOP AT result ASSIGNING FIELD-SYMBOL(<ls_match>) WHERE token = c_token-keyword.
+      DATA(lv_index) = sy-tabix.
       IF abap_false = is_keyword( substring( val = iv_line
                                              off = <ls_match>-offset
                                              len = <ls_match>-length ) ).
-        DELETE rt_matches INDEX lv_index.
+        DELETE result INDEX lv_index.
       ENDIF.
     ENDLOOP.
 

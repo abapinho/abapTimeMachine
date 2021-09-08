@@ -29,10 +29,10 @@ CLASS ZCL_TIMEM_DYNPRO IMPLEMENTATION.
   METHOD hide_buttons.
     DATA: ucomms TYPE TABLE OF sy-ucomm.
 
-*  PERFORM set_pf_status IN PROGRAM rsdbrunt IF FOUND.
-
-    APPEND 'CRET' TO ucomms.  "Button Execute
-    APPEND 'GET' TO ucomms.  "Button Save
+    " Button Execute
+    APPEND 'CRET' TO ucomms.
+    " Button Save
+    APPEND 'GET' TO ucomms.
 
     CALL FUNCTION 'RS_SET_SELSCREEN_STATUS'
       EXPORTING
@@ -46,10 +46,10 @@ CLASS ZCL_TIMEM_DYNPRO IMPLEMENTATION.
   METHOD remove_toolbar.
     " Borrowed from abapGit
 
-    DATA: header               TYPE rpy_dyhead,
-          containers           TYPE dycatt_tab,
-          fields_to_containers TYPE dyfatc_tab,
-          flow_logic           TYPE swydyflow.
+    DATA header               TYPE rpy_dyhead.
+    DATA containers           TYPE dycatt_tab.
+    DATA fields_to_containers TYPE dyfatc_tab.
+    DATA flow_logic           TYPE swydyflow.
 
     CALL FUNCTION 'RPY_DYNPRO_READ'
       EXPORTING
@@ -67,11 +67,13 @@ CLASS ZCL_TIMEM_DYNPRO IMPLEMENTATION.
         permission_error     = 3
         OTHERS               = 4.
     IF sy-subrc IS NOT INITIAL.
-      RETURN. " Ignore errors, just exit
+      " Ignore errors, just exit
+      RETURN.
     ENDIF.
 
     IF header-no_toolbar = abap_true.
-      RETURN. " No change required
+      " No change required
+      RETURN.
     ENDIF.
 
     header-no_toolbar = abap_true.
@@ -96,7 +98,8 @@ CLASS ZCL_TIMEM_DYNPRO IMPLEMENTATION.
         illegal_field_position = 9
         OTHERS                 = 10.
     IF sy-subrc <> 2 AND sy-subrc <> 0.
-      RETURN. " Ignore errors, just exit
+      " Ignore errors, just exit
+      ASSERT 1 = 1.
     ENDIF.
   ENDMETHOD.
 ENDCLASS.

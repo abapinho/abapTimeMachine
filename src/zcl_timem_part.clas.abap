@@ -114,8 +114,8 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
     DATA(options) = zcl_timem_options=>get_instance( ).
     result = SWITCH #(
       options->get_instance( )->mode
-      WHEN zif_timem_consts=>mode-blame THEN get_diffed_source_with_blame( options->timestamp )
-      WHEN zif_timem_consts=>mode-time_machine THEN get_source_at_timestamp( options->timestamp ) ).
+      WHEN zcl_timem_consts=>mode-blame THEN get_diffed_source_with_blame( options->timestamp )
+      WHEN zcl_timem_consts=>mode-time_machine THEN get_source_at_timestamp( options->timestamp ) ).
   ENDMETHOD.
 
 

@@ -49,9 +49,9 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
 
 
   METHOD compute.
-    DATA: old_index TYPE i VALUE 1,
-          new_index TYPE i VALUE 1,
-          s_line    LIKE LINE OF result.
+    DATA old_index TYPE i VALUE 1.
+    DATA new_index TYPE i VALUE 1.
+    DATA s_line    LIKE LINE OF result.
 
     IF lines_old IS INITIAL.
       result = lines_new.
@@ -97,16 +97,17 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
       ENDIF.
 
       IF new_index > lines( lines_new ) AND old_index > lines( lines_old ).
-        EXIT. " current loop
+        " Current loop
+        EXIT.
       ENDIF.
     ENDDO.
   ENDMETHOD.
 
 
   METHOD compute_delta.
-    DATA: t_trdirtab_old TYPE TABLE OF trdir,
-          t_trdirtab_new TYPE TABLE OF trdir,
-          t_trdir_delta  TYPE TABLE OF xtrdir.
+    DATA t_trdirtab_old TYPE TABLE OF trdir.
+    DATA t_trdirtab_new TYPE TABLE OF trdir.
+    DATA t_trdir_delta  TYPE TABLE OF xtrdir.
 
     DATA(t_source_old) = get_source( lines_old ).
     DATA(t_source_new) = get_source( lines_new ).

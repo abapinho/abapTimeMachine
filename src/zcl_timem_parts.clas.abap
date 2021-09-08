@@ -100,7 +100,7 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
 
     result = VALUE #( name = object_name
                        type = object_type
-                       version = zif_timem_consts=>version
+                       version = zcl_timem_consts=>version
                        parts = t_part
                        timestamps = get_timestamps( )
                        stats = get_stats( t_part )
@@ -161,7 +161,8 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
                                            vrsd_type = s_part->type ).
           INSERT part INTO TABLE parts.
         CATCH zcx_timem.
-          ASSERT 1 = 1. " Doesn't exist? Carry on
+          " Doesn't exist? Carry on
+          ASSERT 1 = 1.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.

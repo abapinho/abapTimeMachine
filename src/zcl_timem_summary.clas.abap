@@ -76,15 +76,19 @@ CLASS ZCL_TIMEM_SUMMARY IMPLEMENTATION.
 
   METHOD add_line_to_summary_lines.
     ASSIGN COMPONENT fieldname OF STRUCTURE line TO FIELD-SYMBOL(<field>).
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
 
     " Insert if it doesn't yet exist
     IF NOT line_exists( summary_lines[ value = <field> ] ).
-      INSERT VALUE #( value = <field> ) INTO TABLE summary_lines.
+      INSERT VALUE #( value = <field> ) INTO TABLE summary_lines. "#EC CI_SUBRC
     ENDIF.
 
     READ TABLE summary_lines ASSIGNING FIELD-SYMBOL(<summary_line>) WITH KEY value = <field>.
-
-    <summary_line>-line_count = <summary_line>-line_count + 1.
+    IF sy-subrc = 0.
+      <summary_line>-line_count = <summary_line>-line_count + 1.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -109,7 +113,7 @@ CLASS ZCL_TIMEM_SUMMARY IMPLEMENTATION.
 
     " If we only have one line and no value was found... this summary is pointless
     IF lines( result ) = 1 AND result[ 1 ]-value IS INITIAL.
-      REFRESH result.
+      CLEAR result.
     ENDIF.
 
     calc_missing_data(
@@ -123,8 +127,10 @@ CLASS ZCL_TIMEM_SUMMARY IMPLEMENTATION.
   METHOD build_value_request_list.
     LOOP AT lines INTO DATA(line).
       ASSIGN COMPONENT fieldname OF STRUCTURE line TO FIELD-SYMBOL(<field>).
-      " Store fieldname+request (it will not have duplicates because the table has an UNIQUE KEY
-      INSERT VALUE #( value = <field> request = line-request ) INTO TABLE result.
+      IF sy-subrc = 0.
+        " Store fieldname+request (it will not have duplicates because the table has a UNIQUE KEY
+        INSERT VALUE #( value = <field> request = line-request ) INTO TABLE result.
+      ENDIF.
     ENDLOOP.
   ENDMETHOD.
 

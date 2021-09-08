@@ -63,7 +63,8 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
             CHANGING
               data = data ).
         CATCH cx_sy_dyn_call_illegal_method.
-          ASSERT 1 = 1. " Not implemented? Carry on.
+          " Not implemented? Carry on.
+          ASSERT 1 = 1.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.
@@ -82,6 +83,7 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
   METHOD load_instances.
     DATA impkey TYPE  seoclskey.
     DATA impkeys TYPE seor_implementing_keys.
+    DATA o TYPE REF TO zif_timem_userexit.
 
     impkey-clsname = 'ZIF_TIMEM_USEREXIT'.
     CALL FUNCTION 'SEO_INTERFACE_IMPLEM_GET_ALL'
@@ -96,9 +98,8 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA o TYPE REF TO zif_timem_userexit.
     LOOP AT impkeys INTO DATA(classdata).
-      CREATE OBJECT o TYPE (classdata-clsname).
+      CREATE OBJECT o TYPE (classdata-clsname). "#EC PREF_NEW
       INSERT o INTO TABLE instances.
     ENDLOOP.
   ENDMETHOD.
@@ -114,7 +115,8 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
             CHANGING
               content = content ).
         CATCH cx_sy_dyn_call_illegal_method.
-          ASSERT 1 = 1. " Not implemented? Carry on.
+          " Not implemented? Carry on.
+          ASSERT 1 = 1.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.
@@ -129,7 +131,8 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
             CHANGING
               parts         = parts ).
         CATCH cx_sy_dyn_call_illegal_method.
-          ASSERT 1 = 1. " Not implemented? Carry on.
+          " Not implemented? Carry on.
+          ASSERT 1 = 1.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.
@@ -144,7 +147,8 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
             CHANGING
               part_list = part_list ).
         CATCH cx_sy_dyn_call_illegal_method.
-          ASSERT 1 = 1. " Not implemented? Carry on.
+          " Not implemented? Carry on.
+          ASSERT 1 = 1.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.
@@ -159,7 +163,8 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
             CHANGING
               summary = summary ).
         CATCH cx_sy_dyn_call_illegal_method.
-          ASSERT 1 = 1. " Not implemented? Carry on.
+          " Not implemented? Carry on.
+          ASSERT 1 = 1.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.
@@ -173,7 +178,8 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
              action  = action
              getdata = getdata ).
         CATCH cx_sy_dyn_call_illegal_method.
-          ASSERT 1 = 1. " Not implemented? Carry on.
+          " Not implemented? Carry on.
+          ASSERT 1 = 1.
       ENDTRY.
     ENDLOOP.
   ENDMETHOD.

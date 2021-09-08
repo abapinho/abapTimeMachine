@@ -80,13 +80,13 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
 
 
   METHOD populate_details.
-    SELECT as4text trstatus INTO (description, status)
+    SELECT as4text, trstatus INTO (@description, @status)
     UP TO 1 ROWS
     FROM e070
-    INNER JOIN e07t ON e07t~trkorr = e070~trkorr
-    WHERE e070~trkorr = id
+    LEFT JOIN e07t ON e07t~trkorr = e070~trkorr
+    WHERE e070~trkorr = @id
       AND langu  = 'E'
-    ORDER BY as4text trstatus.
+    ORDER BY as4text, trstatus.
       EXIT.
     ENDSELECT.
     IF sy-subrc <> 0.

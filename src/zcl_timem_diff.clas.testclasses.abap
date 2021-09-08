@@ -4,7 +4,7 @@ CLASS ltcl_diff DEFINITION FINAL FOR TESTING
   RISK LEVEL HARMLESS.
 
   PRIVATE SECTION.
-    data: o_diff type ref to zcl_timem_diff.
+    DATA: o_diff TYPE REF TO zcl_timem_diff.
     METHODS:
       setup,
       changed_line FOR TESTING RAISING cx_static_check,
@@ -17,8 +17,8 @@ ENDCLASS.
 
 
 CLASS ltcl_diff IMPLEMENTATION.
-  method setup.
-    o_diff = new #( ).
+  METHOD setup.
+    o_diff = NEW #( ).
   ENDMETHOD.
 
 

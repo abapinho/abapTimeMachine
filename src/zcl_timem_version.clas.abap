@@ -155,8 +155,10 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
 
 
   METHOD load_source.
+    DATA t_trdir TYPE trdir_it.
+
     " If already loaded, skip it
-    IF gt_source[] IS NOT INITIAL.
+    IF gt_source IS NOT INITIAL.
       RETURN.
     ENDIF.
 
@@ -166,7 +168,6 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
         name           = vrsd-objname
         version_number = me->version_number.
 
-    DATA t_trdir TYPE trdir_it.
     CALL FUNCTION 'SVRS_GET_REPS_FROM_OBJECT'
       EXPORTING
         object_name = vrsd-objname
@@ -179,25 +180,17 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
         no_version  = 1
         OTHERS      = 2.
     IF sy-subrc <> 0.
-      RETURN.
+      " Ignore errors, just exit.
+      ASSERT 1 = 1.
     ENDIF.
   ENDMETHOD.
 
 
   METHOD retrieve.
-    DATA(infolna) = VALUE vrsinfolna( objname = vrsd-objname ).
-    DATA(infolnb) = VALUE vrsinfolnb(
-      korrnum = vrsd-korrnum
-      datum = | vrsd-date date = user |
-      author = vrsd-author ).
     DATA(real_version) = get_real_version( ).
-
-*   TODO SUBMIT parameter does not exist???
     SUBMIT rsedtve1 AND RETURN                           "#EC CI_SUBMIT
              WITH objtype = vrsd-objtype
              WITH objname = vrsd-objname
-             WITH versno  = real_version
-             WITH infolna = infolna
-             WITH infolnb = infolnb.
+             WITH versno  = real_version.
   ENDMETHOD.
 ENDCLASS.

@@ -47,7 +47,7 @@ CLASS ZCL_TIMEM_OBJECT_PROG_INCLUDES IMPLEMENTATION.
         permission_error = 3
         OTHERS           = 4.
     IF sy-subrc <> 0.
-      RETURN.
+      ASSERT 1 = 0.
     ENDIF.
   ENDMETHOD.
 

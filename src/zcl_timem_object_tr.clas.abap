@@ -49,7 +49,6 @@ CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
       THEN NEW zcl_timem_object_factory( )->get_instance(
         object_type = object_key-object
         object_name = CONV #( object_key-obj_name ) )
-
       WHEN object_key-pgmid = 'LIMU' AND object_key-object = 'REPS'
       THEN NEW zcl_timem_object_factory( )->get_instance(
         object_type = 'PROG'
@@ -73,7 +72,7 @@ CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
       RAISE EXCEPTION TYPE zcx_timem.
     ENDIF.
     result = request_data-objects.
-    SORT result BY pgmid object obj_name.
+    SORT result BY pgmid ASCENDING object ASCENDING obj_name ASCENDING.
     DELETE ADJACENT DUPLICATES FROM result COMPARING pgmid object obj_name.
   ENDMETHOD.
 
@@ -83,6 +82,7 @@ CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
         NEW zcl_timem_request( me->id ).
         result = abap_true.
       CATCH zcx_timem.
+        result = abap_false.
     ENDTRY.
   ENDMETHOD.
 

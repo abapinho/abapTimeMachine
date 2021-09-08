@@ -38,7 +38,7 @@ INITIALIZATION.
     p_mtimem = abap_false.
     p_mblame = abap_true.
   ENDIF.
-  link = 'More details at https://github.com/abapinho/abapTimeMachine'.  ##NO_TEXT
+  link = 'More details at https://github.com/abapinho/abapTimeMachine' ##NO_TEXT.
   NEW zcl_timem_dynpro( '1001' )->remove_toolbar( ).
 
 AT SELECTION-SCREEN OUTPUT.
@@ -46,7 +46,6 @@ AT SELECTION-SCREEN OUTPUT.
     IF screen-group1 = 'BLA' AND p_mblame IS INITIAL.
       screen-active = '0'.
       MODIFY SCREEN.
-      CONTINUE.
     ENDIF.
   ENDLOOP.
 
@@ -56,8 +55,8 @@ START-OF-SELECTION.
   " Convert radio button to mode
   DATA(mode) = SWITCH zcl_timem_options=>ty_mode(
     p_mblame
-    WHEN abap_true THEN zif_timem_consts=>mode-blame
-    ELSE zif_timem_consts=>mode-time_machine ).
+    WHEN abap_true THEN zcl_timem_consts=>mode-blame
+    ELSE zcl_timem_consts=>mode-time_machine ).
 
   TRY.
       zcl_timem_options=>get_instance( )->set( mode               = mode

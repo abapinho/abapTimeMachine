@@ -66,14 +66,14 @@ CLASS ltcl_syntax_cases IMPLEMENTATION.
 
   METHOD do_test.
 
-    DATA: lt_matches_act TYPE zcl_timem_syntax_highlighter=>ty_match_tt,
-          lo_syntax      TYPE REF TO zcl_timem_syntax_highlighter.
+    DATA lt_matches_act TYPE zcl_timem_syntax_highlighter=>ty_match_tt.
+    DATA lo_syntax      TYPE REF TO zcl_timem_syntax_highlighter.
 
 
     lo_syntax = zcl_timem_syntax_highlighter=>create( iv_filename ).
     lt_matches_act = lo_syntax->parse_line( iv_line ).
 
-    SORT lt_matches_act BY offset.
+    SORT lt_matches_act BY offset ASCENDING.
 
     cl_abap_unit_assert=>assert_equals( exp = mt_after_parse
                                         act = lt_matches_act
@@ -521,7 +521,7 @@ CLASS ltcl_syntax_cases IMPLEMENTATION.
     DATA lv_line TYPE string.
 
     "unclosed tag
-    lv_line = '<ns:tag ns:a1="v1"'.                                     "#EC NOTEXT
+    lv_line = '<ns:tag ns:a1="v1"'.                         "#EC NOTEXT
 
     " Generate table with expected values after parsing
     _generate_parse 'X' 0  1.
@@ -547,7 +547,7 @@ CLASS ltcl_syntax_cases IMPLEMENTATION.
     DATA lv_line TYPE string.
 
     "xml special characters in attribute
-    lv_line = '<tag attribute=" '' > "/>'.                   "#EC NOTEXT
+    lv_line = '<tag attribute=" '' > "/>'.                  "#EC NOTEXT
 
     " Generate table with expected values after parsing
     _generate_parse 'X' 0  1.
@@ -579,7 +579,7 @@ CLASS ltcl_syntax_cases IMPLEMENTATION.
     DATA lv_line TYPE string.
 
     "attribute at beginning of line
-    lv_line = 'attribute=''>" '''.                   "#EC NOTEXT
+    lv_line = 'attribute=''>" '''.                          "#EC NOTEXT
 
     " Generate table with expected values after parsing
     _generate_parse 'A' 0  9.
@@ -634,10 +634,9 @@ CLASS ltcl_syntax_basic_logic IMPLEMENTATION.
 
   METHOD format_line.
 
-    DATA:
-      lv_line     TYPE string,
-      lv_line_act TYPE string,
-      lv_line_exp TYPE string.
+    DATA lv_line     TYPE string.
+    DATA lv_line_act TYPE string.
+    DATA lv_line_exp TYPE string.
 
     lv_line = 'call function ''FM_NAME''. " Commented'.     "#EC NOTEXT
 
