@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_TIMEM_ASSET_HTML_BLAME</CLSNAME>
+    <CLSNAME>ZCL_TIMEM_CONSTS</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>abapTimeMachine Asset HTML</DESCRIPT>
+    <DESCRIPT>ZCL_TIMEM_CONSTS</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

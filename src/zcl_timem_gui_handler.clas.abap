@@ -145,7 +145,8 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
     TRY.
         gui->display( ).
       CATCH zcx_timem.
-        RETURN. " Ignore error
+        " Ignore error
+        ASSERT 1 = 1.
     ENDTRY.
   ENDMETHOD.
 

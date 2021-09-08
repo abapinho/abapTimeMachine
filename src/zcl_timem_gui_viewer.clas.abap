@@ -110,13 +110,15 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
 
 
   METHOD render.
-    SKIP. " Creates the screen0 container
+    " Creates the screen0 container
+    SKIP.
+
     add_asset( NEW zcl_timem_asset_factory( )->create_instance(
-      asset_type = zif_timem_consts=>asset_type-css
+      asset_type = zcl_timem_consts=>asset_type-css
       data       = data ) ).
 
     DATA(url) = add_asset( NEW zcl_timem_asset_factory( )->create_instance(
-      asset_type = zif_timem_consts=>asset_type-html
+      asset_type = zcl_timem_consts=>asset_type-html
       data       = data ) ).
 
     html_viewer->show_url(

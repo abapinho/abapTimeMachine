@@ -37,7 +37,7 @@ CLASS zcl_timem_options DEFINITION
       RETURNING
         VALUE(result) TYPE REF TO zcl_timem_options .
 
-    METHODS set
+    METHODS set      "#EC OPTL_PARAM
       IMPORTING
         !mode               TYPE ty_mode OPTIONAL
         !ignore_case        TYPE boolean OPTIONAL
@@ -59,7 +59,7 @@ CLASS ZCL_TIMEM_OPTIONS IMPLEMENTATION.
   METHOD class_constructor.
     instance = NEW #( ).
     instance->set(
-      mode               = zif_timem_consts=>mode-blame
+      mode               = zcl_timem_consts=>mode-blame
       ignore_case        = abap_false
       ignore_indentation = abap_false
       timestamp          = CONV #( |{ sy-datum }235959| )

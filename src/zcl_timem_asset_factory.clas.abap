@@ -28,7 +28,7 @@ CLASS ZCL_TIMEM_ASSET_FACTORY IMPLEMENTATION.
       WHEN 'HTML' THEN
         SWITCH #(
           options->mode
-          WHEN zif_timem_consts=>mode-blame THEN NEW zcl_timem_asset_html_blame( data )
-          WHEN zif_timem_consts=>mode-time_machine THEN NEW zcl_timem_asset_html_tmachine( data ) ) ).
+          WHEN zcl_timem_consts=>mode-blame THEN NEW zcl_timem_asset_html_blame( data )
+          WHEN zcl_timem_consts=>mode-time_machine THEN NEW zcl_timem_asset_html_tmachine( data ) ) ).
   ENDMETHOD.
 ENDCLASS.
