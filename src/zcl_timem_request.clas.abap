@@ -85,7 +85,7 @@ CLASS ZCL_TIMEM_REQUEST IMPLEMENTATION.
     FROM e070
     LEFT JOIN e07t ON e07t~trkorr = e070~trkorr
     WHERE e070~trkorr = @id
-      AND langu  = 'E'
+      AND langu  = @sy-langu
     ORDER BY as4text, trstatus.
       EXIT.
     ENDSELECT.
