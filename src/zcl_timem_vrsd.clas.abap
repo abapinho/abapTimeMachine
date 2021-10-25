@@ -45,7 +45,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
+CLASS zcl_timem_vrsd IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -160,6 +160,13 @@ CLASS ZCL_TIMEM_VRSD IMPLEMENTATION.
     IF vrsd-author IS INITIAL.
       RAISE EXCEPTION TYPE zcx_timem.
     ENDIF.
+
+    " Unreleased versions will be set to current date and time because, while
+    " different parts will most probably have different date+time creation date,
+    " each one is not really a version. At least not yet. And without this hack
+    " we'd get one version moment for each unreleased part, which is not realistic.
+    vrsd-datum = sy-datum.
+    vrsd-zeit = sy-uzeit.
 
     vrsd-versno = versno.
     vrsd-objtype = me->type.
