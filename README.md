@@ -1,5 +1,7 @@
 # abapTimeMachine
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=abapinho_abapTimeMachine&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=abapinho_abapTimeMachine)
+
 `abapTimeMachine` provides a simple way to look at past versions of classes, function groups, etc, as a whole (as opposed to the crappy native include-oriented approach). Alternatively, it also partially emulates [git-blame](https://www.git-scm.com/docs/git-blame) by showing "what revision and author last modified each line of a file" for any given version.
 
 ## Why
