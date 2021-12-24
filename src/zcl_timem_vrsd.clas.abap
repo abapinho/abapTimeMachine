@@ -54,7 +54,11 @@ CLASS zcl_timem_vrsd IMPLEMENTATION.
     me->options = zcl_timem_options=>get_instance( ).
     load_from_table( ).
     IF options->ignore_unreleased = abap_false.
-      load_active_or_modified( zcl_timem_version=>c_version-active ).
+      " Even released parts have an active version. We know it is unreleased if the
+      " request is not empty. Otherwise we will disregard it.
+      IF get_request_active_modif(  ) IS NOT INITIAL.
+        load_active_or_modified( zcl_timem_version=>c_version-active ).
+      ENDIF.
       load_active_or_modified( zcl_timem_version=>c_version-modified ).
     ENDIF.
     SORT me->vrsd_list BY versno ASCENDING.
