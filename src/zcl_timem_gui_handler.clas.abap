@@ -55,7 +55,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
+CLASS zcl_timem_gui_handler IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -134,10 +134,20 @@ CLASS ZCL_TIMEM_GUI_HANDLER IMPLEMENTATION.
 
 
   METHOD display_user.
-    CALL FUNCTION 'SUID_IDENTITY_MAINT'
+    DATA return TYPE bapiret2_t.
+    CALL FUNCTION 'BAPI_USER_GET_DETAIL'
       EXPORTING
-        i_username       = user
-        i_tcode_mode     = 6.
+        username = user
+      TABLES
+        return   = return.
+    IF line_exists( return[ type = 'E' ] ).
+      MESSAGE 'User no longer exists' TYPE 'I' DISPLAY LIKE 'E'.
+    ELSE.
+      CALL FUNCTION 'SUID_IDENTITY_MAINT'
+        EXPORTING
+          i_username   = user
+          i_tcode_mode = 6.
+    ENDIF.
   ENDMETHOD.
 
 
