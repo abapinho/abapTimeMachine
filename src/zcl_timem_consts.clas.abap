@@ -4,7 +4,7 @@ CLASS zcl_timem_consts DEFINITION
   CREATE PRIVATE .
 
   PUBLIC SECTION.
-    CONSTANTS version TYPE char10 VALUE '0.33b' ##NO_TEXT.
+    CONSTANTS version TYPE char10 VALUE '0.35b' ##NO_TEXT.
 
     CONSTANTS:
       BEGIN OF mode,

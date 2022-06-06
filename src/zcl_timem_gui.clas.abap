@@ -28,7 +28,6 @@ CLASS zcl_timem_gui DEFINITION
     DATA object_name TYPE sobj_name.
     DATA parts TYPE REF TO zcl_timem_parts .
     DATA viewer TYPE REF TO zcl_timem_gui_viewer .
-    DATA handler TYPE REF TO zcl_timem_gui_handler .
 
     METHODS highlight_source
       CHANGING
@@ -45,14 +44,14 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_GUI IMPLEMENTATION.
+CLASS zcl_timem_gui IMPLEMENTATION.
 
 
   METHOD constructor.
     me->object_type = object_type.
     me->object_name = object_name.
     load_parts( ).
-    me->handler = NEW #( me ).
+    DATA(handler) = NEW zcl_timem_gui_handler( me ).
     me->viewer = NEW #( handler ).
   ENDMETHOD.
 
