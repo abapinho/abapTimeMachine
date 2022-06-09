@@ -36,12 +36,6 @@ CLASS zcl_timem_gui_viewer DEFINITION
       RETURNING
         VALUE(result) TYPE w3url .
 
-    METHODS string_2_xstring
-      IMPORTING
-        !input        TYPE string
-      RETURNING
-        VALUE(result) TYPE xstring .
-
     METHODS register_events
       IMPORTING
         io_handler TYPE REF TO zcl_timem_gui_handler.
@@ -55,7 +49,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
+CLASS zcl_timem_gui_viewer IMPLEMENTATION.
 
 
   METHOD add_asset.
@@ -67,7 +61,7 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
        CHANGING
          content = content ).
 
-    DATA(xstr) = string_2_xstring( content ).
+    DATA(xstr) = cl_abap_codepage=>convert_to( source = content codepage = 'ISO-8859-1' ).
 
     DATA(t_bintab) = xstring_2_bintab( xstr ).
 
@@ -130,21 +124,6 @@ CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
         cnht_error_parameter   = 3
         dp_error_general       = 4
         OTHERS                 = 5 ).
-    IF sy-subrc <> 0.
-      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
-                 WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
-    ENDIF.
-  ENDMETHOD.
-
-
-  METHOD string_2_xstring.
-    CALL FUNCTION 'SCMS_STRING_TO_XSTRING'
-      EXPORTING
-        text   = input
-      IMPORTING
-        buffer = result
-      EXCEPTIONS
-        OTHERS = 1.
     IF sy-subrc <> 0.
       MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
                  WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
