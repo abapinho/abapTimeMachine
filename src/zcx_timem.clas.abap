@@ -6,7 +6,6 @@ class ZCX_TIMEM definition
 
 public section.
 
-  interfaces IF_T100_DYN_MSG .
   interfaces IF_T100_MESSAGE .
 
   constants:
@@ -27,9 +26,9 @@ public section.
     raising
       ZCX_TIMEM .
 
-  methods IF_MESSAGE~GET_TEXT
-    redefinition .
   methods IF_MESSAGE~GET_LONGTEXT
+    redefinition .
+  methods IF_MESSAGE~GET_TEXT
     redefinition .
 protected section.
 private section.
