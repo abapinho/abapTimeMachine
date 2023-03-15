@@ -78,7 +78,7 @@ FORM java_gui_f3_workaround.
   CALL FUNCTION 'RSAN_WB_TEST_GET_GUI_TYPE'
     IMPORTING
       e_gui_type = gui_type.
-  IF gui_type NE 'WIN_GUI'.
+  IF gui_type <> 'WIN_GUI'.
     CALL SCREEN 9000.
   ENDIF.
 ENDFORM.

@@ -159,7 +159,6 @@ CLASS zcl_timem_vrsd IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA vrsd TYPE vrsd.
     CALL FUNCTION 'SVRS_EXTRACT_INFO_FROM_OBJECT'
       EXPORTING
         object    = obj
