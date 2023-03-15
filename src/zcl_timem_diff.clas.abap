@@ -4,6 +4,10 @@ CLASS zcl_timem_diff DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    METHODS constructor
+      IMPORTING
+        ignore_case        TYPE boolean
+        ignore_indentation TYPE boolean.
 
     "! Takes two source lists - old and new - and returns a new source list
     "! which merges both, adding for each line an indicator of how it changed
@@ -12,8 +16,8 @@ CLASS zcl_timem_diff DEFINITION
     "! @parameter lines_new | New source list
     METHODS compute
       IMPORTING
-        !lines_old       TYPE ztimem_line_t
-        !lines_new       TYPE ztimem_line_t
+        !lines_old    TYPE ztimem_line_t
+        !lines_new    TYPE ztimem_line_t
       RETURNING
         VALUE(result) TYPE ztimem_line_t .
   PROTECTED SECTION.
@@ -25,10 +29,13 @@ CLASS zcl_timem_diff DEFINITION
         update TYPE c LENGTH 1 VALUE 'U',
       END OF c_diff .
 
+    DATA ignore_case TYPE boolean.
+    DATA ignore_indentation TYPE boolean.
+
     METHODS compute_delta
       IMPORTING
-        !lines_old       TYPE ztimem_line_t
-        !lines_new       TYPE ztimem_line_t
+        !lines_old    TYPE ztimem_line_t
+        !lines_new    TYPE ztimem_line_t
       RETURNING
         VALUE(result) TYPE vxabapt255_tab .
 
@@ -45,7 +52,11 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
+CLASS zcl_timem_diff IMPLEMENTATION.
+  METHOD constructor.
+    me->ignore_case = ignore_case.
+    me->ignore_indentation = ignore_indentation.
+  ENDMETHOD.
 
 
   METHOD compute.
@@ -132,10 +143,10 @@ CLASS ZCL_TIMEM_DIFF IMPLEMENTATION.
 
   METHOD process_line.
     result = i_line.
-    IF zcl_timem_options=>get_instance( )->ignore_case = abap_true.
+    IF me->ignore_case = abap_true.
       result = to_upper( result ).
     ENDIF.
-    IF zcl_timem_options=>get_instance( )->ignore_indentation = abap_true.
+    IF me->ignore_indentation = abap_true.
       SHIFT result LEFT DELETING LEADING space.
     ENDIF.
   ENDMETHOD.

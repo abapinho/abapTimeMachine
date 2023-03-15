@@ -28,11 +28,11 @@ INTERFACE zif_timem_userexit
       !action  TYPE c
       !getdata TYPE c .
 
-  METHODS modify_part_list
+  METHODS modify_tadir_list
     IMPORTING
       !options   TYPE REF TO zcl_timem_options
     CHANGING
-      !part_list TYPE ztimem_part_t
+      !tadir_list TYPE ztimem_part_t
     RAISING
       zcx_timem.
 

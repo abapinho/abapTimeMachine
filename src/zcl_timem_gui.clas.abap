@@ -28,6 +28,7 @@ CLASS zcl_timem_gui DEFINITION
     DATA object_name TYPE sobj_name.
     DATA parts TYPE REF TO zcl_timem_parts .
     DATA viewer TYPE REF TO zcl_timem_gui_viewer .
+    DATA options TYPE REF TO zcl_timem_options.
 
     METHODS highlight_source
       CHANGING
@@ -38,6 +39,8 @@ CLASS zcl_timem_gui DEFINITION
         !data TYPE ztimem_data .
 
     METHODS load_parts
+      IMPORTING
+        ignore_unreleased TYPE boolean
       RAISING
         zcx_timem.
 ENDCLASS.
@@ -50,7 +53,8 @@ CLASS zcl_timem_gui IMPLEMENTATION.
   METHOD constructor.
     me->object_type = object_type.
     me->object_name = object_name.
-    load_parts( ).
+    me->options = zcl_timem_options=>get_instance( ).
+    load_parts( options->ignore_unreleased ).
     DATA(handler) = NEW zcl_timem_gui_handler( me ).
     me->viewer = NEW #( handler ).
   ENDMETHOD.
@@ -81,11 +85,18 @@ CLASS zcl_timem_gui IMPLEMENTATION.
 
 
   METHOD display.
-    DATA(data) = parts->get_data( ).
+    DATA(data) = parts->to_struct(
+      mode = options->mode
+      timestamp = options->timestamp
+      ignore_case = options->ignore_case
+      ignore_indentation = options->ignore_indentation ).
     NEW zcl_timem_userexits( )->before_rendering( CHANGING data = data ).
     highlight_source( CHANGING data = data ).
     deduplicate_header_fields( CHANGING data = data ).
-    viewer->render( data ).
+    viewer->render(
+        data  = data
+        mode  = options->mode
+        theme = options->theme ).
   ENDMETHOD.
 
 
@@ -101,13 +112,14 @@ CLASS zcl_timem_gui IMPLEMENTATION.
 
 
   METHOD load_parts.
-    me->parts = NEW zcl_timem_parts( object_type = object_type
-                                     object_name = object_name ).
+    me->parts = NEW zcl_timem_parts( object_type       = object_type
+                                     object_name       = object_name
+                                     ignore_unreleased = ignore_unreleased ).
   ENDMETHOD.
 
 
   METHOD revert.
     parts->revert( ts ).
-    load_parts( ).
+    load_parts( options->ignore_unreleased ).
   ENDMETHOD.
 ENDCLASS.

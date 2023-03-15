@@ -4,11 +4,8 @@ CLASS zcl_timem_options DEFINITION
   CREATE PRIVATE .
 
   PUBLIC SECTION.
-
-    TYPES ty_mode TYPE char1 .
-
     "! Mode (Blame or Time Machine)
-    DATA mode TYPE ty_mode READ-ONLY .
+    DATA mode TYPE ztimem_mode READ-ONLY .
 
     "! Diff operation should ignore case
     DATA ignore_case TYPE boolean READ-ONLY .
@@ -39,7 +36,7 @@ CLASS zcl_timem_options DEFINITION
 
     METHODS set      "#EC OPTL_PARAM
       IMPORTING
-        !mode               TYPE ty_mode OPTIONAL
+        !mode               TYPE ztimem_mode OPTIONAL
         !ignore_case        TYPE boolean OPTIONAL
         !ignore_indentation TYPE boolean OPTIONAL
         !timestamp          TYPE timestamp OPTIONAL

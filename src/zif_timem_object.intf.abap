@@ -6,7 +6,7 @@ INTERFACE zif_timem_object
     ty_t_part_ref TYPE STANDARD TABLE OF REF TO zcl_timem_part WITH KEY table_line .
 
   "! Returns a list of references to part instances
-  METHODS get_part_list
+  METHODS get_tadir_list
     RETURNING
       VALUE(result) TYPE ztimem_part_t
     RAISING

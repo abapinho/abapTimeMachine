@@ -23,6 +23,8 @@ CLASS zcl_timem_gui_viewer DEFINITION
     METHODS render
       IMPORTING
         !data TYPE ztimem_data
+        mode  TYPE ztimem_mode
+        theme TYPE ztimem_theme
       RAISING
         zcx_timem .
   PROTECTED SECTION.
@@ -49,7 +51,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_timem_gui_viewer IMPLEMENTATION.
+CLASS ZCL_TIMEM_GUI_VIEWER IMPLEMENTATION.
 
 
   METHOD add_asset.
@@ -61,7 +63,7 @@ CLASS zcl_timem_gui_viewer IMPLEMENTATION.
        CHANGING
          content = content ).
 
-    DATA(xstr) = cl_abap_codepage=>convert_to( source = content codepage = 'ISO-8859-1' ).
+    DATA(xstr) = cl_abap_codepage=>convert_to( source = content codepage = 'UTF-8' ).
 
     DATA(t_bintab) = xstring_2_bintab( xstr ).
 
@@ -109,11 +111,15 @@ CLASS zcl_timem_gui_viewer IMPLEMENTATION.
 
     add_asset( NEW zcl_timem_asset_factory( )->create_instance(
       asset_type = zcl_timem_consts=>asset_type-css
-      data       = data ) ).
+      data       = data
+      mode       = mode
+      theme      = theme ) ).
 
     DATA(url) = add_asset( NEW zcl_timem_asset_factory( )->create_instance(
       asset_type = zcl_timem_consts=>asset_type-html
-      data       = data ) ).
+      data       = data
+      mode       = mode
+      theme      = theme ) ).
 
     html_viewer->show_url(
       EXPORTING

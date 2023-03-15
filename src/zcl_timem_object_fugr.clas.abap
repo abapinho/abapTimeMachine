@@ -86,7 +86,7 @@ CLASS ZCL_TIMEM_OBJECT_FUGR IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_timem_object~get_part_list.
+  METHOD zif_timem_object~get_tadir_list.
     DATA t_include TYPE STANDARD TABLE OF progname.
 
     DATA(main_program) = get_main_name( ).

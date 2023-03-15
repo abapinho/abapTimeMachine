@@ -11,15 +11,21 @@ CLASS zcl_timem_parts DEFINITION
     "! @parameter i_object_name | Object name
     METHODS constructor
       IMPORTING
-        !object_type TYPE ztimem_object_type
-        !object_name TYPE sobj_name
+        !object_type      TYPE ztimem_object_type
+        !object_name      TYPE sobj_name
+        ignore_unreleased TYPE boolean
       RAISING
         zcx_timem .
 
     "! Returns a deep structure containing all the details for all the parts.
-    METHODS get_data
+    METHODS to_struct
+      IMPORTING
+        mode               TYPE ztimem_mode
+        timestamp          TYPE timestamp
+        ignore_case        TYPE boolean
+        ignore_indentation TYPE boolean
       RETURNING
-        VALUE(result) TYPE ztimem_data
+        VALUE(result)      TYPE ztimem_data
       RAISING
         zcx_timem .
 
@@ -35,12 +41,13 @@ CLASS zcl_timem_parts DEFINITION
     DATA object_name TYPE sobj_name .
     DATA parts TYPE zif_timem_object=>ty_t_part_ref .
     DATA userexits TYPE REF TO zcl_timem_userexits.
-    DATA options TYPE REF TO zcl_timem_options.
 
     "! Load all the data, creating the actual parts
     "! which will load all the versions
     "! @parameter io_counter | To keep track of progress
     METHODS load
+      IMPORTING
+        ignore_unreleased TYPE boolean
       RAISING
         zcx_timem .
 
@@ -72,26 +79,26 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
+CLASS zcl_timem_parts IMPLEMENTATION.
 
 
   METHOD constructor.
     me->object_type = object_type.
     me->object_name = object_name.
     me->userexits = NEW #( ).
-    me->options = zcl_timem_options=>get_instance( ).
-    load( ).
+    load( ignore_unreleased ).
   ENDMETHOD.
 
 
-  METHOD get_data.
+  METHOD to_struct.
     DATA(t_part) =
       VALUE ztimem_part_source_t(
         FOR part IN parts
-        ( name = part->name
-        type = part->vrsd_type
-        object_name = part->vrsd_name
-        lines = part->get_source( ) ) ).
+        ( part->to_struct(
+            mode = mode
+            ts = timestamp
+            ignore_case = ignore_case
+            ignore_indentation = ignore_indentation ) ) ).
     DELETE t_part WHERE lines IS INITIAL.
 
     " The custom fields and anything else related to the parts must be edited at this point
@@ -104,10 +111,10 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
                        parts = t_part
                        timestamps = get_timestamps( )
                        stats = get_stats( t_part )
-                       timestamp = options->timestamp
+                       timestamp = timestamp
                        summaries = get_summaries( get_lines( t_part ) )
-                       ignore_case = options->ignore_case
-                       ignore_indentation = options->ignore_indentation ).
+                       ignore_case = ignore_case
+                       ignore_indentation = ignore_indentation ).
   ENDMETHOD.
 
 
@@ -150,15 +157,16 @@ CLASS ZCL_TIMEM_PARTS IMPLEMENTATION.
     DATA(object) = NEW zcl_timem_object_factory( )->get_instance( object_type = object_type
                                                                   object_name = object_name ).
 
-    DATA(part_list) = object->get_part_list( ).
+    DATA(tadir_list) = object->get_tadir_list( ).
 
-    userexits->modify_part_list( CHANGING part_list = part_list ).
+    userexits->modify_tadir_list( CHANGING tadir_list = tadir_list ).
 
-    LOOP AT part_list REFERENCE INTO DATA(s_part).
+    LOOP AT tadir_list REFERENCE INTO DATA(tadir_item).
       TRY.
-          DATA(part) = NEW zcl_timem_part( name      = s_part->name
-                                           vrsd_name = s_part->object_name
-                                           vrsd_type = s_part->type ).
+          DATA(part) = NEW zcl_timem_part( name              = tadir_item->name
+                                           vrsd_name         = tadir_item->object_name
+                                           vrsd_type         = tadir_item->type
+                                           ignore_unreleased = ignore_unreleased ).
           INSERT part INTO TABLE parts.
         CATCH zcx_timem.
           " Doesn't exist? Carry on

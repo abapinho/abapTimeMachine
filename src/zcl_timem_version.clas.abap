@@ -73,33 +73,24 @@ CLASS zcl_timem_version DEFINITION
     METHODS load_source
       RAISING zcx_timem.
 
-    METHODS get_real_version
-      RETURNING VALUE(result) TYPE versno.
-
     "! Try to find the object in the request tasks because sometimes the request was created
     "! by someone who was not the actual developer. The tasks better reflects the object's author.
     "! If we find a task, we overwrite the author. We choose to pick the latest task.
-    METHODS load_latest_task.
+    METHODS load_latest_task
+      RAISING zcx_timem.
+
+    METHODS load_author_name
+      RAISING zcx_timem.
 ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
-
-
+CLASS zcl_timem_version IMPLEMENTATION.
   METHOD constructor.
     me->vrsd = vrsd.
     load_attributes( ).
     load_latest_task( ).
-  ENDMETHOD.
-
-
-  METHOD get_real_version.
-    " Technically the current version is 0 but in order to keep them properly sorted we're
-    " setting it to magic number 99997 (because 'ACTIVE' is 99998 and 'MODIFIED' is 99999.
-    " But when we're going to fetch it from the database we must use 0.
-    result = COND #( WHEN me->version_number = c_version-latest THEN 0
-                     ELSE me->version_number ).
+    load_author_name( ).
   ENDMETHOD.
 
 
@@ -130,7 +121,6 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
     me->author = vrsd-author.
     me->date = vrsd-datum.
     me->time = vrsd-zeit.
-    me->author_name = NEW zcl_timem_author( )->get_name( vrsd-author ).
     me->request = vrsd-korrnum.
   ENDMETHOD.
 
@@ -139,18 +129,19 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
     IF me->request IS INITIAL.
       RETURN.
     ENDIF.
-    SELECT e070~trkorr as4user as4date as4time name_textc
-      INTO (me->task, me->author, me->date, me->time, me->author_name)
-      FROM e070
-      INNER JOIN e071 ON e071~trkorr = e070~trkorr
-      LEFT JOIN user_addr ON user_addr~bname = e070~as4user
-      UP TO 1 ROWS
-      WHERE strkorr = me->request
-        AND object = vrsd-objtype
-        AND obj_name = vrsd-objname
-      ORDER BY as4date DESCENDING as4time DESCENDING.
-      EXIT.
-    ENDSELECT.
+    DATA(request) = NEW zcl_timem_request( me->request ).
+    DATA(e070) = request->get_latest_task_for_object(
+      object_type = vrsd-objtype
+      object_name = vrsd-objname ).
+    me->task = e070-trkorr.
+    me->author = e070-as4user.
+    me->date = e070-as4date.
+    me->time = e070-as4time.
+  ENDMETHOD.
+
+
+  METHOD load_author_name.
+    me->author_name = NEW zcl_timem_author( )->get_name( me->author ).
   ENDMETHOD.
 
 
@@ -172,7 +163,7 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
       EXPORTING
         object_name = vrsd-objname
         object_type = vrsd-objtype
-        versno      = get_real_version( )
+        versno      = zcl_timem_versno=>to_internal( me->version_number )
       TABLES
         repos_tab   = gt_source
         trdir_tab   = t_trdir
@@ -187,10 +178,10 @@ CLASS ZCL_TIMEM_VERSION IMPLEMENTATION.
 
 
   METHOD retrieve.
-    DATA(real_version) = get_real_version( ).
+    DATA(db_versno) = zcl_timem_versno=>to_internal( me->version_number ).
     SUBMIT rsedtve1 AND RETURN                           "#EC CI_SUBMIT
              WITH objtype = vrsd-objtype
              WITH objname = vrsd-objname
-             WITH versno  = real_version.
+             WITH versno  = db_versno.
   ENDMETHOD.
 ENDCLASS.
