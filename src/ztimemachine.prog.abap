@@ -53,7 +53,7 @@ AT SELECTION-SCREEN OUTPUT.
 
 START-OF-SELECTION.
   " Convert radio button to mode
-  DATA(mode) = SWITCH zcl_timem_options=>ty_mode(
+  DATA(mode) = SWITCH ztimem_mode(
     p_mblame
     WHEN abap_true THEN zcl_timem_consts=>mode-blame
     ELSE zcl_timem_consts=>mode-time_machine ).
@@ -64,14 +64,33 @@ START-OF-SELECTION.
                                                ignore_indentation = p_iinde
                                                timestamp = CONV #( |{ p_date }{ p_time }| )
                                                ignore_unreleased  = p_iunre ).
-
       NEW zcl_timem_run( )->go( object_type = p_otype
                                 object_name = p_name ).
-
-      CALL SELECTION-SCREEN 1001.
-      LEAVE SCREEN.
-
+      PERFORM java_gui_f3_workaround.
     CATCH zcx_timem INTO DATA(exc).
       DATA(text) = exc->get_text( ).
       MESSAGE text TYPE 'I' DISPLAY LIKE 'E'.
   ENDTRY.
+
+
+FORM java_gui_f3_workaround.
+  DATA gui_type TYPE string.
+  CALL FUNCTION 'RSAN_WB_TEST_GET_GUI_TYPE'
+    IMPORTING
+      e_gui_type = gui_type.
+  IF gui_type NE 'WIN_GUI'.
+    CALL SCREEN 9000.
+  ENDIF.
+ENDFORM.
+
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_9000  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE user_command_9000 INPUT.
+  CASE sy-ucomm.
+    WHEN 'E' OR 'ENDE' OR 'ECAN'.
+      LEAVE TO SCREEN 0.
+  ENDCASE.
+ENDMODULE.

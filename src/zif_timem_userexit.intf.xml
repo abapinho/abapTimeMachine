@@ -10,6 +10,14 @@
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>
    </VSEOINTERF>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>BEFORE_RENDERING</CMPNAME>
+     <SCONAME>DATA</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>abapTimeMachine Parts</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
   </asx:values>
  </asx:abap>
 </abapGit>

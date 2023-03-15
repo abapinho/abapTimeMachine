@@ -20,9 +20,10 @@ CLASS zcl_timem_part DEFINITION
     "! @parameter vrsd_name | Part object
     METHODS constructor
       IMPORTING
-        !name      TYPE string
-        !vrsd_type TYPE versobjtyp
-        !vrsd_name TYPE versobjnam
+        !name             TYPE string
+        !vrsd_type        TYPE versobjtyp
+        !vrsd_name        TYPE versobjnam
+        ignore_unreleased TYPE boolean
       RAISING
         zcx_timem .
 
@@ -30,16 +31,21 @@ CLASS zcl_timem_part DEFINITION
       RETURNING
         VALUE(result) TYPE ztimem_timestamp_t .
 
-    METHODS get_source
-      RETURNING
-        VALUE(result) TYPE ztimem_line_t
-      RAISING
-        zcx_timem .
-
     METHODS revert
       IMPORTING
                 ts TYPE timestamp
       RAISING   zcx_timem.
+
+    METHODS to_struct
+      IMPORTING
+        mode               TYPE ztimem_mode
+        ts                 TYPE timestamp
+        ignore_case        TYPE boolean
+        ignore_indentation TYPE boolean
+      RETURNING
+        VALUE(result)      TYPE ztimem_part_source
+      RAISING
+        zcx_timem.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -49,10 +55,22 @@ CLASS zcl_timem_part DEFINITION
 
     DATA versions TYPE ty_t_version .
 
+    METHODS get_source
+      IMPORTING
+        mode               TYPE ztimem_mode
+        ts                 TYPE timestamp
+        ignore_case        TYPE boolean
+        ignore_indentation TYPE boolean
+      RETURNING
+        VALUE(result)      TYPE ztimem_line_t
+      RAISING
+        zcx_timem .
+
     METHODS load_versions
       IMPORTING
-        !vrsd_type TYPE versobjtyp
-        !vrsd_name TYPE versobjnam
+        !vrsd_type        TYPE versobjtyp
+        !vrsd_name        TYPE versobjnam
+        ignore_unreleased TYPE boolean
       RAISING
         zcx_timem .
 
@@ -72,9 +90,11 @@ CLASS zcl_timem_part DEFINITION
     "! details.
     METHODS get_diffed_source_with_blame
       IMPORTING
-        ts            TYPE timestamp
+        ts                 TYPE timestamp
+        ignore_case        TYPE boolean
+        ignore_indentation TYPE boolean
       RETURNING
-        VALUE(result) TYPE ztimem_line_t
+        VALUE(result)      TYPE ztimem_line_t
       RAISING
         zcx_timem .
 
@@ -89,20 +109,23 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_PART IMPLEMENTATION.
+CLASS zcl_timem_part IMPLEMENTATION.
 
 
   METHOD  constructor.
     me->name = name.
     me->vrsd_type = vrsd_type.
     me->vrsd_name = vrsd_name.
-    load_versions( vrsd_type = vrsd_type
-                   vrsd_name = vrsd_name ).
+    load_versions( vrsd_type         = vrsd_type
+                   vrsd_name         = vrsd_name
+                   ignore_unreleased = ignore_unreleased ).
   ENDMETHOD.
 
 
   METHOD get_diffed_source_with_blame.
-    DATA(diff) = NEW zcl_timem_diff( ).
+    DATA(diff) = NEW zcl_timem_diff(
+      ignore_case        = ignore_case
+      ignore_indentation = ignore_indentation ).
     LOOP AT get_versions_until_timestamp( ts ) INTO DATA(version).
       result = diff->compute( lines_old = result
                               lines_new =  version->get_source( ) ).
@@ -111,11 +134,13 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
 
 
   METHOD get_source.
-    DATA(options) = zcl_timem_options=>get_instance( ).
     result = SWITCH #(
-      options->get_instance( )->mode
-      WHEN zcl_timem_consts=>mode-blame THEN get_diffed_source_with_blame( options->timestamp )
-      WHEN zcl_timem_consts=>mode-time_machine THEN get_source_at_timestamp( options->timestamp ) ).
+      mode
+      WHEN zcl_timem_consts=>mode-blame THEN get_diffed_source_with_blame(
+        ts                 = ts
+        ignore_case        = ignore_case
+        ignore_indentation = ignore_indentation )
+      WHEN zcl_timem_consts=>mode-time_machine THEN get_source_at_timestamp( ts ) ).
   ENDMETHOD.
 
 
@@ -161,7 +186,8 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
 
   METHOD load_versions.
     DATA(vrsd) = NEW zcl_timem_vrsd( type = vrsd_type
-                                     name = vrsd_name ).
+                                     name = vrsd_name
+                                     ignore_unreleased = ignore_unreleased ).
 
     versions = VALUE #( FOR s_vrsd IN vrsd->vrsd_list
                         ( NEW zcl_timem_version( s_vrsd ) ) ).
@@ -173,5 +199,18 @@ CLASS ZCL_TIMEM_PART IMPLEMENTATION.
     IF version IS BOUND.
       version->retrieve( ).
     ENDIF.
+  ENDMETHOD.
+
+
+  METHOD to_struct.
+    result = VALUE ztimem_part_source(
+      name = me->name
+      type = me->vrsd_type
+      object_name = me->vrsd_name
+      lines = me->get_source(
+        mode = mode
+        ts = ts
+        ignore_case = ignore_case
+        ignore_indentation = ignore_indentation ) ).
   ENDMETHOD.
 ENDCLASS.

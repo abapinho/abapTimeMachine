@@ -46,7 +46,7 @@ CLASS ZCL_TIMEM_OBJECT_FUNC IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_timem_object~get_part_list.
+  METHOD zif_timem_object~get_tadir_list.
     result = VALUE #( (
       name        = CONV #( name )
       object_name = CONV #( name )

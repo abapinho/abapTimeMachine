@@ -28,9 +28,9 @@ CLASS zcl_timem_userexits DEFINITION
         !action  TYPE c
         !getdata TYPE c .
 
-    METHODS modify_part_list
+    METHODS modify_tadir_list
       CHANGING
-        !part_list TYPE ztimem_part_t
+        !tadir_list TYPE ztimem_part_t
       RAISING
         zcx_timem.
 
@@ -51,7 +51,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
+CLASS zcl_timem_userexits IMPLEMENTATION.
 
 
   METHOD before_rendering.
@@ -81,11 +81,8 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
 
 
   METHOD load_instances.
-    DATA impkey TYPE  seoclskey.
     DATA impkeys TYPE seor_implementing_keys.
-    DATA o TYPE REF TO zif_timem_userexit.
-
-    impkey-clsname = 'ZIF_TIMEM_USEREXIT'.
+    DATA(impkey) = VALUE seoclskey( clsname = 'ZIF_TIMEM_USEREXIT' ).
     CALL FUNCTION 'SEO_INTERFACE_IMPLEM_GET_ALL'
       EXPORTING
         intkey       = impkey
@@ -98,6 +95,7 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    DATA o TYPE REF TO zif_timem_userexit.
     LOOP AT impkeys INTO DATA(classdata).
       CREATE OBJECT o TYPE (classdata-clsname). "#EC PREF_NEW
       INSERT o INTO TABLE instances.
@@ -138,14 +136,14 @@ CLASS ZCL_TIMEM_USEREXITS IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD modify_part_list.
+  METHOD modify_tadir_list.
     LOOP AT instances INTO DATA(instance).
       TRY.
-          instance->modify_part_list(
+          instance->modify_tadir_list(
             EXPORTING
               options = options
             CHANGING
-              part_list = part_list ).
+              tadir_list = tadir_list ).
         CATCH cx_sy_dyn_call_illegal_method.
           " Not implemented? Carry on.
           ASSERT 1 = 1.

@@ -10,7 +10,7 @@ CLASS zcl_timem_userexit_default DEFINITION
   PRIVATE SECTION.
     CONSTANTS:
       BEGIN OF c_return_code,
-        warning TYPE sysubrc value 4,
+        warning TYPE sysubrc VALUE 4,
       END OF c_return_code.
 
     METHODS modify_summary_author
@@ -34,7 +34,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_USEREXIT_DEFAULT IMPLEMENTATION.
+CLASS zcl_timem_userexit_default IMPLEMENTATION.
 
 
   METHOD build_request_imported_systems.
@@ -66,10 +66,16 @@ CLASS ZCL_TIMEM_USEREXIT_DEFAULT IMPLEMENTATION.
     summary-text1_title = 'Description' ##NO_TEXT.
     summary-text2_title = 'Systems' ##NO_TEXT.
     LOOP AT summary-lines REFERENCE INTO DATA(line).
-      DATA(request) = NEW zcl_timem_request( CONV #( line->value ) ).
-      line->text1 = request->description.
-      line->text2 = build_request_imported_systems( request ).
-      line->value = |<a href="SAPEVENT:request?{ line->value }">{ line->value }</a>|.
+      TRY.
+          DATA(request) = NEW zcl_timem_request( CONV #( line->value ) ).
+          line->text1 = request->description.
+          line->text2 = build_request_imported_systems( request ).
+          line->value = |<a href="SAPEVENT:request?{ line->value }">{ line->value }</a>|.
+        CATCH zcx_timem.
+          line->text1 = 'N/A'.
+          line->text2 = space.
+          line->value = space.
+      ENDTRY.
     ENDLOOP.
   ENDMETHOD.
 
@@ -89,7 +95,7 @@ CLASS ZCL_TIMEM_USEREXIT_DEFAULT IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_timem_userexit~modify_part_list.
+  METHOD zif_timem_userexit~modify_tadir_list.
     RETURN.
   ENDMETHOD.
 

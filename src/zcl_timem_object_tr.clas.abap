@@ -14,12 +14,20 @@ CLASS zcl_timem_object_tr DEFINITION
         !id TYPE  trkorr.
   PROTECTED SECTION.
   PRIVATE SECTION.
-
+    TYPES ty_t_object TYPE TABLE OF REF TO zif_timem_object WITH KEY table_line.
     DATA id TYPE trkorr.
 
     METHODS get_object_keys
       RETURNING
         VALUE(result) TYPE trwbo_t_e071
+      RAISING
+        zcx_timem.
+
+    METHODS get_objects_for_keys
+      IMPORTING
+        object_keys   TYPE trwbo_t_e071
+      RETURNING
+        VALUE(result) TYPE ty_t_object
       RAISING
         zcx_timem.
 
@@ -34,7 +42,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
+CLASS zcl_timem_object_tr IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -77,6 +85,14 @@ CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD get_objects_for_keys.
+    result = VALUE #(
+      FOR object_key IN object_keys
+      ( get_object( object_key ) ) ).
+    DELETE result WHERE table_line IS NOT BOUND.
+  ENDMETHOD.
+
+
   METHOD zif_timem_object~check_exists.
     TRY.
         NEW zcl_timem_request( me->id ).
@@ -92,15 +108,13 @@ CLASS ZCL_TIMEM_OBJECT_TR IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_timem_object~get_part_list.
-    LOOP AT get_object_keys( ) INTO DATA(object_key).
-      DATA(object) = get_object( object_key ).
-      IF object IS BOUND.
-        LOOP AT object->get_part_list( ) INTO DATA(part).
-          part-name = |({ object->get_name( ) }) { part-name }|.
-          INSERT part INTO TABLE result.
-        ENDLOOP.
-      ENDIF.
-    ENDLOOP.
+  METHOD zif_timem_object~get_tadir_list.
+    DATA(object_keys) = get_object_keys( ).
+    DATA(objects) = get_objects_for_keys( object_keys ).
+    result = REDUCE #(
+      INIT t = VALUE #(  )
+      FOR object IN objects
+      FOR tadir_item IN object->get_tadir_list( )
+      NEXT t = VALUE #( BASE t ( tadir_item ) ) ).
   ENDMETHOD.
 ENDCLASS.

@@ -15,8 +15,9 @@ CLASS zcl_timem_vrsd DEFINITION
     "! versions.
     METHODS constructor
       IMPORTING
-        !type TYPE versobjtyp
-        !name TYPE versobjnam
+        !type             TYPE versobjtyp
+        !name             TYPE versobjnam
+        ignore_unreleased TYPE boolean
       RAISING
         zcx_timem .
 
@@ -25,9 +26,10 @@ CLASS zcl_timem_vrsd DEFINITION
     DATA type TYPE versobjtyp.
     DATA name TYPE versobjnam.
     DATA request_active_modif TYPE trkorr.
-    DATA options TYPE REF TO zcl_timem_options.
 
-    METHODS load_from_table.
+    METHODS load_from_table
+      IMPORTING
+        ignore_unreleased TYPE boolean.
 
     METHODS load_active_or_modified
       IMPORTING
@@ -41,6 +43,20 @@ CLASS zcl_timem_vrsd DEFINITION
     METHODS determine_request_active_modif
       RETURNING VALUE(result) TYPE trkorr
       RAISING   zcx_timem.
+
+    METHODS get_versionable_object
+      RETURNING VALUE(result) TYPE svrs2_versionable_object.
+
+    METHODS get_versionable_object_mode
+      IMPORTING
+                versno        TYPE versno
+      RETURNING VALUE(result) TYPE char1.
+
+    METHODS read_vrsd
+      IMPORTING
+                versno        TYPE versno
+      RETURNING VALUE(result) TYPE vrsd
+      RAISING   zcx_timem.
 ENDCLASS.
 
 
@@ -51,9 +67,8 @@ CLASS zcl_timem_vrsd IMPLEMENTATION.
   METHOD constructor.
     me->type = type.
     me->name = name.
-    me->options = zcl_timem_options=>get_instance( ).
-    load_from_table( ).
-    IF options->ignore_unreleased = abap_false.
+    load_from_table( ignore_unreleased ).
+    IF ignore_unreleased = abap_false.
       " Even released parts have an active version. We know it is unreleased if the
       " request is not empty. Otherwise we will disregard it.
       IF get_request_active_modif(  ) IS NOT INITIAL.
@@ -118,35 +133,23 @@ CLASS zcl_timem_vrsd IMPLEMENTATION.
 
 
   METHOD get_request_active_modif.
-    IF request_active_modif IS INITIAL.
-      request_active_modif = determine_request_active_modif( ).
+    IF me->request_active_modif IS INITIAL.
+      me->request_active_modif = determine_request_active_modif( ).
     ENDIF.
-    result = request_active_modif.
+    result = me->request_active_modif.
   ENDMETHOD.
 
 
-  METHOD load_active_or_modified.
-    DATA vrsd TYPE vrsd.
-
-    DATA(obj) = VALUE svrs2_versionable_object(
-      objtype = me->type
-      data_pointer = me->type
-      objname = me->name
-      header_only = abap_true ).
-
+  METHOD read_vrsd.
     CALL FUNCTION 'SVRS_INITIALIZE_DATAPOINTER'
       CHANGING
         objtype      = me->type
         data_pointer = me->type.
 
-    DATA(mode) = SWITCH char1(
-      versno
-      WHEN zcl_timem_version=>c_version-active THEN 'A'
-      WHEN zcl_timem_version=>c_version-modified THEN 'M' ).
-
+    DATA(obj) = get_versionable_object( ).
     CALL FUNCTION 'SVRS_GET_VERSION_REPOSITORY'
       EXPORTING
-        mode      = mode
+        mode      = get_versionable_object_mode( versno )
       CHANGING
         obj       = obj
       EXCEPTIONS
@@ -156,11 +159,22 @@ CLASS zcl_timem_vrsd IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    DATA vrsd TYPE vrsd.
     CALL FUNCTION 'SVRS_EXTRACT_INFO_FROM_OBJECT'
       EXPORTING
         object    = obj
       CHANGING
-        vrsd_info = vrsd.
+        vrsd_info = result.
+  ENDMETHOD.
+
+
+  METHOD load_active_or_modified.
+    DATA(vrsd) = read_vrsd( versno ).
+
+    IF vrsd IS INITIAL.
+      RETURN.
+    ENDIF.
+
     IF vrsd-author IS INITIAL.
       RAISE EXCEPTION TYPE zcx_timem.
     ENDIF.
@@ -184,7 +198,7 @@ CLASS zcl_timem_vrsd IMPLEMENTATION.
   METHOD load_from_table.
     DATA: versno_range TYPE RANGE OF versno.
 
-    IF options->ignore_unreleased = abap_true.
+    IF ignore_unreleased = abap_true.
       versno_range = VALUE #(
         option = 'NE'
         sign = 'I'
@@ -198,10 +212,25 @@ CLASS zcl_timem_vrsd IMPLEMENTATION.
         AND versno IN versno_range
       ORDER BY PRIMARY KEY.
 
-    " We consider the current version to be 99998 instead of 0
-    LOOP AT me->vrsd_list ASSIGNING FIELD-SYMBOL(<s_vrsd>)
-      WHERE versno = zcl_timem_version=>c_version-latest_db.
-      <s_vrsd>-versno = zcl_timem_version=>c_version-latest.
+    LOOP AT me->vrsd_list REFERENCE INTO DATA(vrsd).
+      vrsd->versno = zcl_timem_versno=>to_external( vrsd->versno ).
     ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD get_versionable_object.
+    result = VALUE #(
+      objtype = me->type
+      data_pointer = me->type
+      objname = me->name
+      header_only = abap_true ).
+  ENDMETHOD.
+
+
+  METHOD get_versionable_object_mode.
+    result = SWITCH #(
+      versno
+      WHEN zcl_timem_version=>c_version-active THEN 'A'
+      WHEN zcl_timem_version=>c_version-modified THEN 'M' ).
   ENDMETHOD.
 ENDCLASS.
