@@ -40,9 +40,9 @@
   <xsl:template name="options">
     <xsl:param name="node" select="." />
     <div class="metadata">
-    <form method="get" action="SAPEVENT:timestamp">
+    <form method="get" action="SAPEVENT:timetravel">
       <label for="timestamps">Moment: </label>
-      <select id="timestamp" name="timestamp" onchange='this.form.submit();'>
+      <select id="timestamp" name="timestamp">
         <xsl:for-each select="TIMESTAMPS/TIMESTAMP">
           <option>
             <xsl:attribute name="value">
@@ -51,12 +51,13 @@
             <xsl:if test=". = ../../TIMESTAMP">
               <xsl:attribute name="selected">selected</xsl:attribute>
             </xsl:if>
-            <xsl:value-of select="substring(.,1,4)"/>-<xsl:value-of select="substring(.,5,2)"/>-<xsl:value-of select="substring(.,7,2)"/>
+            <xsl:value-of select="concat(substring(.,1,4),'-',substring(.,5,2),'-',substring(.,7,2))"/>
             &amp;nbsp;
-            <xsl:value-of select="substring(.,9,2)"/>:<xsl:value-of select="substring(.,11,2)"/>:<xsl:value-of select="substring(.,13,2)"/>
+            <xsl:value-of select="concat(substring(.,9,2),':',substring(.,11,2),':',substring(.,13,2))"/>
           </option>
         </xsl:for-each>
       </select>
+      <input type="button" value="Time travel" onclick="form.submit();"/>
     </form>
     </div>
   </xsl:template>
