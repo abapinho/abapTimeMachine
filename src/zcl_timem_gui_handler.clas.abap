@@ -192,7 +192,7 @@ CLASS zcl_timem_gui_handler IMPLEMENTATION.
         display_source( type        = type
                         object_name = object_name ).
 
-      WHEN 'timestamp'.
+      WHEN 'timetravel'.
         " Depending on the link, getdata may be just the timestamp xxx or be like timestamp=xxx
         ts = COND #( WHEN getdata(10) = 'timestamp=' THEN getdata+10 ELSE getdata ).
         zcl_timem_options=>get_instance( )->set( timestamp = ts ).
