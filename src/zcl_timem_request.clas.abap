@@ -125,5 +125,15 @@ CLASS zcl_timem_request IMPLEMENTATION.
       ORDER BY as4date DESCENDING as4time DESCENDING.
       EXIT.
     ENDSELECT.
+    IF sy-subrc <> 0 AND object_type = 'REPS'.
+      " This is a unfortunate hack. I hope there is a way to avoid this.
+      " But for some reason in VRSD the object type for programs is REPS
+      " (which stands for report source) for a given TR, but in E071 the
+      " object type registered is PROG. This is a workaround to
+      " be sure the request details are found in those cases.
+      result = get_latest_task_for_object(
+                 object_type = 'PROG'
+                 object_name = object_name ).
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.
