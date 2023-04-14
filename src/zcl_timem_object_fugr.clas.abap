@@ -24,7 +24,7 @@ CLASS zcl_timem_object_fugr DEFINITION
         VALUE(result) TYPE program .
     METHODS get_functions
       RETURNING
-        VALUE(result) TYPE re_t_funcincl .
+        VALUE(result) TYPE zre_t_funcincl .
 ENDCLASS.
 
 
