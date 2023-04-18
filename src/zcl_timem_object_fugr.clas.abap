@@ -16,15 +16,17 @@ CLASS zcl_timem_object_fugr DEFINITION
         !name TYPE rs38l_area .
   PROTECTED SECTION.
   PRIVATE SECTION.
+    TYPES ty_t_rs38l_incl TYPE STANDARD TABLE OF rs38l_incl WITH KEY table_line.
 
     DATA name TYPE rs38l_area .
 
     METHODS get_main_name
       RETURNING
         VALUE(result) TYPE program .
+
     METHODS get_functions
       RETURNING
-        VALUE(result) TYPE re_t_funcincl .
+        VALUE(result) TYPE ty_t_rs38l_incl.
 ENDCLASS.
 
 
