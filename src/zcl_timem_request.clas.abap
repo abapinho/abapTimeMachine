@@ -31,7 +31,7 @@ CLASS zcl_timem_request DEFINITION
       RETURNING
         VALUE(result) TYPE ty_t_system.
 
-    METHODS get_latest_task_for_object
+    METHODS get_task_for_object
       IMPORTING
                 object_type   TYPE versobjtyp
                 object_name   TYPE versobjnam
@@ -54,6 +54,15 @@ CLASS zcl_timem_request DEFINITION
       IMPORTING
                 system        TYPE ctslg_system
       RETURNING VALUE(result) TYPE ty_date_time.
+
+    METHODS get_latest_task_for_object
+      IMPORTING
+                object_type   TYPE versobjtyp
+                object_name   TYPE versobjnam
+      RETURNING VALUE(result) TYPE e070.
+
+    METHODS get_task_if_only_one
+      RETURNING VALUE(result) TYPE e070.
 ENDCLASS.
 
 
@@ -68,7 +77,7 @@ CLASS zcl_timem_request IMPLEMENTATION.
 
 
   METHOD get_imported_systems.
-    DATA cofile                 TYPE ctslg_cofile.
+    DATA cofile TYPE ctslg_cofile.
     CALL FUNCTION 'TR_READ_GLOBAL_INFO_OF_REQUEST'
       EXPORTING
         iv_trkorr = id
@@ -112,6 +121,53 @@ CLASS zcl_timem_request IMPLEMENTATION.
       ELSE dt ) ).
   ENDMETHOD.
 
+  METHOD get_task_for_object.
+    " TODO
+    " This approach was taken because the relationship between VRSD and E071
+    " is not direct so sometimes method get_latest_task_for_object fails to
+    " find anything in E071. Assuming that the most common scenario is for a
+    " TR to have only one task, we first try to get a single task and only if
+    " there is more than one do we use E071. This doesn't solve 100% of the
+    " cases but should take care of many. I still hope to find a definitive
+    " solution someday though.
+    result = get_task_if_only_one( ).
+
+    IF result IS INITIAL.
+      " If here then there is more than one task for this request
+      result = get_latest_task_for_object(
+                 object_type = object_type
+                 object_name = object_name ).
+    ENDIF.
+
+    IF result IS INITIAL AND object_type = 'REPS'.
+      " This is a unfortunate hack. I hope to find a way to avoid this.
+      " For some reason in VRSD the object type for programs is REPS
+      " (which stands for report source) for a given TR, but in E071 the
+      " object type registered is PROG. This is a workaround to
+      " be sure the request details are found in those cases.
+      result = get_task_for_object(
+                 object_type = 'PROG'
+                 object_name = object_name ).
+    ENDIF.
+
+    " For TRs with more than one task for which the relationship between VRSD
+    " and E071 is not direct this can still fail. Example:
+    " - VRSD: REPS + LZFUNCTIONGROUPNAMETOP
+    " - E071: FUGR + ZFUNCTIONGROUP
+  ENDMETHOD.
+
+
+  METHOD get_task_if_only_one.
+    DATA e070_list TYPE STANDARD TABLE OF e070.
+    SELECT trkorr as4user as4date as4time
+      INTO CORRESPONDING FIELDS OF TABLE e070_list
+      FROM e070
+      WHERE strkorr = me->id.
+    IF lines( e070_list ) = 1.
+      result = e070_list[ 1 ].
+    ENDIF.
+  ENDMETHOD.
+
 
   METHOD get_latest_task_for_object.
     SELECT e070~trkorr as4user as4date as4time
@@ -125,15 +181,5 @@ CLASS zcl_timem_request IMPLEMENTATION.
       ORDER BY as4date DESCENDING as4time DESCENDING.
       EXIT.
     ENDSELECT.
-    IF sy-subrc <> 0 AND object_type = 'REPS'.
-      " This is a unfortunate hack. I hope there is a way to avoid this.
-      " But for some reason in VRSD the object type for programs is REPS
-      " (which stands for report source) for a given TR, but in E071 the
-      " object type registered is PROG. This is a workaround to
-      " be sure the request details are found in those cases.
-      result = get_latest_task_for_object(
-                 object_type = 'PROG'
-                 object_name = object_name ).
-    ENDIF.
   ENDMETHOD.
 ENDCLASS.
