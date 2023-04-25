@@ -130,7 +130,7 @@ CLASS zcl_timem_version IMPLEMENTATION.
       RETURN.
     ENDIF.
     DATA(request) = NEW zcl_timem_request( me->request ).
-    DATA(e070) = request->get_latest_task_for_object(
+    DATA(e070) = request->get_task_for_object(
       object_type = vrsd-objtype
       object_name = vrsd-objname ).
     me->task = e070-trkorr.
