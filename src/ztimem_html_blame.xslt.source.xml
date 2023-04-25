@@ -3,6 +3,7 @@
   <xsl:template match="DATA">
     <html>
       <head>
+        <meta charset="utf-8"/>
         <title>ABAP Blame</title>
         <link href="abaptimemachine.css" rel="stylesheet" type="text/css"/>
       </head>
