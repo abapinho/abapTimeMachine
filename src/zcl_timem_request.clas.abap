@@ -162,7 +162,8 @@ CLASS zcl_timem_request IMPLEMENTATION.
     SELECT trkorr as4user as4date as4time
       INTO CORRESPONDING FIELDS OF TABLE e070_list
       FROM e070
-      WHERE strkorr = me->id.
+      WHERE strkorr = me->id
+      ORDER BY PRIMARY KEY.
     IF lines( e070_list ) = 1.
       result = e070_list[ 1 ].
     ENDIF.
